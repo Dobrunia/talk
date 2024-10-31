@@ -19,31 +19,8 @@
       </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/handlers/main_handler.ts"></script>
     <script>
-      function rofloFunc() {
-        const DATA = [
-          {
-            id: 1,
-            imageUrl: "/1.gif",
-            serverName: "Название Сервера 1",
-            category: [
-              {
-                id: 1,
-                categoryName: "первая категория",
-                channels: [
-                  {
-                    id: 1,
-                    channelName: "первый войс канал",
-                    type: "voice",
-                  },
-                ],
-              },
-            ],
-          },
-        ];
-        renderServerInfo(DATA);
-      }
-
       function toggleCategory() {
         const channelList = document.querySelector(".channel_list");
         const toggleIcon = document.querySelector(".toggle_icon");

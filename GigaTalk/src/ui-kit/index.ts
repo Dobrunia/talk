@@ -1,15 +1,74 @@
-import { serverDATA } from "../types/types.ts";
-import { serverName, serverCategory } from "../ui-kit/components.ts";
+import { serverDATA } from '../types/types.ts';
+import {
+  serverName,
+  serverCategory,
+  serverListAddServerElement,
+  serverListElement,
+  myProfile,
+} from '../ui-kit/components.ts';
 
-export function renderServerInfo(DATA: serverDATA[]) {
-  let htmlContent = serverName(DATA[0].serverName);
-  DATA[0].category?.forEach((element) => {
+export function renderServerInfo(serverId: number) {
+  const DATA: serverDATA[] = [
+    {
+      id: 1,
+      imageUrl: '/1.gif',
+      name: 'Название Сервера 1',
+      category: [
+        {
+          id: 1,
+          name: 'первая категория',
+          channels: [
+            {
+              id: 1,
+              name: 'первый войс канал',
+              type: 'voice',
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'вторая категория',
+          channels: [
+            {
+              id: 2,
+              name: '2 войс канал',
+              type: 'voice',
+            },
+          ],
+        },
+      ],
+    },
+  ];
+  let htmlContent = serverName(DATA[serverId - 1].name);
+  DATA[serverId - 1].category?.forEach((element) => {
     htmlContent += serverCategory(element);
   });
-  const server_slot = document.getElementById("server_components_block");
+  const server_slot = document.getElementById('server_components_block');
   if (!server_slot) {
-    console.error("Server info container not found!");
+    console.error('Server info container not found!');
     return;
   }
   server_slot.innerHTML = htmlContent;
+}
+
+export function renderServersAndAttachListeners(DATA: serverDATA[]) {
+  const server_list = document.getElementById('servers_list');
+  if (!server_list) {
+    console.error('Server list container not found!');
+    return;
+  }
+  let htmlContent = serverListAddServerElement();
+  DATA.forEach((server) => {
+    htmlContent += serverListElement(server);
+  });
+  server_list.insertAdjacentHTML('beforeend', htmlContent);
+}
+
+export function renderProfile() {
+  const profile = document.getElementById('my_profile');
+  if (!profile) {
+    console.error('My profile container not found!');
+    return;
+  }
+  profile.innerHTML = myProfile();
 }

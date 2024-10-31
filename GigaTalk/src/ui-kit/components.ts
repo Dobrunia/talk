@@ -5,8 +5,8 @@ export function serverListAddServerElement() {
   return `<div class="server_list_element add_server"><div class="element_info">Добавить сервер</div></div>`;
 }
 
-export function serverListElement(element: serverDATA) {
-  return `<div class="server_list_element" onclick="rofloFunc()" style="background-image: url(${element.imageUrl});" data-id="${element.id}"><div class="element_info">${element.serverName}</div></div>`;
+export function serverListElement(server: serverDATA) {
+  return `<div class="server_list_element" onclick="renderServerInfo(${server.id})" style="background-image: url(${server.imageUrl});"><div class="element_info">${server.name}</div></div>`;
 }
 
 export function serverName(name: string) {
@@ -18,12 +18,12 @@ export function serverCategory(category: category) {
   category.channels?.forEach((channel) => {
     ch += `<li class="channel_item">${
       channel.type === 'voice' ? SVG.voiceIco : '#'
-    }<span>${channel.channelName}</span></li>`;
+    }<span>${channel.name}</span></li>`;
   });
   return `
   <div class="server_category">
     <div class="category_header" onclick="toggleCategory()">
-        <span>${category.categoryName}</span>
+        <span>${category.name}</span>
         <span class="toggle_icon">-</span>
     </div>
     <ul class="channel_list">

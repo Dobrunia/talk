@@ -3,18 +3,18 @@ type channelType = 'voice' | 'text';
 export type serverDATA = {
   id: number;
   imageUrl: string;
-  serverName: string;
+  name: string;
   category?: category[];
 };
 
 export type category = {
   id: number;
-  categoryName: string;
+  name: string;
   channels?: channel[];
 };
 
 export type channel = {
   id: number;
-  channelName: string;
+  name: string;
   type: channelType;
 };

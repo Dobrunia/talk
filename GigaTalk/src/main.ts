@@ -1,55 +1,42 @@
-import {
-  serverListElement,
-  serverListAddServerElement,
-  myProfile,
-} from './ui-kit/components';
 import './ui-kit/style.css';
 import { serverDATA } from './types/types';
+import { renderProfile, renderServersAndAttachListeners } from './ui-kit';
 
+const DATA: serverDATA[] = [
+  {
+    id: 1,
+    imageUrl: '/1.gif',
+    name: 'Название Сервера 1',
+    category: [
+      {
+        id: 1,
+        name: 'первая категория',
+        channels: [
+          {
+            id: 1,
+            name: 'первый войс канал',
+            type: 'voice',
+          },
+        ],
+      },
+      {
+        id: 2,
+        name: 'вторая категория',
+        channels: [
+          {
+            id: 2,
+            name: '2 войс канал',
+            type: 'voice',
+          },
+        ],
+      },
+    ],
+  },
+];
 
-    const DATA: serverDATA[] = [
-        {
-          id: 1,
-          imageUrl: '/1.gif',
-          serverName: 'Название Сервера 1',
-          category: [
-            {
-              id: 1,
-              categoryName: 'первая категория',
-              channels: [
-                {
-                  id: 1,
-                  channelName: 'первый войс канал',
-                  type: 'voice',
-                },
-              ],
-            },
-          ],
-        },
-      ];
-
-function renderServersAndAttachListeners(DATA: serverDATA[]) {
-  const server_list = document.getElementById('servers_list');
-  if (!server_list) {
-    console.error('Server list container not found!');
-    return;
-  }
-  let htmlContent = serverListAddServerElement();
-  DATA.forEach((element) => {
-    htmlContent += serverListElement(element);
-  });
-  server_list.insertAdjacentHTML('beforeend', htmlContent);
-  
+function start() {
+  localStorage.setItem('username', 'Dobrunia');
+  renderServersAndAttachListeners(DATA);
+  renderProfile();
 }
-renderServersAndAttachListeners(DATA);
-
-localStorage.setItem('username', 'Dobrunia');
-function m() {
-  const profile = document.getElementById('my_profile');
-  if (!profile) {
-    console.error('My profile container not found!');
-    return;
-  }
-  profile.innerHTML = myProfile();
-}
-m();
+start();
