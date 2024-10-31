@@ -7,7 +7,7 @@ const DATA: serverDATA[] = [
     id: 1,
     imageUrl: '/1.gif',
     name: 'Название Сервера 1',
-    category: [
+    categories: [
       {
         id: 1,
         name: 'первая категория',

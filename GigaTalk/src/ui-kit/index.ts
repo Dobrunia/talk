@@ -13,7 +13,7 @@ export function renderServerInfo(serverId: number) {
       id: 1,
       imageUrl: '/1.gif',
       name: 'Название Сервера 1',
-      category: [
+      categories: [
         {
           id: 1,
           name: 'первая категория',
@@ -40,8 +40,8 @@ export function renderServerInfo(serverId: number) {
     },
   ];
   let htmlContent = serverName(DATA[serverId - 1].name);
-  DATA[serverId - 1].category?.forEach((element) => {
-    htmlContent += serverCategory(element);
+  DATA[serverId - 1].categories?.forEach((category) => {
+    htmlContent += serverCategory(category);
   });
   const server_slot = document.getElementById('server_components_block');
   if (!server_slot) {

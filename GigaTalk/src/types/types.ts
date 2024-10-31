@@ -4,7 +4,7 @@ export type serverDATA = {
   id: number;
   imageUrl: string;
   name: string;
-  category?: category[];
+  categories?: category[];
 };
 
 export type category = {
