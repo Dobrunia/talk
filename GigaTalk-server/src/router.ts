@@ -3,9 +3,32 @@ import { User } from './models/User';
 
 export const router = Router();
 
-router.get('/', (req: Request, res: Response) => {
+router.get('/api', (req: Request, res: Response) => {
   res.send('Welcome to the API');
 });
+
+router.get('/api/users', (req: Request, res: Response) => {
+  res.json([
+    {
+      id: 1,
+      imageUrl: '/1.gif',
+      serverName: 'Название Сервера 1',
+      category: [
+        {
+          id: 1,
+          categoryName: 'первая категория',
+          channels: [
+            {
+              id: 1,
+              channelName: 'первый войс канал',
+              type: 'voice',
+            },
+          ],
+        },
+      ],
+    },
+  ])
+})
 
 // Создание нового пользователя
 router.post('/users', async (req: Request, res: Response) => {

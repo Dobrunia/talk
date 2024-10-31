@@ -23,8 +23,8 @@ async function startApp() {
   const userRepository = new MySQLUserRepository(connection);
   const userController = new UserController(userRepository);
 
-  app.post('/users', (req, res) => userController.createUser(req, res));
-  app.get('/users/:email', (req, res) => userController.getUser(req, res));
+  // app.post('/users', (req, res) => userController.createUser(req, res));
+  // app.get('/users/:email', (req, res) => userController.getUser(req, res));
 
   app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
