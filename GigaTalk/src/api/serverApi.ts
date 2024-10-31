@@ -2,8 +2,8 @@ import apiClient from './axiosInstance.ts';
 
 export const serverApi = {
   // Получить список всех серверов
-  async getUsers() {
+  async getAllServers() {
     const response = await apiClient.get('/servers');
-    console.log(response.data);
+    return response.data;
   },
 };

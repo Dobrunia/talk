@@ -1,4 +1,3 @@
-import { serverApi } from '../api/serverApi.ts';
 import { serverDATA } from '../types/types.ts';
 import {
   serverName,
@@ -40,7 +39,6 @@ export async function renderServerInfo(serverId: number) {
       ],
     },
   ];
-  await serverApi.getUsers()
   let htmlContent = serverName(DATA[serverId - 1].name);
   DATA[serverId - 1].categories?.forEach((category) => {
     htmlContent += serverCategory(category);
