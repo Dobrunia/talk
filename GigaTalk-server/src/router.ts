@@ -3,6 +3,7 @@ import { serverController } from './controllers/ServerController';
 
 const router = Router();
 
-router.get('/getAllServers', (req, res, next) => serverController.getAllServers(req, res, next));
+router.get('/getAllServers', serverController.getAllServers);
+router.get('/getServerById/:serverId', serverController.getServerById);
 
 export { router };

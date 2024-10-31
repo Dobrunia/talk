@@ -6,7 +6,7 @@ export function serverListAddServerElement() {
 }
 
 export function serverListElement(server: serverDATA) {
-  return `<div class="server_list_element" onclick="renderServerInfo(${server.id})" style="background-image: url(${server.imageUrl});"><div class="element_info">${server.name}</div></div>`;
+  return `<div class="server_list_element" onclick="serverClickHandler(${server.id})" style="background-image: url(${server.imageUrl});"><div class="element_info">${server.name}</div></div>`;
 }
 
 export function serverName(name: string) {
