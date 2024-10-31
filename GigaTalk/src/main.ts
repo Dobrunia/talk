@@ -1,5 +1,4 @@
 import './ui-kit/style.css';
-import { serverDATA } from './types/types';
 import { renderProfile, renderServersAndAttachListeners } from './ui-kit';
 import { serverApi } from './api/serverApi';
 

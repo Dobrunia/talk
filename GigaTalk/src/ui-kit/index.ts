@@ -7,40 +7,9 @@ import {
   myProfile,
 } from '../ui-kit/components.ts';
 
-export async function renderServerInfo(serverId: number) {
-  const DATA: serverDATA[] = [
-    {
-      id: 1,
-      imageUrl: '/1.gif',
-      name: 'Название Сервера 1',
-      categories: [
-        {
-          id: 1,
-          name: 'первая категория',
-          channels: [
-            {
-              id: 1,
-              name: 'первый войс канал',
-              type: 'voice',
-            },
-          ],
-        },
-        {
-          id: 2,
-          name: 'вторая категория',
-          channels: [
-            {
-              id: 2,
-              name: '2 войс канал',
-              type: 'voice',
-            },
-          ],
-        },
-      ],
-    },
-  ];
-  let htmlContent = serverName(DATA[serverId - 1].name);
-  DATA[serverId - 1].categories?.forEach((category) => {
+export function renderServerInfo(serverData: serverDATA) {
+  let htmlContent = serverName(serverData.name);
+  serverData.categories?.forEach((category) => {
     htmlContent += serverCategory(category);
   });
   const server_slot = document.getElementById('server_components_block');
