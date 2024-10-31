@@ -22,11 +22,11 @@ export function serverCategory(category: category) {
   });
   return `
   <div class="server_category">
-    <div class="category_header" onclick="toggleCategory()">
+    <div class="category_header" onclick="toggleCategory(${category.id})">
         <span>${category.name}</span>
-        <span class="toggle_icon">-</span>
+        <span class="toggle_icon" id="toggle_icon_${category.id}">-</span>
     </div>
-    <ul class="channel_list">
+    <ul class="channel_list" id="channel_list_${category.id}">
     ${ch}
     </ul>
   </div>`;
