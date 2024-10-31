@@ -1,43 +1,32 @@
 import {
   serverListElement,
   serverListAddServerElement,
-  serverName,
-  serverCategory,
   myProfile,
-} from './ui/components';
-import './styles/style.css';
+} from './ui-kit/components';
+import './ui-kit/style.css';
 import { serverDATA } from './types/types';
 
-const DATA: serverDATA[] = [
-  {
-    id: 1,
-    imageUrl: '/1.gif',
-    serverName: 'Название Сервера 1',
-    category: [
-      {
-        id: 1,
-        categoryName: 'первая категория',
-        channels: [
-          {
-            id: 1,
-            channelName: 'первый войс канал',
-            type: 'voice',
-          },
-        ],
-      },
-    ],
-  },
-];
 
-function addServerClickListener() {
-  const servers = document.querySelectorAll('.server_element');
-  servers.forEach((server) => {
-    server.addEventListener('click', () => {
-      const serverId = server.getAttribute('data-id');
-      renderServerInfo(DATA);
-    });
-  });
-}
+    const DATA: serverDATA[] = [
+        {
+          id: 1,
+          imageUrl: '/1.gif',
+          serverName: 'Название Сервера 1',
+          category: [
+            {
+              id: 1,
+              categoryName: 'первая категория',
+              channels: [
+                {
+                  id: 1,
+                  channelName: 'первый войс канал',
+                  type: 'voice',
+                },
+              ],
+            },
+          ],
+        },
+      ];
 
 function renderServersAndAttachListeners(DATA: serverDATA[]) {
   const server_list = document.getElementById('servers_list');
@@ -50,22 +39,9 @@ function renderServersAndAttachListeners(DATA: serverDATA[]) {
     htmlContent += serverListElement(element);
   });
   server_list.insertAdjacentHTML('beforeend', htmlContent);
-  addServerClickListener();
+  
 }
 renderServersAndAttachListeners(DATA);
-
-function renderServerInfo(DATA: serverDATA[]) {
-  let htmlContent = serverName(DATA[0].serverName);
-  DATA[0].category?.forEach((element) => {
-    htmlContent += serverCategory(element);
-  });
-  const server_slot = document.getElementById('server_components_block');
-  if (!server_slot) {
-    console.error('Server info container not found!');
-    return;
-  }
-  server_slot.innerHTML = htmlContent;
-}
 
 localStorage.setItem('username', 'Dobrunia');
 function m() {

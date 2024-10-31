@@ -6,7 +6,7 @@ export function serverListAddServerElement() {
 }
 
 export function serverListElement(element: serverDATA) {
-  return `<div class="server_list_element server_element" style="background-image: url(${element.imageUrl});" data-id="${element.id}"><div class="element_info">${element.serverName}</div></div>`;
+  return `<div class="server_list_element" onclick="rofloFunc()" style="background-image: url(${element.imageUrl});" data-id="${element.id}"><div class="element_info">${element.serverName}</div></div>`;
 }
 
 export function serverName(name: string) {
