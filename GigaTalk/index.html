@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TalkZone</title>
+  </head>
+  <body>
+    <div class="app">
+      <div class="servers_block">
+        <div class="servers_list" id="servers_list"></div>
+      </div>
+      <div>
+        <div class="server_components_block" id="server_components_block"></div>
+        <div class="profile">
+          <div class="profile_wrapper" id="my_profile"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+    <script>
+      function toggleCategory() {
+        const channelList = document.querySelector('.channel_list');
+        const toggleIcon = document.querySelector('.toggle_icon');
+
+        if (
+          channelList.style.display === 'none' ||
+          channelList.style.display === ''
+        ) {
+          channelList.style.display = 'block';
+          toggleIcon.textContent = '-';
+        } else {
+          channelList.style.display = 'none';
+          toggleIcon.textContent = '+';
+        }
+      }
+    </script>
+  </body>
+</html>

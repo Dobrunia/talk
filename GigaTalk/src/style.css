@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app {
+  @apply w-screen h-screen flex
+}
+
+.servers_block {
+  @apply w-[80px] h-full bg-servers_list_dg flex flex-col items-center justify-start
+}
+
+.server_list_element {
+  @apply w-[60px] h-[60px] rounded-md bg-[#EB4C42] my-default cursor-pointer relative bg-cover bg-center
+}
+
+.add_server {
+  background-image: url('/add.svg');
+  background-color: #6839C7;
+}
+
+.element_info {
+  @apply w-max h-[48px] invisible bg-[#333] absolute top-[6px] left-[117%] z-[1] text-[16px] p-[8px] rounded-md flex items-center justify-center
+}
+
+/* Треугольник внизу всплывающей подсказки */
+.element_info::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  transform: translateY(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #333 transparent transparent;
+}
+
+.server_list_element:hover .element_info {
+  @apply visible;
+}
+
+.server_components_block {
+  height: calc(100% - 60px);
+  @apply w-[230px] bg-server_components_dg p-default
+}
+
+.server_name {
+  white-space: nowrap;
+  @apply w-full h-[48px] flex items-center justify-start text-[18px] text-ellipsis overflow-hidden border-b-[1px] mb-[20px]
+}
+
+.server_category {
+  @apply cursor-pointer
+}
+
+.category_header {
+  @apply flex justify-between items-center bg-[#2f3136] italic rounded-md p-[4px]
+}
+
+.toggle_icon {
+  font-size: 12px;
+  transition: transform 0.3s;
+}
+
+.channel_list {
+  list-style-type: none;
+  @apply m-0 block p-[4px]
+}
+
+.channel_item {
+  @apply h-[24px] cursor-pointer flex items-center justify-start rounded-md hover:bg-[#2D2E32]
+}
+
+.channel_item span {
+  @apply pb-[2px]
+}
+
+.profile {
+  @apply w-full h-[60px] bg-[#1A1B1E]
+}
+
+.profile_wrapper {
+  @apply w-full h-full flex items-center justify-center
+}
+
+.profile_avatar {
+  @apply w-[44px] h-[44px] rounded-full bg-lime-500
+}
+
+.profile_name {
+  @apply w-[100px] h-[48px] flex items-center justify-center text-[16px]
+}
+
+.profile_buttons {
+  @apply w-[72px] h-[48px] flex items-center justify-between
+}
+
+.profile_buttons svg:hover{
+  cursor: pointer;
+}
+
+.profile_buttons svg:hover path {
+  fill: #B3404A !important;
+}
