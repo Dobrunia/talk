@@ -49,19 +49,14 @@ class AuthController {
     try {
       const { username, password } = req.body;
 
-      // Получение пользователя
-      const [users] = await connection.query(
-        'SELECT * FROM users WHERE username = ?',
-        [username],
-      );
+      // Проверка пользователя
+      const [users] = await connection.query('SELECT * FROM users WHERE username = ?', [username]);
       if ((users as any[]).length === 0) {
         res.status(401).json({ error: 'Неверное имя пользователя или пароль' });
         return;
       }
 
       const user = (users as any[])[0];
-
-      // Проверка пароля
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
       if (!isPasswordCorrect) {
         res.status(401).json({ error: 'Неверное имя пользователя или пароль' });
@@ -69,20 +64,16 @@ class AuthController {
       }
 
       // Создание JWT токена
-      const token = jwt.sign(
-        { id: user.id, username: user.username },
-        JWT_SECRET,
-        { expiresIn: TOKEN_EXPIRATION },
-      );
+      const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: TOKEN_EXPIRATION });
 
-      // Добавление записи в `ActiveSessions`
+      // Добавление записи в `active_sessions`
       await connection.query(
         'INSERT INTO active_sessions (user_id, token, expires_at, is_guest) VALUES (?, ?, NOW() + INTERVAL 1 DAY, FALSE)',
         [user.id, token],
       );
 
-      res.status(200).json({ token });
-      return;
+      // Возвращаем токен, userId и username
+      res.status(200).json({ token, userId: user.id, username: user.username });
     } catch (error) {
       next(error);
     }

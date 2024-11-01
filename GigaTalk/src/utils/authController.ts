@@ -1,5 +1,6 @@
 import { closeAuthModal, showLogin } from './authUIController';
 import { authApi } from '../api/authApi';
+import { renderProfile } from '../ui-kit';
 
 async function guestLoginHandler() {
   try {
@@ -51,8 +52,13 @@ async function handleLogin(event: Event) {
 
   try {
     const data = await authApi.login(username, password);
+
+    // Сохраняем token, userId и username в localStorage
     localStorage.setItem('token', data.token);
-    alert('Вы успешно вошли в систему');
+    localStorage.setItem('userId', data.userId.toString());
+    localStorage.setItem('username', data.username);
+    renderProfile();
+    //alert('Вы успешно вошли в систему');
     closeAuthModal();
   } catch (error) {
     console.error('Ошибка при входе:', error);
@@ -85,6 +91,7 @@ async function checkTokenValidity() {
     // Если токен действителен, скрываем модальное окно
     if (response.valid) {
       closeAuthModal();
+      renderProfile();
     } else {
       // Если токен недействителен, удаляем его и показываем модальное окно
       localStorage.removeItem('token');

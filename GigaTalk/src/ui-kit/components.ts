@@ -32,8 +32,7 @@ export function serverCategory(category: category) {
   </div>`;
 }
 
-export function myProfile() {
-  const username = localStorage.getItem('username');
+export function myProfile(username: string) {
   return `<div class="profile_avatar">
   </div><div class="profile_name">${username}</div>
   <div class="profile_buttons">${SVG.micro}${SVG.headphones}</div>`;

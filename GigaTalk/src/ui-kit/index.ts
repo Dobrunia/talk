@@ -39,5 +39,10 @@ export function renderProfile() {
     console.error('My profile container not found!');
     return;
   }
-  profile.innerHTML = myProfile();
+  const username = localStorage.getItem('username');
+  if (!username) {
+    console.error('username in localStorage not found!');
+    return;
+  }
+  profile.innerHTML = myProfile(username);
 }
