@@ -9,5 +9,7 @@ declare global {
     guestLoginHandler: typeof guestLoginHandler;
     handleRegister: typeof handleRegister;
     handleLogin: typeof handleLogin;
+    voiceChannelClick: typeof voiceChannelClick;
+    voiceChannelLeave: typeof voiceChannelLeave;
   }
 }

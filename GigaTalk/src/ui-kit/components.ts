@@ -16,9 +16,11 @@ export function serverName(name: string) {
 export function serverCategory(category: category) {
   let ch = '';
   category.channels?.forEach((channel) => {
-    ch += `<li class="channel_item">${
-      channel.type === 'voice' ? SVG.voiceIco : '#'
-    }<span>${channel.name}</span></li>`;
+    ch += `<li class="channel_item" onclick="voiceChannelClick(${
+      channel.id
+    })">${channel.type === 'voice' ? SVG.voiceIco : '#'}<span>${
+      channel.name
+    }</span></li>`;
   });
   return `
   <div class="server_category">

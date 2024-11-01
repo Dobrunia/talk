@@ -51,7 +51,7 @@
 }
 
 .server_components_block {
-  height: calc(100% - 60px);
+  height: calc(100% - 120px);
   @apply w-[230px] bg-server_components_dg p-default
 }
 

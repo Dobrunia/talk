@@ -13,52 +13,131 @@
       </div>
       <div>
         <div class="server_components_block" id="server_components_block"></div>
+        <div
+          id="in_conversation_things"
+          class="w-full h-[60px] flex items-center justify-center hidden"
+        >
+          <button id="leave_button" onclick="voiceChannelLeave()">
+            Покинуть канал
+          </button>
+        </div>
         <div class="profile">
           <div class="profile_wrapper" id="my_profile"></div>
         </div>
       </div>
-      <div id="authModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+      <div
+        id="authModal"
+        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden"
+      >
         <div class="bg-gray-800 text-white p-6 rounded-lg w-96">
           <!-- Заголовок и кнопки переключения -->
           <div class="flex justify-between mb-4">
-            <button id="loginTab" onclick="showLogin()" class="auth-tab-active">Вход</button>
-            <button id="registerTab" onclick="showRegister()" class="auth-tab-inactive">Регистрация</button>
+            <button id="loginTab" onclick="showLogin()" class="auth-tab-active">
+              Вход
+            </button>
+            <button
+              id="registerTab"
+              onclick="showRegister()"
+              class="auth-tab-inactive"
+            >
+              Регистрация
+            </button>
           </div>
-      
+
           <!-- Форма для входа -->
           <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
             <div>
-              <label for="loginUsername" class="block text-sm">Имя пользователя</label>
-              <input type="text" id="loginUsername" name="username" autocomplete="username" required class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none" />
+              <label for="loginUsername" class="block text-sm"
+                >Имя пользователя</label
+              >
+              <input
+                type="text"
+                id="loginUsername"
+                name="username"
+                autocomplete="username"
+                required
+                class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none"
+              />
             </div>
             <div>
               <label for="loginPassword" class="block text-sm">Пароль</label>
-              <input type="password" id="loginPassword" name="password" autocomplete="current-password" required class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none" />
+              <input
+                type="password"
+                id="loginPassword"
+                name="password"
+                autocomplete="current-password"
+                required
+                class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none"
+              />
             </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded-md">Войти</button>
+            <button
+              type="submit"
+              class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded-md"
+            >
+              Войти
+            </button>
           </form>
-      
+
           <!-- Форма для регистрации -->
-          <form id="registerForm" class="space-y-4 hidden" onsubmit="handleRegister(event)">
+          <form
+            id="registerForm"
+            class="space-y-4 hidden"
+            onsubmit="handleRegister(event)"
+          >
             <div>
-              <label for="registerUsername" class="block text-sm">Имя пользователя</label>
-              <input type="text" id="registerUsername" name="username" autocomplete="username" required class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none" />
+              <label for="registerUsername" class="block text-sm"
+                >Имя пользователя</label
+              >
+              <input
+                type="text"
+                id="registerUsername"
+                name="username"
+                autocomplete="username"
+                required
+                class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none"
+              />
             </div>
             <div>
               <label for="registerPassword" class="block text-sm">Пароль</label>
-              <input type="password" id="registerPassword" name="password" autocomplete="new-password" required class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none" />
+              <input
+                type="password"
+                id="registerPassword"
+                name="password"
+                autocomplete="new-password"
+                required
+                class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none"
+              />
             </div>
             <div>
-              <label for="registerConfirmPassword" class="block text-sm">Подтвердите пароль</label>
-              <input type="password" id="registerConfirmPassword" name="confirmPassword" autocomplete="new-password"  required class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none" />
+              <label for="registerConfirmPassword" class="block text-sm"
+                >Подтвердите пароль</label
+              >
+              <input
+                type="password"
+                id="registerConfirmPassword"
+                name="confirmPassword"
+                autocomplete="new-password"
+                required
+                class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none"
+              />
             </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded-md">Зарегистрироваться</button>
+            <button
+              type="submit"
+              class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded-md"
+            >
+              Зарегистрироваться
+            </button>
           </form>
-      
+
           <!-- Кнопка для входа как гость -->
-          <button onclick="guestLoginHandler()" class="mt-4 w-full bg-gray-600 hover:bg-gray-700 p-2 rounded-md text-sm">Войти как гость</button>
+          <button
+            onclick="guestLoginHandler()"
+            class="mt-4 w-full bg-gray-600 hover:bg-gray-700 p-2 rounded-md text-sm"
+          >
+            Войти как гость
+          </button>
         </div>
-      </div>          
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
     <script type="module" src="/src/utils/authUIController.ts"></script>
