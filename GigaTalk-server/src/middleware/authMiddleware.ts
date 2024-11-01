@@ -1,6 +1,6 @@
 // src/middleware/authMiddleware.ts
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import connection from '../db/connection';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
@@ -13,11 +13,15 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
   try {
     // Проверка валидности токена
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
     // Проверка токена в `ActiveSessions`
     const [sessions] = await connection.query('SELECT * FROM ActiveSessions WHERE token = ?', [token]);
-    if (sessions.length === 0) {
+    
+    // Приведение типа sessions к массиву строк, чтобы избежать ошибки
+    const sessionData = sessions as any[];
+
+    if (sessionData.length === 0) {
       return res.status(401).json({ error: 'Сессия не активна или токен недействителен' });
     }
 

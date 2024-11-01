@@ -1,4 +1,3 @@
-// src/controllers/AuthController.ts
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -9,7 +8,7 @@ const TOKEN_EXPIRATION = '1d'; // Срок действия токена
 const GUEST_EXPIRATION_DAYS = 7;  // Время жизни гостевых аккаунтов в днях
 
 class AuthController {
-  async register(req: Request, res: Response, next: NextFunction) {
+  async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { username, password } = req.body;
 
@@ -18,8 +17,9 @@ class AuthController {
         'SELECT * FROM users WHERE username = ?',
         [username]
       );
-      if (existingUsers.length > 0) {
-        return res.status(400).json({ error: 'Пользователь с таким именем уже существует' });
+      if ((existingUsers as any[]).length > 0) {
+        res.status(400).json({ error: 'Пользователь с таким именем уже существует' });
+        return;
       }
 
       // Хеширование пароля
@@ -30,15 +30,16 @@ class AuthController {
         'INSERT INTO users (username, password, created_at) VALUES (?, ?, NOW())',
         [username, hashedPassword]
       );
-      const userId = result.insertId;
+      const userId = (result as any).insertId;
 
       res.status(201).json({ message: 'Регистрация прошла успешно', userId });
+      return;
     } catch (error) {
       next(error);
     }
   }
 
-  async login(req: Request, res: Response, next: NextFunction) {
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { username, password } = req.body;
       
@@ -47,16 +48,18 @@ class AuthController {
         'SELECT * FROM users WHERE username = ?',
         [username]
       );
-      if (users.length === 0) {
-        return res.status(401).json({ error: 'Неверное имя пользователя или пароль' });
+      if ((users as any[]).length === 0) {
+        res.status(401).json({ error: 'Неверное имя пользователя или пароль' });
+        return;
       }
 
-      const user = users[0];
+      const user = (users as any[])[0];
       
       // Проверка пароля
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
       if (!isPasswordCorrect) {
-        return res.status(401).json({ error: 'Неверное имя пользователя или пароль' });
+        res.status(401).json({ error: 'Неверное имя пользователя или пароль' });
+        return;
       }
 
       // Создание JWT токена
@@ -64,17 +67,18 @@ class AuthController {
       
       // Добавление записи в `ActiveSessions`
       await connection.query(
-        'INSERT INTO ActiveSessions (user_id, token, expires_at, is_guest) VALUES (?, ?, NOW() + INTERVAL 1 DAY, FALSE)',
+        'INSERT INTO active_sessions (user_id, token, expires_at, is_guest) VALUES (?, ?, NOW() + INTERVAL 1 DAY, FALSE)',
         [user.id, token]
       );
 
       res.status(200).json({ token });
+      return;
     } catch (error) {
       next(error);
     }
   }
 
-  async guestLogin(req: Request, res: Response, next: NextFunction) {
+  async guestLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const username = `guest_${Date.now()}`;
       const password = `guest_${Math.random().toString(36).substring(2, 15)}`;
@@ -85,7 +89,7 @@ class AuthController {
         'INSERT INTO users (username, password, permission, created_at) VALUES (?, ?, ?, NOW())',
         [username, hashedPassword, 0]
       );
-      const userId = result.insertId;
+      const userId = (result as any).insertId;
 
       // Создание JWT токена
       const token = jwt.sign({ id: userId, username, guest: true }, JWT_SECRET, { expiresIn: TOKEN_EXPIRATION });
@@ -97,21 +101,24 @@ class AuthController {
       );
 
       res.status(200).json({ token });
+      return;
     } catch (error) {
       next(error);
     }
   }
 
-  async logout(req: Request, res: Response, next: NextFunction) {
+  async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const token = req.headers.authorization?.split(' ')[1];
       if (!token) {
-        return res.status(401).json({ error: 'Токен не предоставлен' });
+        res.status(401).json({ error: 'Токен не предоставлен' });
+        return;
       }
 
       // Удаление сессии из `ActiveSessions`
       await connection.query('DELETE FROM ActiveSessions WHERE token = ?', [token]);
       res.status(200).json({ message: 'Выход выполнен успешно' });
+      return;
     } catch (error) {
       next(error);
     }

@@ -3,6 +3,7 @@ import apiClient from './axiosInstance';
 export const authApi = {
   // Регистрация пользователя
   async register(username: string, password: string) {
+    console.log('register', username, password)
     const response = await apiClient.post('/register', { username, password });
     return response.data;
   },

@@ -3,7 +3,7 @@ import { renderProfile } from './ui-kit';
 import { loadServers, serverClickHandler } from './utils/cache';
 
 async function start() {
-  localStorage.setItem('username', 'Dobrunia');
+  //localStorage.setItem('username', 'Dobrunia');
   loadServers();
   renderProfile();
 }
