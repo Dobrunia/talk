@@ -60,3 +60,8 @@ export async function loadServers() {
     }
   }
 }
+
+export function saveUserData(userId: number, username: string) {
+  localStorage.setItem('userId', userId.toString());
+  localStorage.setItem('username', username);
+}

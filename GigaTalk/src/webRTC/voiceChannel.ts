@@ -54,19 +54,33 @@ export async function joinVoiceChannel(channelId: number, socket: WebSocket) {
   }
 }
 
-// Функция для обработки ответа на SDP-предложение
+const candidateQueue: RTCIceCandidateInit[] = []; // Буфер для ICE-кандидатов
+
+// Функция для обработки ответа (answer) на SDP-предложение
 export async function handleAnswer(answer: RTCSessionDescriptionInit) {
   if (peerConnection) {
     await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+
+    // После установки RemoteDescription добавляем все ICE-кандидаты из очереди
+    while (candidateQueue.length > 0) {
+      const candidate = candidateQueue.shift();
+      if (candidate) {
+        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      }
+    }
   }
 }
 
-// Обработка полученных ICE-кандидатов
+// Обработка ICE-кандидатов
 export async function handleCandidate(candidate: RTCIceCandidateInit) {
-  if (peerConnection) {
+  if (peerConnection && peerConnection.remoteDescription) {
     await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+  } else {
+    // Если RemoteDescription еще не установлено, сохраняем кандидата в буфер
+    candidateQueue.push(candidate);
   }
 }
+
 
 // Функция для выхода из голосового канала
 export function leaveVoiceChannel() {

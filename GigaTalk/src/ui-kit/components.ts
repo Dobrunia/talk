@@ -16,11 +16,13 @@ export function serverName(name: string) {
 export function serverCategory(category: category) {
   let ch = '';
   category.channels?.forEach((channel) => {
-    ch += `<li class="channel_item" onclick="voiceChannelClick(${
-      channel.id
-    })">${channel.type === 'voice' ? SVG.voiceIco : '#'}<span>${
-      channel.name
-    }</span></li>`;
+    ch += `<li class="channel_item">
+    <div class="channel_name" onclick="voiceChannelClick(${channel.id})">
+      ${channel.type === 'voice' ? SVG.voiceIco : '#'}
+      <div>${channel.name}</div>
+    </div>
+    <ul class="user_list" id="user_list_${channel.id}"></ul>
+    </li>`;
   });
   return `
   <div class="server_category">
@@ -38,4 +40,11 @@ export function myProfile(username: string) {
   return `<div class="profile_avatar">
   </div><div class="profile_name">${username}</div>
   <div class="profile_buttons">${SVG.micro}${SVG.headphones}</div>`;
+}
+
+export function userInChannel(username: string, userId: string) {
+  return `<div class="user_in_channel" id="user_in_channel_${userId}">
+  <div class="user_in_channel_avatar"></div>
+  <div class="user_in_channel_name">${username}</div>
+  </div>`;
 }

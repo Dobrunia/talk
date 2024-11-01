@@ -1,6 +1,7 @@
 import { closeAuthModal, showLogin } from './authUIController';
 import { authApi } from '../api/authApi';
 import { renderProfile } from '../ui-kit';
+import { saveUserData } from './cache';
 
 async function guestLoginHandler() {
   try {
@@ -55,14 +56,22 @@ async function handleLogin(event: Event) {
 
     // Сохраняем token, userId и username в localStorage
     localStorage.setItem('token', data.token);
-    localStorage.setItem('userId', data.userId.toString());
-    localStorage.setItem('username', data.username);
+    saveUserData(data.userId, data.username);
     renderProfile();
     //alert('Вы успешно вошли в систему');
     closeAuthModal();
   } catch (error) {
-    console.error('Ошибка при входе:', error);
-    alert('Ошибка при входе');
+    if (error instanceof Error && (error as any).response) {
+      const axiosError = error as any;
+      if (axiosError.response.status === 401) {
+        // Если сервер возвращает статус 401 Unauthorized
+        alert('Неверное имя пользователя или пароль');
+      }
+    } else {
+      // Обработка других ошибок
+      console.error('Ошибка при входе:', error);
+      alert('Ошибка при входе');
+    }
   }
 }
 
@@ -87,10 +96,11 @@ async function checkTokenValidity() {
   try {
     // Вызов API для проверки токена
     const response = await authApi.verifyToken(token);
-
     // Если токен действителен, скрываем модальное окно
     if (response.valid) {
       closeAuthModal();
+      console.log(response);
+      saveUserData(response.decoded.id, response.decoded.username);
       renderProfile();
     } else {
       // Если токен недействителен, удаляем его и показываем модальное окно
