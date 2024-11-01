@@ -1,6 +1,6 @@
 import './ui-kit/style.css';
-import { renderProfile, renderServersAndAttachListeners } from './ui-kit';
-import { serverApi } from './api/serverApi';
+import { renderProfile } from './ui-kit';
+import { loadServers, serverClickHandler } from './utils/cache';
 
 // const DATA: serverDATA[] = [
 //   {
@@ -36,11 +36,11 @@ import { serverApi } from './api/serverApi';
 
 async function start() {
   localStorage.setItem('username', 'Dobrunia');
-  const DATA = await serverApi.getAllServers();
-  if (!DATA) {
-    return;
-  }
-  renderServersAndAttachListeners(DATA);
+  loadServers();
   renderProfile();
 }
-start();
+window.onload = () => {
+  start();
+};
+
+window.serverClickHandler = serverClickHandler;

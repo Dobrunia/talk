@@ -20,14 +20,14 @@ export function renderServerInfo(serverData: serverDATA) {
   server_slot.innerHTML = htmlContent;
 }
 
-export function renderServersAndAttachListeners(DATA: serverDATA[]) {
+export function renderServersAndAttachListeners(serversList: serverDATA[]) {
   const server_list = document.getElementById('servers_list');
   if (!server_list) {
     console.error('Server list container not found!');
     return;
   }
   let htmlContent = serverListAddServerElement();
-  DATA.forEach((server) => {
+  serversList.forEach((server) => {
     htmlContent += serverListElement(server);
   });
   server_list.insertAdjacentHTML('beforeend', htmlContent);
