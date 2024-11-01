@@ -60,6 +60,50 @@ async function handleLogin(event: Event) {
   }
 }
 
+async function checkTokenValidity() {
+  const authModal = document.getElementById('authModal');
+
+  // Сначала скрываем модальное окно, пока проверяем токен
+  if (authModal) {
+    authModal.classList.add('hidden');
+  }
+
+  const token = localStorage.getItem('token');
+
+  // Если токена нет, показываем модальное окно и завершаем проверку
+  if (!token) {
+    if (authModal) {
+      authModal.classList.remove('hidden');
+    }
+    return;
+  }
+
+  try {
+    // Вызов API для проверки токена
+    const response = await authApi.verifyToken(token);
+
+    // Если токен действителен, скрываем модальное окно
+    if (response.valid) {
+      closeAuthModal();
+    } else {
+      // Если токен недействителен, удаляем его и показываем модальное окно
+      localStorage.removeItem('token');
+      if (authModal) {
+        authModal.classList.remove('hidden');
+      }
+    }
+  } catch (error) {
+    console.error('Ошибка при проверке токена:', error);
+    localStorage.removeItem('token');
+    // Показываем модальное окно в случае ошибки проверки
+    if (authModal) {
+      authModal.classList.remove('hidden');
+    }
+  }
+}
+
+checkTokenValidity();
+
 window.guestLoginHandler = guestLoginHandler;
 window.handleRegister = handleRegister;
 window.handleLogin = handleLogin;

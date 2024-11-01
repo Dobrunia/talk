@@ -14,4 +14,7 @@ router.post('/login', authController.login);
 router.post('/guest-login', authController.guestLogin);
 router.post('/logout', authController.logout);
 
+// Маршрут проверки токена
+router.get('/verify-token', authController.verifyToken);
+
 export { router };
