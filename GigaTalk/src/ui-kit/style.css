@@ -113,3 +113,15 @@
 .profile_buttons svg:hover path {
   fill: #B3404A !important;
 }
+
+.auth-tab-active {
+  @apply px-4 py-2 text-xl font-semibold text-white bg-blue-500 rounded-lg cursor-pointer border border-blue-500 focus:outline-none;
+}
+
+.auth-tab-inactive {
+  @apply px-4 py-2 text-xl font-semibold text-blue-400 bg-gray-200 rounded-lg cursor-pointer border border-gray-300 focus:outline-none;
+}
+
+.auth-tab-inactive:hover {
+  @apply bg-blue-100 text-blue-600;
+}
