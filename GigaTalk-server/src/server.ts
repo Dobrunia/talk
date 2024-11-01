@@ -79,27 +79,24 @@ wss.on('connection', (ws: WebSocket) => {
 // Функция для подключения клиента к каналу
 // Функция для подключения клиента к каналу
 function handleJoin(ws: WebSocket, channelId: string) {
-  // Создаем канал, если он не существует
   if (!channels[channelId]) {
     channels[channelId] = new Set();
     console.log(`Channel ${channelId} created.`);
   }
 
-  // Добавляем пользователя в канал
   channels[channelId].add(ws);
-  const userId = clients.get(ws); // Получаем ID нового пользователя
+  const userId = clients.get(ws);
   console.log(`User with ID ${userId} joined channel ${channelId}`);
 
-  // Отправляем уведомление всем в канале о новом участнике
   broadcastToChannel(channelId, ws, JSON.stringify({
     type: 'user_joined',
     userId: userId,
     channelId: channelId,
   }));
 
-  // Обновляем список пользователей для всех в канале
   broadcastUserList(channelId);
 }
+
 
 
 // Функция для выхода клиента из канала

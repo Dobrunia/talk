@@ -6,19 +6,21 @@ import {
   leaveVoiceChannel,
   handleAnswer,
   handleCandidate,
+  handleOffer,
 } from './webRTC/voiceChannel.ts';
+
+let channelIdCheck: number = 0;
+let peerConnection: RTCPeerConnection | null = null;
 
 async function start() {
   loadServers();
 }
+
 window.onload = () => {
   start();
 };
 
-// Создаем WebSocket соединение
 const socket = new WebSocket('ws://localhost:3000');
-
-// Обработка открытия соединения
 socket.onopen = () => {
   console.log('WebSocket connection established.');
 };
@@ -28,13 +30,16 @@ socket.onmessage = async (event) => {
   const data = JSON.parse(event.data);
 
   switch (data.type) {
+    case 'offer':
+      await handleOffer(data.offer, socket, data.channelId); // Обработка SDP предложения с передачей channelId
+      break;
     case 'answer':
-      await handleAnswer(data.answer);
+      await handleAnswer(data.answer); // Обработка SDP ответа
       break;
     case 'candidate':
-      await handleCandidate(data.candidate);
+      await handleCandidate(data.candidate); // Обработка ICE-кандидата
       break;
-    case 'user_joined': // Логирование при присоединении пользователя
+    case 'user_joined':
       console.log(`User with ID ${data.userId} joined channel ${data.channelId}`);
       break;
     case 'update_users':
@@ -45,63 +50,36 @@ socket.onmessage = async (event) => {
   }
 };
 
-
-// Обработка ошибок WebSocket
-socket.onerror = (error) => {
-  console.error('WebSocket encountered error:', error);
-};
-
-// Обработка закрытия соединения
-socket.onclose = (event) => {
-  console.log(`WebSocket connection closed: ${event.reason}`);
-};
-
-
-
-
-// Функция ожидания открытия WebSocket соединения
-function waitForWebSocketOpen(socket: WebSocket): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (socket.readyState === WebSocket.OPEN) {
-      resolve();
-    } else {
-      socket.addEventListener("open", () => resolve(), { once: true });
-      socket.addEventListener("error", (err) => reject(err), { once: true });
-    }
-  });
-}
-
-let channelIdCheck: number = 0;
 // Функция для подключения к каналу при нажатии на кнопку
-async function voiceChannelClick(channelId: number) {
+function voiceChannelClick(channelId: number) {
   if (channelId === channelIdCheck) {
     console.log('Вы уже в этом канале');
     return;
   }
 
-  try {
-    await waitForWebSocketOpen(socket); // Ожидаем открытия WebSocket-соединения
+  joinVoiceChannel(channelId, socket);
 
-    // Отправляем команду на присоединение к каналу
-    socket.send(JSON.stringify({ type: 'join', channelId }));
-    joinVoiceChannel(channelId, socket);
-
-    const username = localStorage.getItem('username');
-    const userId = localStorage.getItem('userId');
-    if (username && userId) {
-      addUserToChannel(channelId, username, userId);
-    } else {
-      console.warn('Пользователь не найден в локальном хранилище');
-    }
-
-    document.getElementById('in_conversation_things')?.classList.remove('hidden');
-    channelIdCheck = channelId;
-  } catch (error) {
-    console.error("WebSocket connection could not be opened:", error);
+  const username = localStorage.getItem('username');
+  const userId = localStorage.getItem('userId');
+  if (username && userId) {
+    addUserToChannel(channelId, username, userId);
+  } else {
+    console.warn('Пользователь не найден в локальном хранилище');
   }
+
+  // Создаем элемент audio, если его еще нет
+  let remoteAudio = document.getElementById('remoteAudio') as HTMLAudioElement;
+  if (!remoteAudio) {
+    console.warn('Элемент remoteAudio не найден, создаем новый элемент.');
+    remoteAudio = document.createElement('audio');
+    remoteAudio.id = 'remoteAudio';
+    remoteAudio.autoplay = true;
+    document.body.appendChild(remoteAudio);
+  }
+
+  document.getElementById('in_conversation_things')?.classList.remove('hidden');
+  channelIdCheck = channelId;
 }
-
-
 
 // Функция для добавления пользователя в отображение канала
 function addUserToChannel(channelId: number, username: string, userId: string) {
@@ -116,7 +94,7 @@ function addUserToChannel(channelId: number, username: string, userId: string) {
 
 // Функция для обновления списка пользователей в канале
 function updateUserList(userIds: string[]) {
-  console.log('updateUserList ' + userIds)
+  console.log('updateUserList ' + userIds);
   const channelUserList = document.getElementById(`user_list_${channelIdCheck}`);
   if (channelUserList) {
     channelUserList.innerHTML = '';
