@@ -7,7 +7,7 @@ function toggleElementClass(elementId: string, className: string, action: 'add' 
   }
 }
 
-function showLogin() {
+export function showLogin() {
   try {
     toggleElementClass('loginForm', 'hidden', 'remove');
     toggleElementClass('registerForm', 'hidden', 'add');
@@ -37,7 +37,7 @@ function showRegister() {
   }
 }
 
-function closeAuthModal() {
+export function closeAuthModal() {
   try {
     toggleElementClass('authModal', 'hidden', 'add');
   } catch (error) {
