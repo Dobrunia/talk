@@ -1,27 +1,29 @@
-import apiClient from '../api/axiosInstance';
 import { closeAuthModal, showLogin } from './authUIController';
+import { authApi } from '../api/authApi';
 
-export async function guestLoginHandler() {
+async function guestLoginHandler() {
   try {
-    const response = await apiClient.post('/guest-login');
-    if (response.status === 200) {
-      localStorage.setItem('token', response.data.token);
-      alert('Вы вошли как гость');
-      closeAuthModal();
-    } else {
-      alert('Ошибка при входе как гость');
-    }
+    const data = await authApi.guestLogin();
+    localStorage.setItem('token', data.token);
+    alert('Вы вошли как гость');
+    closeAuthModal();
   } catch (error) {
     console.error('Ошибка при входе как гость:', error);
     alert('Ошибка при входе как гость');
   }
 }
 
-export async function handleRegister(event: Event) {
+async function handleRegister(event: Event) {
   event.preventDefault();
-  const username = (document.getElementById('registerUsername') as HTMLInputElement).value;
-  const password = (document.getElementById('registerPassword') as HTMLInputElement).value;
-  const confirmPassword = (document.getElementById('registerConfirmPassword') as HTMLInputElement).value;
+  const username = (
+    document.getElementById('registerUsername') as HTMLInputElement
+  ).value;
+  const password = (
+    document.getElementById('registerPassword') as HTMLInputElement
+  ).value;
+  const confirmPassword = (
+    document.getElementById('registerConfirmPassword') as HTMLInputElement
+  ).value;
 
   if (password !== confirmPassword) {
     alert('Пароли не совпадают');
@@ -29,33 +31,29 @@ export async function handleRegister(event: Event) {
   }
 
   try {
-    const response = await apiClient.post('/register', { username, password });
-    if (response.status === 200) {
-      alert('Регистрация прошла успешно');
-      showLogin();
-    } else {
-      alert('Ошибка при регистрации');
-    }
+    const data = await authApi.register(username, password);
+    alert('Регистрация прошла успешно');
+    showLogin(); // Переход на вкладку "Войти" после успешной регистрации
   } catch (error) {
     console.error('Ошибка при регистрации:', error);
     alert('Ошибка при регистрации');
   }
 }
 
-export async function handleLogin(event: Event) {
+async function handleLogin(event: Event) {
   event.preventDefault();
-  const username = (document.getElementById('loginUsername') as HTMLInputElement).value;
-  const password = (document.getElementById('loginPassword') as HTMLInputElement).value;
+  const username = (
+    document.getElementById('loginUsername') as HTMLInputElement
+  ).value;
+  const password = (
+    document.getElementById('loginPassword') as HTMLInputElement
+  ).value;
 
   try {
-    const response = await apiClient.post('/login', { username, password });
-    if (response.status === 200) {
-      localStorage.setItem('token', response.data.token);
-      alert('Вы успешно вошли в систему');
-      closeAuthModal();
-    } else {
-      alert('Ошибка при входе');
-    }
+    const data = await authApi.login(username, password);
+    localStorage.setItem('token', data.token);
+    alert('Вы успешно вошли в систему');
+    closeAuthModal();
   } catch (error) {
     console.error('Ошибка при входе:', error);
     alert('Ошибка при входе');
