@@ -1,25 +1,30 @@
-import { handleSocketMessage, joinToAllMyServers, leaveFromAllMyServers } from './socketController';
+import {
+  handleSocketMessage,
+  joinToAllMyServers,
+  leaveFromAllMyServers,
+} from './socketController';
 
 let socket: WebSocket | null = null;
 
 export function connectSocket() {
-  socket = new WebSocket('ws://localhost:3000');
+  socket = new WebSocket(
+    `ws://localhost:3000/socket?token=${localStorage.getItem('token')}`,
+  );
 
   socket.onopen = () => {
-    joinToAllMyServers();
     console.log('WebSocket connection opened');
+    joinToAllMyServers(); // Подключение ко всем серверам после открытия соединения
   };
 
   socket.onclose = () => {
-    leaveFromAllMyServers();
     console.log('WebSocket connection closed.');
+    leaveFromAllMyServers();
   };
 
   socket.onerror = (error) => {
     console.error('WebSocket error:', error);
   };
 
-  // Перенаправление сообщений в socketController
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     handleSocketMessage(data);

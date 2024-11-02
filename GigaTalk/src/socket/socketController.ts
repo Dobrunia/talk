@@ -5,6 +5,19 @@ import { sendSocketMessage } from './socket.ts';
 
 export function handleSocketMessage(data: any) {
   switch (data.type) {
+    case 'user_join_server':
+      // renderUserToServer(
+      //   data.serverId,
+      //   data.userId,
+      //   data.username,
+      //   data.userAvatar,
+      // );
+      console.log('Пользователь подключился к серверу', data);
+      break;
+    case 'user_leave_server':
+      //removeUserFromServer(data.serverId, data.userId);
+      console.log('Пользователь покинул сервер', data);
+      break;
     case 'user_join_channel':
       renderUserToChannel(
         data.serverId,
@@ -17,12 +30,21 @@ export function handleSocketMessage(data: any) {
       break;
     case 'user_leave_channel':
       removeUserFromChannel(data.serverId, data.channelId, data.userId);
-      console.log('пользователь покинул канал', data);
+      console.log('Пользователь покинул канал', data);
+      break;
+    case 'user_list_server':
+      //updateServerUserList(data.serverId, data.users);
+      console.log('Обновлен список пользователей на сервере', data);
+      break;
+    case 'user_list_channel':
+      //updateChannelUserList(data.channelId, data.users);
+      console.log('Обновлен список пользователей в канале', data);
       break;
     default:
       console.warn('Неизвестный тип сообщения:', data.type);
   }
 }
+
 
 export async function joinToAllMyServers() {
   await updateCache.serversList();

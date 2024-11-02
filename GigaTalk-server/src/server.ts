@@ -23,7 +23,7 @@ app.use(errorHandler);
 const server = http.createServer(app);
 
 // Инициализация WebSocket сервера
-// setupWebSocket(server);
+setupWebSocket(server);
 
 
 server.listen(port, () => {
