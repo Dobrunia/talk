@@ -13,6 +13,10 @@ export function serverName(name: string) {
   return `<h1 class="server_name">${name}</h1>`;
 }
 
+export function serverId(id: string) {
+  return `<div id="server_id_${id}"></div>`;
+}
+
 export function serverCategory(category: category) {
   let ch = '';
   category.channels?.forEach((channel) => {

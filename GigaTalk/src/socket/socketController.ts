@@ -19,7 +19,7 @@ export function handleSocketMessage(data: any) {
       break;
     case 'update_users':
       console.log(data)
-      updateUsersInChannel(data.roomId, data.users);
+      updateUsersInChannel(data.serverId, data.channelId, data.users);
       break;
     default:
       console.warn('Unknown message type:', data.type);

@@ -6,10 +6,12 @@ import {
   serverListElement,
   myProfile,
   userInChannel,
+  serverId,
 } from '../ui-kit/components.ts';
 
 export function renderServerInfo(serverData: serverDATA) {
   let htmlContent = serverName(serverData.name);
+  htmlContent += serverId(serverData.id.toString());
   serverData.categories?.forEach((category) => {
     htmlContent += serverCategory(category);
   });
@@ -67,15 +69,23 @@ export function removeUserFromChannel(userId: string) {
 }
 
 export function updateUsersInChannel(
-  roomId: string,
-  users: { userId: string; username: string }[],
+  serverId: string,
+  channelId: string,
+  users: {
+    userId: string;
+    username: string;
+    userAvatar: string;
+  }[],
 ) {
-  const [serverId, channelId] = roomId.split('-');
-  const channel_list = document.getElementById(`user_list_${channelId}`);
-  if (channel_list) {
-    channel_list.innerHTML = '';
-    users.forEach((user) => {
-      renderUserToChannel(channelId, user.userId, user.username);
-    });
+  const isServerOpen = document.getElementById(`server_id_${serverId}`);
+  if (isServerOpen) {
+    console.log(users);
+    const channel_list = document.getElementById(`user_list_${channelId}`);
+    if (channel_list) {
+      channel_list.innerHTML = '';
+      users.forEach((user) => {
+        renderUserToChannel(channelId, user.userId, user.username);
+      });
+    }
   }
 }
