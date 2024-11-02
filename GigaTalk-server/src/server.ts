@@ -1,3 +1,4 @@
+// server.ts
 import express from 'express';
 import { router } from './router';
 import cors from 'cors';
@@ -13,140 +14,93 @@ app.use(
     origin: 'http://localhost:5173',
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
-  }),
+  })
 );
 app.use(express.json());
 app.use(router);
 
-// Создаем HTTP-сервер и передаем его в Express и WebSocketServer
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
-// Объект для хранения участников по каналам
-const channels: Record<string, Set<WebSocket>> = {};
-// Объект для хранения уникальных идентификаторов клиентов
-const clients = new Map<WebSocket, string>();
+// Объект для хранения участников по комнатам
+const rooms: Record<string, Set<WebSocket>> = {};
+const clients = new Map<WebSocket, { userId: string; username: string }>();
 
-// Обработка подключений WebSocket
 wss.on('connection', (ws: WebSocket) => {
   const clientId = uuidv4();
-  clients.set(ws, clientId);
-  console.log(`New WebSocket connection established with ID: ${clientId}`);
+  clients.set(ws, { userId: clientId, username: `User-${clientId}` });
+  console.log(`WebSocket connection established with ID: ${clientId}`);
 
   ws.on('message', (message: string) => {
-    try {
-      const data = JSON.parse(message);
-      console.log(`Received message: ${message} from client ${clientId}`);
+    const data = JSON.parse(message);
 
-      switch (data.type) {
-        case 'join':
-          handleJoin(ws, data.channelId);
-          break;
-        case 'offer':
-          broadcastToChannel(data.channelId, ws, JSON.stringify({ type: 'offer', offer: data.offer }));
-          break;
-        case 'answer':
-          broadcastToChannel(data.channelId, ws, JSON.stringify({ type: 'answer', answer: data.answer }));
-          break;
-        case 'candidate':
-          broadcastToChannel(data.channelId, ws, JSON.stringify({ type: 'candidate', candidate: data.candidate }));
-          break;
-        case 'leave':
-          handleLeave(ws, data.channelId);
-          break;
-        default:
-          console.warn(`Unknown message type: ${data.type}`);
-      }
-    } catch (err) {
-      console.error(`Error processing message: ${message} from client ${clientId}`, err);
+    switch (data.type) {
+      case 'join':
+        joinRoom(ws, `${data.serverId}-${data.channelId}`, data.userId, data.username);
+        break;
+      case 'leave':
+        leaveRoom(ws, `${data.serverId}-${data.channelId}`);
+        break;
+      default:
+        console.warn('Unknown message type:', data.type);
     }
   });
 
   ws.on('close', () => {
-    console.log(`Connection closed for client ${clientId}`);
-    for (const channelId in channels) {
-      channels[channelId].delete(ws);
-    }
+    // Удаление клиента из всех комнат
     clients.delete(ws);
-  });
-
-  ws.on('error', (err) => {
-    console.error(`WebSocket error for client ${clientId}:`, err);
+    for (const roomId in rooms) {
+      rooms[roomId].delete(ws);
+      if (rooms[roomId].size === 0) {
+        delete rooms[roomId];
+      }
+    }
   });
 });
 
-
-// Функция для подключения клиента к каналу
-// Функция для подключения клиента к каналу
-function handleJoin(ws: WebSocket, channelId: string) {
-  if (!channels[channelId]) {
-    channels[channelId] = new Set();
-    console.log(`Channel ${channelId} created.`);
+// Функция для добавления пользователя в комнату
+function joinRoom(ws: WebSocket, roomId: string, userId: string, username: string) {
+  if (!rooms[roomId]) {
+    rooms[roomId] = new Set();
   }
+  rooms[roomId].add(ws);
+  clients.set(ws, { userId, username });
 
-  channels[channelId].add(ws);
-  const userId = clients.get(ws);
-  console.log(`User with ID ${userId} joined channel ${channelId}`);
-
-  broadcastToChannel(channelId, ws, JSON.stringify({
-    type: 'user_joined',
-    userId: userId,
-    channelId: channelId,
-  }));
-
-  broadcastUserList(channelId);
+  console.log(`User ${username} joined room ${roomId}`);
+  broadcastUserList(roomId);
 }
 
-
-
-// Функция для выхода клиента из канала
-function handleLeave(ws: WebSocket, channelId: string) {
-  if (channels[channelId]) {
-    channels[channelId].delete(ws);
-    console.log(`User with ID ${clients.get(ws)} left channel ${channelId}`);
-    // Если в канале больше нет пользователей, удаляем его
-    if (channels[channelId].size === 0) {
-      delete channels[channelId];
-      console.log(`Channel ${channelId} deleted as it is empty.`);
+// Функция для выхода из комнаты
+function leaveRoom(ws: WebSocket, roomId: string) {
+  if (rooms[roomId]) {
+    rooms[roomId].delete(ws);
+    console.log(`User ${clients.get(ws)?.username} left room ${roomId}`);
+    if (rooms[roomId].size === 0) {
+      delete rooms[roomId];
+    } else {
+      broadcastUserList(roomId);
     }
-    // Обновляем список пользователей для всех оставшихся клиентов
-    broadcastUserList(channelId);
-  } else {
-    console.warn(`Attempted to leave non-existent channel: ${channelId}`);
   }
 }
 
-// Функция для пересылки сообщений всем участникам канала, кроме отправителя
-function broadcastToChannel(channelId: string, sender: WebSocket, message: string) {
-  if (channels[channelId]) {
-    channels[channelId].forEach((client) => {
-      if (client !== sender && client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
+// Отправка списка пользователей всем в комнате
+function broadcastUserList(roomId: string) {
+  if (rooms[roomId]) {
+    const usersInRoom = Array.from(rooms[roomId]).map((client) => clients.get(client));
+    const userListMessage = JSON.stringify({
+      type: 'update_users',
+      users: usersInRoom.map((user) => ({ userId: user?.userId, username: user?.username })),
     });
-    console.log(`Broadcasted message to channel ${channelId}: ${message}`);
-  } else {
-    console.warn(`Attempted to broadcast to non-existent channel: ${channelId}`);
-  }
-}
 
-// Функция для отправки обновленного списка пользователей всем в канале
-function broadcastUserList(channelId: string) {
-  if (channels[channelId]) {
-    const usersInChannel = Array.from(channels[channelId]).map((client) => clients.get(client));
-    const userListMessage = JSON.stringify({ type: 'update_users', users: usersInChannel });
-    channels[channelId].forEach((client) => {
+    rooms[roomId].forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(userListMessage);
       }
     });
-    console.log(`Updated user list broadcasted to channel ${channelId}: ${userListMessage}`);
-  } else {
-    console.warn(`Attempted to update user list for non-existent channel: ${channelId}`);
   }
 }
 
-// Запускаем HTTP и WebSocket серверы
+// Запуск сервера
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

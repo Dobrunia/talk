@@ -1,9 +1,8 @@
 import { closeAuthModal, showLogin } from './authUIController';
 import { authApi } from '../api/authApi';
-import { renderProfile } from '../ui-kit';
 import { saveUserData } from './cache';
 
-async function guestLoginHandler() {
+export async function guestLoginHandler() {
   try {
     const data = await authApi.guestLogin();
     localStorage.setItem('token', data.token);
@@ -15,7 +14,7 @@ async function guestLoginHandler() {
   }
 }
 
-async function handleRegister(event: Event) {
+export async function handleRegister(event: Event) {
   event.preventDefault();
   const username = (
     document.getElementById('registerUsername') as HTMLInputElement
@@ -42,7 +41,7 @@ async function handleRegister(event: Event) {
   }
 }
 
-async function handleLogin(event: Event) {
+export async function handleLogin(event: Event) {
   event.preventDefault();
   const username = (
     document.getElementById('loginUsername') as HTMLInputElement
@@ -53,12 +52,8 @@ async function handleLogin(event: Event) {
 
   try {
     const data = await authApi.login(username, password);
-
-    // Сохраняем token, userId и username в localStorage
     localStorage.setItem('token', data.token);
     saveUserData(data.userId, data.username);
-    renderProfile();
-    //alert('Вы успешно вошли в систему');
     closeAuthModal();
   } catch (error) {
     if (error instanceof Error && (error as any).response) {
@@ -75,14 +70,18 @@ async function handleLogin(event: Event) {
   }
 }
 
-async function checkTokenValidity() {
-  const authModal = document.getElementById('authModal');
-
-  // Сначала скрываем модальное окно, пока проверяем токен
-  if (authModal) {
-    authModal.classList.add('hidden');
+async function checkTokenValidity(token: string) {
+  try {
+    const response = await authApi.verifyToken(token);
+    return response;
+  } catch (error) {
+    console.error('Ошибка при проверке токена:', error);
+    return false;
   }
+}
 
+export async function getInCheck() {
+  const authModal = document.getElementById('authModal');
   const token = localStorage.getItem('token');
 
   // Если токена нет, показываем модальное окно и завершаем проверку
@@ -90,37 +89,19 @@ async function checkTokenValidity() {
     if (authModal) {
       authModal.classList.remove('hidden');
     }
-    return;
+    return false;
   }
 
-  try {
-    // Вызов API для проверки токена
-    const response = await authApi.verifyToken(token);
-    // Если токен действителен, скрываем модальное окно
-    if (response.valid) {
-      closeAuthModal();
-      console.log(response);
-      saveUserData(response.decoded.id, response.decoded.username);
-      renderProfile();
-    } else {
-      // Если токен недействителен, удаляем его и показываем модальное окно
-      localStorage.removeItem('token');
-      if (authModal) {
-        authModal.classList.remove('hidden');
-      }
-    }
-  } catch (error) {
-    console.error('Ошибка при проверке токена:', error);
+  const response = await checkTokenValidity(token);
+  if (response.valid) {
+    saveUserData(response.decoded.id, response.decoded.username);
+    return true;
+  } else {
+    // Если токен недействителен, удаляем его и показываем модальное окно
     localStorage.removeItem('token');
-    // Показываем модальное окно в случае ошибки проверки
     if (authModal) {
       authModal.classList.remove('hidden');
     }
+    return false;
   }
 }
-
-checkTokenValidity();
-
-window.guestLoginHandler = guestLoginHandler;
-window.handleRegister = handleRegister;
-window.handleLogin = handleLogin;

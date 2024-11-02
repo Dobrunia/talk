@@ -5,6 +5,7 @@ import {
   serverListAddServerElement,
   serverListElement,
   myProfile,
+  userInChannel,
 } from '../ui-kit/components.ts';
 
 export function renderServerInfo(serverData: serverDATA) {
@@ -20,7 +21,7 @@ export function renderServerInfo(serverData: serverDATA) {
   server_slot.innerHTML = htmlContent;
 }
 
-export function renderServersAndAttachListeners(serversList: serverDATA[]) {
+export function renderServersList(serversList: serverDATA[]) {
   const server_list = document.getElementById('servers_list');
   if (!server_list) {
     console.error('Server list container not found!');
@@ -45,4 +46,35 @@ export function renderProfile() {
     return;
   }
   profile.innerHTML = myProfile(username);
+}
+
+export function renderUserToChannel(
+  channelId: string,
+  userId: string,
+  username: string,
+) {
+  const channel_list = document.getElementById(`user_list_${channelId}`);
+  if (!channel_list) {
+    console.error('User list container not found for channel:', channelId);
+    return;
+  }
+  channel_list.insertAdjacentHTML('beforeend', userInChannel(userId, username));
+}
+
+export function removeUserFromChannel(userId: string) {
+  const userElement = document.getElementById(`user_in_channel_${userId}`);
+  userElement?.remove();
+}
+
+export function updateUsersInChannel(
+  channelId: string,
+  users: { userId: string; username: string }[],
+) {
+  const channel_list = document.getElementById(`user_list_${channelId}`);
+  if (channel_list) {
+    channel_list.innerHTML = '';
+    users.forEach((user) => {
+      renderUserToChannel(channelId, user.userId, user.username);
+    });
+  }
 }
