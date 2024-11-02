@@ -45,13 +45,13 @@ function voiceChannelClick(channelId: number) {
     return;
   }
 
-  joinChannel(channelId, userId, username);
+  joinChannel(1, channelId, userId, username, 'img');
   document.getElementById('in_conversation_things')?.classList.remove('hidden');
   channelIdCheck = channelId;
 }
 
 function voiceChannelLeave() {
-  leaveChannel(channelIdCheck, userId);
+  leaveChannel(1, channelIdCheck, userId);
   document.getElementById('in_conversation_things')?.classList.add('hidden');
   channelIdCheck = 0;
 }

@@ -1,4 +1,3 @@
-// server.ts
 import express from 'express';
 import { router } from './router';
 import cors from 'cors';
@@ -22,13 +21,13 @@ app.use(router);
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
-// Объект для хранения участников по комнатам
+// Объект для хранения участников по комнатам (комнаты идентифицируются как serverId-channelId)
 const rooms: Record<string, Set<WebSocket>> = {};
-const clients = new Map<WebSocket, { userId: string; username: string }>();
+const clients = new Map<WebSocket, { userId: string; username: string; userAvatar: string }>();
 
 wss.on('connection', (ws: WebSocket) => {
   const clientId = uuidv4();
-  clients.set(ws, { userId: clientId, username: `User-${clientId}` });
+  clients.set(ws, { userId: clientId, username: `User-${clientId}`, userAvatar: 'default_avatar.png' });
   console.log(`WebSocket connection established with ID: ${clientId}`);
 
   ws.on('message', (message: string) => {
@@ -36,7 +35,7 @@ wss.on('connection', (ws: WebSocket) => {
 
     switch (data.type) {
       case 'join':
-        joinRoom(ws, `${data.serverId}-${data.channelId}`, data.userId, data.username);
+        joinRoom(ws, `${data.serverId}-${data.channelId}`, data.userId, data.username, data.userAvatar);
         break;
       case 'leave':
         leaveRoom(ws, `${data.serverId}-${data.channelId}`);
@@ -47,8 +46,8 @@ wss.on('connection', (ws: WebSocket) => {
   });
 
   ws.on('close', () => {
-    // Удаление клиента из всех комнат
     clients.delete(ws);
+    // Удаление пользователя из всех комнат, в которых он состоит
     for (const roomId in rooms) {
       rooms[roomId].delete(ws);
       if (rooms[roomId].size === 0) {
@@ -59,15 +58,15 @@ wss.on('connection', (ws: WebSocket) => {
 });
 
 // Функция для добавления пользователя в комнату
-function joinRoom(ws: WebSocket, roomId: string, userId: string, username: string) {
+function joinRoom(ws: WebSocket, roomId: string, userId: string, username: string, userAvatar: string) {
   if (!rooms[roomId]) {
     rooms[roomId] = new Set();
   }
   rooms[roomId].add(ws);
-  clients.set(ws, { userId, username });
+  clients.set(ws, { userId, username, userAvatar });
 
   console.log(`User ${username} joined room ${roomId}`);
-  broadcastUserList(roomId);
+  broadcastUserList(roomId); // Обновляем список пользователей для всех в комнате
 }
 
 // Функция для выхода из комнаты
@@ -77,6 +76,7 @@ function leaveRoom(ws: WebSocket, roomId: string) {
     console.log(`User ${clients.get(ws)?.username} left room ${roomId}`);
     if (rooms[roomId].size === 0) {
       delete rooms[roomId];
+      console.log(`Room ${roomId} deleted as it is empty.`);
     } else {
       broadcastUserList(roomId);
     }
@@ -89,7 +89,12 @@ function broadcastUserList(roomId: string) {
     const usersInRoom = Array.from(rooms[roomId]).map((client) => clients.get(client));
     const userListMessage = JSON.stringify({
       type: 'update_users',
-      users: usersInRoom.map((user) => ({ userId: user?.userId, username: user?.username })),
+      roomId,
+      users: usersInRoom.map((user) => ({
+        userId: user?.userId,
+        username: user?.username,
+        userAvatar: user?.userAvatar
+      })),
     });
 
     rooms[roomId].forEach((client) => {

@@ -42,7 +42,7 @@ export function myProfile(username: string) {
   <div class="profile_buttons">${SVG.micro}${SVG.headphones}</div>`;
 }
 
-export function userInChannel(username: string, userId: string) {
+export function userInChannel(userId: string, username: string) {
   return `<div class="user_in_channel" id="user_in_channel_${userId}">
   <div class="user_in_channel_avatar"></div>
   <div class="user_in_channel_name">${username}</div>

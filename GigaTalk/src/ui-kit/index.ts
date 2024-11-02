@@ -67,9 +67,10 @@ export function removeUserFromChannel(userId: string) {
 }
 
 export function updateUsersInChannel(
-  channelId: string,
+  roomId: string,
   users: { userId: string; username: string }[],
 ) {
+  const [serverId, channelId] = roomId.split('-');
   const channel_list = document.getElementById(`user_list_${channelId}`);
   if (channel_list) {
     channel_list.innerHTML = '';

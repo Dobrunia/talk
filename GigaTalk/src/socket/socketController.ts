@@ -18,7 +18,8 @@ export function handleSocketMessage(data: any) {
       removeUserFromChannel(data.userId);
       break;
     case 'update_users':
-      updateUsersInChannel(data.channelId, data.users);
+      console.log(data)
+      updateUsersInChannel(data.roomId, data.users);
       break;
     default:
       console.warn('Unknown message type:', data.type);
@@ -26,22 +27,28 @@ export function handleSocketMessage(data: any) {
 }
 
 export function joinChannel(
+  serverId: number,
   channelId: number,
   userId: string,
   username: string,
+  userAvatar: string
 ) {
   sendSocketMessage({
     type: 'join',
+    serverId: serverId,
     channelId: channelId,
     userId: userId,
     username: username,
+    userAvatar: userAvatar
   });
 }
 
-export function leaveChannel(channelId: number, userId: string) {
+export function leaveChannel(serverId: number, channelId: number, userId: string) {
   sendSocketMessage({
     type: 'leave',
+    serverId: serverId,
     channelId: channelId,
-    userId: userId,
+    userId: userId
   });
 }
+
