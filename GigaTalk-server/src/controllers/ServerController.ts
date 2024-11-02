@@ -3,22 +3,25 @@ import { RowDataPacket } from 'mysql2';
 import connection from '../db/connection.ts';
 
 class ServerController {
-  async getAllServers(req: Request, res: Response, next: NextFunction) {
+  async getAllMyServers(req: Request, res: Response, next: NextFunction) {
     try {
+      const userId = req.userId;
       const [servers] = await connection.query<RowDataPacket[]>(
-        'SELECT * FROM `servers`',
+        'SELECT servers.* FROM servers JOIN server_members ON servers.id = server_members.server_id WHERE server_members.member_id = ?',
+        [userId]
       );
       res.status(200).json(servers);
     } catch (error) {
       next(error);
     }
   }
-  async getServerById(req: Request, res: Response, next: NextFunction) {
-    const { serverId } = req.params;
+  async getMyServerInfoById(req: Request, res: Response, next: NextFunction) {
     try {
+      const { serverId } = req.params;
+      const userId = req.userId;
       const [serverData] = await connection.query<RowDataPacket[]>(
-        'SELECT * FROM `servers` WHERE id = ? AND type = "open"',
-        [serverId],
+        'SELECT servers.* FROM servers LEFT JOIN server_members ON servers.id = server_members.server_id AND server_members.member_id = ? WHERE servers.id = ? AND (servers.type = "open" OR (servers.type = "private" AND server_members.member_id IS NOT NULL))',
+        [userId, serverId]
       );
 
       const server = serverData[0];

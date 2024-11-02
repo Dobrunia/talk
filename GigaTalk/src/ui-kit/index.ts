@@ -51,41 +51,19 @@ export function renderProfile() {
 }
 
 export function renderUserToChannel(
+  serverId: string,
   channelId: string,
   userId: string,
   username: string,
+  userAvatar: string,
 ) {
-  const channel_list = document.getElementById(`user_list_${channelId}`);
-  if (!channel_list) {
-    console.error('User list container not found for channel:', channelId);
-    return;
-  }
-  channel_list.insertAdjacentHTML('beforeend', userInChannel(userId, username));
+  console.log(serverId, channelId, userId, username, userAvatar);
 }
 
-export function removeUserFromChannel(userId: string) {
-  const userElement = document.getElementById(`user_in_channel_${userId}`);
-  userElement?.remove();
-}
-
-export function updateUsersInChannel(
+export function removeUserFromChannel(
   serverId: string,
   channelId: string,
-  users: {
-    userId: string;
-    username: string;
-    userAvatar: string;
-  }[],
+  userId: string,
 ) {
-  const isServerOpen = document.getElementById(`server_id_${serverId}`);
-  if (isServerOpen) {
-    console.log(users);
-    const channel_list = document.getElementById(`user_list_${channelId}`);
-    if (channel_list) {
-      channel_list.innerHTML = '';
-      users.forEach((user) => {
-        renderUserToChannel(channelId, user.userId, user.username);
-      });
-    }
-  }
+  console.log(serverId, channelId, userId);
 }

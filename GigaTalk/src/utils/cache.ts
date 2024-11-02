@@ -4,15 +4,15 @@ import { serverApi } from '../api/serverApi';
 export const updateCache = {
   async serversList() {
     try {
-      const data = await serverApi.getAllServers();
+      const data = await serverApi.getAllMyServers();
       cacheServersList(data);
     } catch (error) {
       console.error('Failed to update servers list cache:', error);
     }
   },
-  async serverInfo(serverId: number) {
+  async serverInfo(serverId: string) {
     try {
-      const data = await serverApi.getServerById(serverId);
+      const data = await serverApi.getMyServerInfoById(serverId);
       cacheServerInfo(serverId, data);
     } catch (error) {
       console.error('Failed to update server cache:', error);
@@ -24,11 +24,25 @@ async function cacheServersList(data: serverDATA) {
   localStorage.setItem('serversList', JSON.stringify(data));
 }
 
-async function cacheServerInfo(serverId: number, data: serverDATA) {
+async function cacheServerInfo(serverId: string, data: serverDATA) {
   localStorage.setItem(`server_${serverId}`, JSON.stringify(data));
 }
 
-export function saveUserData(userId: number, username: string) {
+export function saveUserData(userId: string, username: string) {
   localStorage.setItem('userId', userId.toString());
   localStorage.setItem('username', username);
+}
+
+export function getData() {
+  const userId = localStorage.getItem('userId') || '';
+  const username = localStorage.getItem('username') || '';
+  const userAvatar = 'img';
+  const serversList = localStorage.getItem('serversList') || '';
+  const DATA = {
+    userId,
+    username,
+    userAvatar,
+    serversList: JSON.parse(serversList),
+  };
+  return DATA;
 }

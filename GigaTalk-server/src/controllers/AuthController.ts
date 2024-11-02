@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import connection from '../db/connection';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 const TOKEN_EXPIRATION = '1d'; // Срок действия токена
 const GUEST_EXPIRATION_DAYS = 7; // Время жизни гостевых аккаунтов в днях

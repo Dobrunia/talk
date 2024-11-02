@@ -1,4 +1,4 @@
-import { handleSocketMessage } from "./socketController";
+import { handleSocketMessage, joinToAllMyServers, leaveFromAllMyServers } from './socketController';
 
 let socket: WebSocket | null = null;
 
@@ -6,10 +6,12 @@ export function connectSocket() {
   socket = new WebSocket('ws://localhost:3000');
 
   socket.onopen = () => {
-    console.log('WebSocket connection established.');
+    joinToAllMyServers();
+    console.log('WebSocket connection opened');
   };
 
   socket.onclose = () => {
+    leaveFromAllMyServers();
     console.log('WebSocket connection closed.');
   };
 

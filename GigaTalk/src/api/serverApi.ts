@@ -1,13 +1,13 @@
 import apiClient from './axiosInstance.ts';
 
 export const serverApi = {
-  async getAllServers() {
-    const response = await apiClient.get('/getAllServers');
+  async getAllMyServers() {
+    const response = await apiClient.get('/getAllMyServers');
     return response.data;
   },
 
-  async getServerById(serverId: number) {
-    const response = await apiClient.get(`/getServerById/${serverId}`);
+  async getMyServerInfoById(serverId: string) {
+    const response = await apiClient.get(`/getMyServerInfoById/${serverId}`);
     return response.data;
   },
 };

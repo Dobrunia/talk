@@ -1,18 +1,16 @@
 import { joinChannel, leaveChannel } from '../socket/socketController.ts';
 import { serverDATA } from '../types/types.ts';
-import { renderServerInfo } from '../ui-kit/index.ts';
+import { renderServerInfo, renderUserToChannel } from '../ui-kit/index.ts';
 import {
+  getInCheck,
   guestLoginHandler,
   handleLogin,
   handleRegister,
 } from '../utils/authController.ts';
 import { showLogin, showRegister } from '../utils/authUIController.ts';
-import { updateCache } from '../utils/cache.ts';
+import { getData, updateCache } from '../utils/cache.ts';
 
-const userId = localStorage.getItem('userId') || 'anonymous';
-const username = localStorage.getItem('username') || 'Guest';
-
-async function serverClickHandler(serverId: number) {
+async function serverClickHandler(serverId: string) {
   const cachedServerData = localStorage.getItem(`server_${serverId}`);
   let serverData: serverDATA | null = null;
   console.log('serverClickHandler');
@@ -23,7 +21,7 @@ async function serverClickHandler(serverId: number) {
       serverData = JSON.parse(cachedServerData) as serverDATA;
       renderServerInfo(serverData);
     } catch (error) {
-      console.error('Failed to parse cached serverData:', error);
+      console.error('Ошибка парсинга serverData:', error);
     }
   }
 
@@ -33,27 +31,43 @@ async function serverClickHandler(serverId: number) {
     if (updatedServerData) {
       serverData = JSON.parse(updatedServerData) as serverDATA;
       renderServerInfo(serverData);
-      console.log('Отрисовываем обновлённые данные сервера');
+      console.log('Отрисовка обновлённых данных сервера');
     }
   }
 }
 
-let channelIdCheck: number = 0;
-function voiceChannelClick(channelId: number) {
-  if (channelId === channelIdCheck) {
+let currentChannelId: string | null = null;
+async function voiceChannelClick(channelId: string, serverId: string) {
+  if (channelId === currentChannelId) {
     console.log('Вы уже в этом канале');
     return;
   }
 
-  joinChannel(1, channelId, userId, username, 'img');
+  await getInCheck();
+  const DATA = getData();
+  joinChannel(serverId, channelId, DATA.userId, DATA.username, DATA.userAvatar);
+  renderUserToChannel(
+    serverId,
+    channelId,
+    DATA.userId,
+    DATA.username,
+    DATA.userAvatar,
+  );
   document.getElementById('in_conversation_things')?.classList.remove('hidden');
-  channelIdCheck = channelId;
+  currentChannelId = channelId;
 }
 
-function voiceChannelLeave() {
-  leaveChannel(1, channelIdCheck, userId);
+function voiceChannelLeave(serverId: string) {
+  const DATA = getData();
+  leaveChannel(
+    serverId,
+    currentChannelId as string,
+    DATA.userId,
+    DATA.username,
+    DATA.userAvatar,
+  );
   document.getElementById('in_conversation_things')?.classList.add('hidden');
-  channelIdCheck = 0;
+  currentChannelId = null;
 }
 
 window.voiceChannelClick = voiceChannelClick;

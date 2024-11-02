@@ -5,8 +5,8 @@ import { authController } from './controllers/AuthController';
 const router = Router();
 
 // Маршруты для серверов
-router.get('/getAllServers', serverController.getAllServers);
-router.get('/getServerById/:serverId', serverController.getServerById);
+router.get('/getAllMyServers', serverController.getAllMyServers);
+router.get('/getMyServerInfoById/:serverId', serverController.getMyServerInfoById);
 
 // Маршруты для аутентификации
 router.post('/register', authController.register);
