@@ -48,9 +48,15 @@ export function myProfile(username: string) {
   <div class="profile_buttons">${SVG.micro}${SVG.headphones}</div>`;
 }
 
-export function userInChannel(userId: string, username: string) {
+export function userInChannel(
+  userId: string,
+  username: string,
+  userAvatar: string,
+) {
   return `<div class="user_in_channel" id="user_in_channel_${userId}">
-  <div class="user_in_channel_avatar"></div>
+  <div class="user_in_channel_avatar" style="background-image: url(${
+    userAvatar !== null ? userAvatar : '/default_profile.jpg'
+  });"></div>
   <div class="user_in_channel_name">${username}</div>
   </div>`;
 }

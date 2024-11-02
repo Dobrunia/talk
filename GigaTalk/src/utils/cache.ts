@@ -28,15 +28,20 @@ async function cacheServerInfo(serverId: string, data: serverDATA) {
   localStorage.setItem(`server_${serverId}`, JSON.stringify(data));
 }
 
-export function saveUserData(userId: string, username: string) {
+export function saveUserData(
+  userId: string,
+  username: string,
+  userAvatar: string,
+) {
   localStorage.setItem('userId', userId.toString());
   localStorage.setItem('username', username);
+  localStorage.setItem('userAvatar', userAvatar);
 }
 
 export function getData() {
   const userId = localStorage.getItem('userId') || '';
   const username = localStorage.getItem('username') || '';
-  const userAvatar = 'img';
+  const userAvatar = localStorage.getItem('userAvatar') || '';
   const serversList = localStorage.getItem('serversList') || '';
   const DATA = {
     userId,

@@ -1,4 +1,5 @@
 import { serverDATA } from '../types/types.ts';
+import { removeUserFromChannel, renderUserToChannel } from '../ui-kit/index.ts';
 import { updateCache } from '../utils/cache.ts';
 import { sendSocketMessage } from './socket.ts';
 
@@ -11,9 +12,17 @@ export function handleSocketMessage(data: any) {
       console.log('Пользователь покинул сервер', data);
       break;
     case 'user_join_channel':
+      renderUserToChannel(
+        data.serverId,
+        data.channelId,
+        data.user.userId,
+        data.user.username,
+        data.user.userAvatar,
+      );
       console.log('Пользователь подключился к каналу', data);
       break;
     case 'user_leave_channel':
+      removeUserFromChannel(data.serverId, data.channelId, data.user.userId);
       console.log('Пользователь покинул канал', data);
       break;
     default:

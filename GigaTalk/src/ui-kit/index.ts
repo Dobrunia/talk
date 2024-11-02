@@ -57,7 +57,14 @@ export function renderUserToChannel(
   username: string,
   userAvatar: string,
 ) {
-  console.log(serverId, channelId, userId, username, userAvatar);
+  const openedServerId = document.getElementById('server_id')?.getAttribute('data-serverId');
+  const user_list = document.getElementById(`user_list_${channelId}`);
+  if ((openedServerId == serverId) && user_list) {//TODO: null  == undefined
+    user_list.insertAdjacentHTML(
+      'beforeend',
+      userInChannel(userId, username, userAvatar),
+    );
+  }
 }
 
 export function removeUserFromChannel(
@@ -65,5 +72,9 @@ export function removeUserFromChannel(
   channelId: string,
   userId: string,
 ) {
-  console.log(serverId, channelId, userId);
+  const openedServerId = document.getElementById('server_id')?.getAttribute('data-serverId');
+  const user_list = document.getElementById(`user_list_${channelId}`);
+  if (openedServerId && serverId && user_list) {
+    document.getElementById(`user_in_channel_${userId}`)?.remove();
+  }
 }

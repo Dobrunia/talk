@@ -30,21 +30,21 @@ export function setupWebSocket(server: http.Server) {
 
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as {
-        userId: string;
+        id: string;
         username: string;
         userAvatar: string;
       };
-      const { userId, username, userAvatar } = decoded;
+      const { id, username, userAvatar } = decoded;
 
       clients.set(ws, {
-        userId,
+        userId: id,
         username,
         userAvatar,
         serverId: null,
         channelId: null,
       });
 
-      console.log(`WebSocket connection established with userId: ${userId}`);
+      console.log(`WebSocket connection established with userId: ${id}`);
 
       ws.on('message', (message: string) => handleSocketMessage(ws, message));
       ws.on('close', () => handleClientDisconnect(ws));
@@ -81,7 +81,6 @@ function handleSocketMessage(ws: WebSocket, message: string) {
         broadcastUserJoinChannel(ws, data.serverId, data.channelId);
         break;
       case 'leave_channel':
-        console.log(data.serverId, data.channelId)
         broadcastUserLeaveChannel(ws, data.serverId, data.channelId);
         break;
       default:
@@ -195,7 +194,6 @@ function broadcastUserJoinChannel(
   servers[serverId]?.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(userJoinMessage);
-      console.log('UserJoinChannel')
     }
   });
   console.log(`User ${clientData.username} JoinChannel ${channelId}`);
@@ -223,7 +221,6 @@ function broadcastUserLeaveChannel(
   servers[serverId]?.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(userLeaveMessage);
-      console.log('UserLeaveChannel')
     }
   });
   console.log(`User ${clientData.username} LeaveChannel ${channelId}`);

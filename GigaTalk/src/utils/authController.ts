@@ -37,7 +37,10 @@ export async function handleRegister(event: Event) {
     alert('Регистрация прошла успешно');
     showLogin(); // Переход на вкладку "Войти" после успешной регистрации
   } catch (error) {
-    console.error('Ошибка при регистрации:', (error as any).response.data.error);
+    console.error(
+      'Ошибка при регистрации:',
+      (error as any).response.data.error,
+    );
     alert((error as any).response.data.error);
   }
 }
@@ -54,7 +57,7 @@ export async function handleLogin(event: Event) {
   try {
     const data = await authApi.login(username, password);
     localStorage.setItem('token', data.token);
-    saveUserData(data.userId, data.username);
+    saveUserData(data.userId, data.username, data.userAvatar);
     closeAuthModal();
     logInRender();
   } catch (error) {
@@ -96,7 +99,11 @@ export async function getInCheck() {
 
   const response = await checkTokenValidity(token);
   if (response.valid) {
-    saveUserData(response.decoded.id, response.decoded.username);
+    saveUserData(
+      response.decoded.id,
+      response.decoded.username,
+      response.decoded.userAvatar,
+    );
     return true;
   } else {
     // Если токен недействителен, удаляем его и показываем модальное окно

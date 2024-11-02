@@ -1,6 +1,6 @@
 import { joinChannel, leaveChannel } from '../socket/socketController.ts';
 import { serverDATA } from '../types/types.ts';
-import { renderServerInfo, renderUserToChannel } from '../ui-kit/index.ts';
+import { removeUserFromChannel, renderServerInfo, renderUserToChannel } from '../ui-kit/index.ts';
 import {
   getInCheck,
   guestLoginHandler,
@@ -44,6 +44,8 @@ async function voiceChannelClick(serverId: string, channelId: string) {
   }
 
   joinChannel(serverId, channelId);
+  // getInCheck()
+  // const DATA = getData();
   // renderUserToChannel(
   //   serverId,
   //   channelId,
@@ -56,7 +58,6 @@ async function voiceChannelClick(serverId: string, channelId: string) {
 }
 
 function voiceChannelLeave() {
-  //const DATA = getData();
   const serverId = document
     .getElementById('server_id')
     ?.getAttribute('data-serverId');
@@ -66,6 +67,8 @@ function voiceChannelLeave() {
   }
 
   leaveChannel(serverId, currentChannelId as string);
+  // const DATA = getData();
+  // removeUserFromChannel(serverId, currentChannelId as string, DATA.userId)
   document.getElementById('in_conversation_things')?.classList.add('hidden');
   currentChannelId = null;
 }
