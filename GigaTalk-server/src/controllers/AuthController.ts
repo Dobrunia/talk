@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
-const TOKEN_EXPIRATION = '1d'; // Срок действия токена
+const TOKEN_EXPIRATION = '10d'; // Срок действия токена
 const GUEST_EXPIRATION_DAYS = 7; // Время жизни гостевых аккаунтов в днях
 
 class AuthController {
@@ -57,25 +57,29 @@ class AuthController {
         res.status(401).json({ error: 'Неверное имя пользователя или пароль' });
         return;
       }
-
+  
       const user = (users as any[])[0];
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
       if (!isPasswordCorrect) {
         res.status(401).json({ error: 'Неверное имя пользователя или пароль' });
         return;
       }
-
-      // Создание JWT токена
-      const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: TOKEN_EXPIRATION });
-
+  
+      // Создание JWT токена с userAvatar
+      const token = jwt.sign(
+        { id: user.id, username: user.username, userAvatar: user.avatar },
+        JWT_SECRET,
+        { expiresIn: TOKEN_EXPIRATION }
+      );
+  
       // Добавление записи в `active_sessions`
       await connection.query(
         'INSERT INTO active_sessions (user_id, token, expires_at, is_guest) VALUES (?, ?, NOW() + INTERVAL 1 DAY, FALSE)',
         [user.id, token],
       );
-
-      // Возвращаем токен, userId и username
-      res.status(200).json({ token, userId: user.id, username: user.username });
+  
+      // Возвращаем токен, userId, username и userAvatar
+      res.status(200).json({ token, userId: user.id, username: user.username, userAvatar: user.avatar });
     } catch (error) {
       next(error);
     }
@@ -151,11 +155,9 @@ class AuthController {
     try {
       // Проверяем токен
       const decoded = jwt.verify(token, JWT_SECRET);
-
       // Возвращаем успешный ответ, если токен валиден
       res.status(200).json({ valid: true, decoded });
     } catch (error) {
-      // Обрабатываем ошибку при невалидном токене
       res.status(401).json({ error: 'Недействительный токен' });
     }
   }

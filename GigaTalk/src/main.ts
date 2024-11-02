@@ -7,7 +7,7 @@ async function start() {
   if (await getInCheck()) {
     logInRender();
     // Запускаем соединение WebSocket
-    connectSocket();
+    // connectSocket();
   }
 }
 

@@ -1,6 +1,7 @@
 import { closeAuthModal, showLogin } from './authUIController';
 import { authApi } from '../api/authApi';
 import { saveUserData } from './cache';
+import { logInRender } from './render';
 
 export async function guestLoginHandler() {
   try {
@@ -36,8 +37,8 @@ export async function handleRegister(event: Event) {
     alert('Регистрация прошла успешно');
     showLogin(); // Переход на вкладку "Войти" после успешной регистрации
   } catch (error) {
-    console.error('Ошибка при регистрации:', error);
-    alert('Ошибка при регистрации');
+    console.error('Ошибка при регистрации:', (error as any).response.data.error);
+    alert((error as any).response.data.error);
   }
 }
 
@@ -55,6 +56,7 @@ export async function handleLogin(event: Event) {
     localStorage.setItem('token', data.token);
     saveUserData(data.userId, data.username);
     closeAuthModal();
+    logInRender();
   } catch (error) {
     if (error instanceof Error && (error as any).response) {
       const axiosError = error as any;

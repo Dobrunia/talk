@@ -1,4 +1,4 @@
-import apiClient from './axiosInstance';
+import apiClient from './axiosInstance.ts';
 
 export const authApi = {
   async register(username: string, password: string) {
