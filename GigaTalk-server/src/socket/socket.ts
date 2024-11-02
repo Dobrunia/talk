@@ -29,7 +29,11 @@ export function setupWebSocket(server: http.Server) {
     }
 
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; username: string; userAvatar: string };
+      const decoded = jwt.verify(token, JWT_SECRET) as {
+        userId: string;
+        username: string;
+        userAvatar: string;
+      };
       const { userId, username, userAvatar } = decoded;
 
       clients.set(ws, {
@@ -44,12 +48,22 @@ export function setupWebSocket(server: http.Server) {
 
       ws.on('message', (message: string) => handleSocketMessage(ws, message));
       ws.on('close', () => handleClientDisconnect(ws));
-
     } catch (error) {
       console.error('Invalid token:', error);
       ws.close(1008, 'Invalid token');
     }
   });
+}
+
+// Обработка отключения клиента
+function handleClientDisconnect(ws: WebSocket) {
+  const clientData = clients.get(ws);
+  if (clientData) {
+    //if (clientData.channelId) leaveChannel(ws);
+    if (clientData.serverId) leaveServer(ws);
+  }
+  clients.delete(ws);
+  console.log(`User ${clientData?.username} disconnected`);
 }
 
 // Обработка сообщений WebSocket
@@ -62,15 +76,6 @@ function handleSocketMessage(ws: WebSocket, message: string) {
         break;
       case 'leave_server':
         leaveServer(ws);
-        break;
-      case 'join_channel':
-        joinChannel(ws, data.channelId);
-        break;
-      case 'leave_channel':
-        leaveChannel(ws);
-        break;
-      case 'send_message':
-        sendMessageToChannel(ws, data.channelId, data.message);
         break;
       default:
         console.warn('Unknown message type:', data.type);
@@ -94,7 +99,7 @@ function joinServer(ws: WebSocket, serverId: string) {
     servers[serverId].add(ws);
 
     console.log(`User ${clientData.username} joined server ${serverId}`);
-    broadcastUserListInServer(serverId);
+    broadcastUserJoinServer(serverId);
   }
 }
 
@@ -115,53 +120,16 @@ function leaveServer(ws: WebSocket) {
     }
 
     console.log(`User ${clientData.username} left server ${serverId}`);
-    broadcastUserListInServer(serverId);
+    broadcastUserLeaveServer(serverId);
   }
 }
 
-// Подключение к каналу
-function joinChannel(ws: WebSocket, channelId: string) {
-  const clientData = clients.get(ws);
-  if (clientData && clientData.serverId) { // Только если пользователь подключен к серверу
-    clientData.channelId = channelId;
-    clients.set(ws, clientData);
-    console.log(`User ${clientData.username} joined channel ${channelId}`);
-    broadcastUserListInChannel(channelId);
-  }
-}
-
-// Отключение от канала
-function leaveChannel(ws: WebSocket) {
-  const clientData = clients.get(ws);
-  if (clientData && clientData.channelId) {
-    const { channelId } = clientData;
-    clientData.channelId = null;
-    clients.set(ws, clientData);
-    console.log(`User ${clientData.username} left channel ${channelId}`);
-    broadcastUserListInChannel(channelId);
-  }
-}
-
-// Отправка сообщения в канал
-function sendMessageToChannel(ws: WebSocket, channelId: string, message: string) {
-  const clientData = clients.get(ws);
-  if (clientData && clientData.channelId === channelId) {
-    const payload = JSON.stringify({
-      type: 'channel_message',
-      channelId,
-      userId: clientData.userId,
-      username: clientData.username,
-      message,
-    });
-    broadcastToChannel(channelId, payload);
-  }
-}
-
-// Бродкаст всем пользователям на сервере
-function broadcastUserListInServer(serverId: string) {
-  const usersInServer = Array.from(servers[serverId] || []).map((ws) => clients.get(ws));
+function broadcastUserJoinServer(serverId: string) {
+  const usersInServer = Array.from(servers[serverId] || []).map((ws) =>
+    clients.get(ws),
+  );
   const userListMessage = JSON.stringify({
-    type: 'user_list_server',
+    type: 'user_join_server',
     serverId,
     users: usersInServer.map((user) => ({
       userId: user?.userId,
@@ -177,41 +145,23 @@ function broadcastUserListInServer(serverId: string) {
   });
 }
 
-// Бродкаст пользователям в канале
-function broadcastUserListInChannel(channelId: string) {
-  const usersInChannel = Array.from(clients.values())
-    .filter((client) => client.channelId === channelId)
-    .map((user) => ({
-      userId: user.userId,
-      username: user.username,
-      userAvatar: user.userAvatar,
-    }));
-
+function broadcastUserLeaveServer(serverId: string) {
+  const usersInServer = Array.from(servers[serverId] || []).map((ws) =>
+    clients.get(ws),
+  );
   const userListMessage = JSON.stringify({
-    type: 'user_list_channel',
-    channelId,
-    users: usersInChannel,
+    type: 'user_leave_server',
+    serverId,
+    users: usersInServer.map((user) => ({
+      userId: user?.userId,
+      username: user?.username,
+      userAvatar: user?.userAvatar,
+    })),
   });
 
-  broadcastToChannel(channelId, userListMessage);
-}
-
-// Бродкаст для канала
-function broadcastToChannel(channelId: string, message: string) {
-  for (const [client, clientData] of clients.entries()) {
-    if (clientData.channelId === channelId && client.readyState === WebSocket.OPEN) {
-      client.send(message);
+  servers[serverId]?.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(userListMessage);
     }
-  }
-}
-
-// Обработка отключения клиента
-function handleClientDisconnect(ws: WebSocket) {
-  const clientData = clients.get(ws);
-  if (clientData) {
-    if (clientData.channelId) leaveChannel(ws);
-    if (clientData.serverId) leaveServer(ws);
-  }
-  clients.delete(ws);
-  console.log(`User ${clientData?.username} disconnected`);
+  });
 }

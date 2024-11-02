@@ -1,4 +1,4 @@
-import { joinChannel, leaveChannel } from '../socket/socketController.ts';
+//import { joinChannel, leaveChannel } from '../socket/socketController.ts';
 import { serverDATA } from '../types/types.ts';
 import { renderServerInfo, renderUserToChannel } from '../ui-kit/index.ts';
 import {
@@ -36,42 +36,42 @@ async function serverClickHandler(serverId: string) {
   }
 }
 
-let currentChannelId: string | null = null;
-async function voiceChannelClick(channelId: string, serverId: string) {
-  if (channelId === currentChannelId) {
-    console.log('Вы уже в этом канале');
-    return;
-  }
+// let currentChannelId: string | null = null;
+// async function voiceChannelClick(channelId: string, serverId: string) {
+//   if (channelId === currentChannelId) {
+//     console.log('Вы уже в этом канале');
+//     return;
+//   }
 
-  await getInCheck();
-  const DATA = getData();
-  joinChannel(serverId, channelId, DATA.userId, DATA.username, DATA.userAvatar);
-  renderUserToChannel(
-    serverId,
-    channelId,
-    DATA.userId,
-    DATA.username,
-    DATA.userAvatar,
-  );
-  document.getElementById('in_conversation_things')?.classList.remove('hidden');
-  currentChannelId = channelId;
-}
+//   await getInCheck();
+//   const DATA = getData();
+//   joinChannel(serverId, channelId, DATA.userId, DATA.username, DATA.userAvatar);
+//   renderUserToChannel(
+//     serverId,
+//     channelId,
+//     DATA.userId,
+//     DATA.username,
+//     DATA.userAvatar,
+//   );
+//   document.getElementById('in_conversation_things')?.classList.remove('hidden');
+//   currentChannelId = channelId;
+// }
 
-function voiceChannelLeave(serverId: string) {
-  const DATA = getData();
-  leaveChannel(
-    serverId,
-    currentChannelId as string,
-    DATA.userId,
-    DATA.username,
-    DATA.userAvatar,
-  );
-  document.getElementById('in_conversation_things')?.classList.add('hidden');
-  currentChannelId = null;
-}
+// function voiceChannelLeave(serverId: string) {
+//   const DATA = getData();
+//   leaveChannel(
+//     serverId,
+//     currentChannelId as string,
+//     DATA.userId,
+//     DATA.username,
+//     DATA.userAvatar,
+//   );
+//   document.getElementById('in_conversation_things')?.classList.add('hidden');
+//   currentChannelId = null;
+// }
 
-window.voiceChannelClick = voiceChannelClick;
-window.voiceChannelLeave = voiceChannelLeave;
+// window.voiceChannelClick = voiceChannelClick;
+// window.voiceChannelLeave = voiceChannelLeave;
 window.serverClickHandler = serverClickHandler;
 window.guestLoginHandler = guestLoginHandler;
 window.handleRegister = handleRegister;
