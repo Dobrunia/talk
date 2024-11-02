@@ -77,6 +77,13 @@ function handleSocketMessage(ws: WebSocket, message: string) {
       case 'leave_server':
         leaveServer(ws);
         break;
+      case 'join_channel':
+        broadcastUserJoinChannel(ws, data.serverId, data.channelId);
+        break;
+      case 'leave_channel':
+        console.log(data.serverId, data.channelId)
+        broadcastUserLeaveChannel(ws, data.serverId, data.channelId);
+        break;
       default:
         console.warn('Unknown message type:', data.type);
     }
@@ -164,4 +171,60 @@ function broadcastUserLeaveServer(serverId: string) {
       client.send(userListMessage);
     }
   });
+}
+
+function broadcastUserJoinChannel(
+  ws: WebSocket,
+  serverId: string,
+  channelId: string,
+) {
+  const clientData = clients.get(ws);
+  if (!clientData) return;
+
+  const userJoinMessage = JSON.stringify({
+    type: 'user_join_channel',
+    serverId,
+    channelId,
+    user: {
+      userId: clientData.userId,
+      username: clientData.username,
+      userAvatar: clientData.userAvatar,
+    },
+  });
+
+  servers[serverId]?.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(userJoinMessage);
+      console.log('UserJoinChannel')
+    }
+  });
+  console.log(`User ${clientData.username} JoinChannel ${channelId}`);
+}
+
+function broadcastUserLeaveChannel(
+  ws: WebSocket,
+  serverId: string,
+  channelId: string,
+) {
+  const clientData = clients.get(ws);
+  if (!clientData) return;
+
+  const userLeaveMessage = JSON.stringify({
+    type: 'user_leave_channel',
+    serverId,
+    channelId,
+    user: {
+      userId: clientData.userId,
+      username: clientData.username,
+      userAvatar: clientData.userAvatar,
+    },
+  });
+
+  servers[serverId]?.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(userLeaveMessage);
+      console.log('UserLeaveChannel')
+    }
+  });
+  console.log(`User ${clientData.username} LeaveChannel ${channelId}`);
 }

@@ -14,14 +14,16 @@ export function serverName(name: string) {
 }
 
 export function serverId(id: string) {
-  return `<div id="server_id_${id}"></div>`;
+  return `<div id="server_id" data-serverId="${id}"></div>`;
 }
 
-export function serverCategory(category: category) {
+export function serverCategory(category: category, serverId: string) {
   let ch = '';
   category.channels?.forEach((channel) => {
     ch += `<li class="channel_item">
-    <div class="channel_name" onclick="voiceChannelClick(${channel.id})">
+    <div class="channel_name" onclick="voiceChannelClick(${serverId},${
+      channel.id
+    })">
       ${channel.type === 'voice' ? SVG.voiceIco : '#'}
       <div>${channel.name}</div>
     </div>

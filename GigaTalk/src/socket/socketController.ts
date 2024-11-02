@@ -10,6 +10,12 @@ export function handleSocketMessage(data: any) {
     case 'user_leave_server':
       console.log('Пользователь покинул сервер', data);
       break;
+    case 'user_join_channel':
+      console.log('Пользователь подключился к каналу', data);
+      break;
+    case 'user_leave_channel':
+      console.log('Пользователь покинул канал', data);
+      break;
     default:
       console.warn('Неизвестный тип сообщения:', data.type);
   }
@@ -41,5 +47,21 @@ function joinServer(serverId: string) {
   sendSocketMessage({
     type: 'join_server',
     serverId,
+  });
+}
+
+export function joinChannel(serverId: string, channelId: string) {
+  sendSocketMessage({
+    type: 'join_channel',
+    serverId,
+    channelId,
+  });
+}
+
+export function leaveChannel(serverId: string, channelId: string) {
+  sendSocketMessage({
+    type: 'leave_channel',
+    serverId,
+    channelId,
   });
 }

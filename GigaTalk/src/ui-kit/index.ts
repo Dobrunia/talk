@@ -13,7 +13,7 @@ export function renderServerInfo(serverData: serverDATA) {
   let htmlContent = serverName(serverData.name);
   htmlContent += serverId(serverData.id.toString());
   serverData.categories?.forEach((category) => {
-    htmlContent += serverCategory(category);
+    htmlContent += serverCategory(category, serverData.id.toString());
   });
   const server_slot = document.getElementById('server_components_block');
   if (!server_slot) {
