@@ -55,6 +55,7 @@ export function setupWebSocket(server: http.Server) {
         handleSocketMessage(ws, message);
       });
       ws.on('close', () => {
+        //leaveChannel(ws, serverId, channelId);
         handleClientDisconnect(ws);
       });
     } catch (error) {
@@ -87,18 +88,15 @@ function handleSocketMessage(ws: WebSocket, message: string) {
         leaveServer(ws);
         break;
       case 'join_channel':
-        registerClient(ws, (clients.get(ws) as ClientData).userId, data.serverId, data.channelId);
+        joinChannel(ws, data.serverId, data.channelId);
         broadcastUserJoinChannel(ws, data.serverId, data.channelId);
         break;
       case 'leave_channel':
-        unregisterClient(ws);
+        leaveChannel(ws, data.serverId, data.channelId);
         broadcastUserLeaveChannel(ws, data.serverId, data.channelId);
         break;
-      case 'offer':
-      case 'answer':
-      case 'ice-candidate':
-        console.log('data ', data)
-        broadcastToChannel(ws, data.serverId, data.channelId, data);
+      case 'update_server_users_in_channels':
+        broadcastUsersInChannels(ws, data.serverId);
         break;
       default:
         console.warn('Unknown message type:', data.type);
@@ -106,6 +104,48 @@ function handleSocketMessage(ws: WebSocket, message: string) {
   } catch (error) {
     console.error('Failed to handle message:', error);
   }
+}
+
+// Создание объекта для хранения пользователей по каналам
+const channelClients: Record<string, WebSocket[]> = {};
+
+function joinChannel(ws: WebSocket, serverId: string, channelId: string) {
+  const clientData = clients.get(ws);
+  if (!clientData) {
+    console.error('Client not found');
+    return;
+  }
+  clientData.serverId = serverId;
+  clientData.channelId = channelId;
+  clients.set(ws, clientData);
+}
+
+function leaveChannel(ws: WebSocket, serverId: string, channelId: string) {
+  const clientData = clients.get(ws);
+  if (!clientData) {
+    console.error('Client not found');
+    return;
+  }
+  clientData.serverId = serverId;
+  clientData.channelId = null;
+  clients.set(ws, clientData);
+}
+
+// Запуск обмена между двумя пользователями
+function initiateExchange(
+  clients: WebSocket[],
+  serverId: string,
+  channelId: string,
+) {
+  clients.forEach((client) => {
+    client.send(
+      JSON.stringify({
+        type: 'exchange_start',
+        serverId,
+        channelId,
+      }),
+    );
+  });
 }
 
 // Подключение к серверу
@@ -241,4 +281,28 @@ function broadcastUserLeaveChannel(
     }
   });
   console.log(`User ${clientData.username} LeaveChannel ${channelId}`);
+}
+
+function broadcastUsersInChannels(ws: WebSocket, serverId: string) {
+  // Создаем массив для хранения данных пользователей
+  const usersInChannels = Array.from(clients.values())
+    .filter((client) => client.serverId === serverId) // Фильтруем пользователей по serverId
+    .map((client) => ({
+      userId: client.userId,
+      username: client.username,
+      userAvatar: client.userAvatar,
+      channelId: client.channelId,
+    }));
+
+  // Формируем сообщение с данными пользователей
+  const returnUsersInChannels = JSON.stringify({
+    type: 'return_server_users_in_channels',
+    serverId,
+    users: usersInChannels,
+  });
+
+  // Отправляем сообщение только запрашивающему клиенту
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(returnUsersInChannels);
+  }
 }

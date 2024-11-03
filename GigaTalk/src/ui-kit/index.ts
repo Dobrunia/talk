@@ -88,3 +88,22 @@ export function removeUserFromChannel(
     document.getElementById(`user_in_channel_${userId}`)?.remove();
   }
 }
+
+export function renderServerUsersInChannels(data: any) {
+  console.log(data.users);
+  const openedServerId = document
+    .getElementById('server_id')
+    ?.getAttribute('data-serverId');
+  data.users.forEach((user: any) => {
+    if (user.channelId && openedServerId) {
+      renderUserToChannel(
+        openedServerId,
+        user.channelId,
+        user.userId,
+        user.username,
+        user.userAvatar,
+      );
+      console.log('Отрисовали', user.username);
+    }
+  });
+}

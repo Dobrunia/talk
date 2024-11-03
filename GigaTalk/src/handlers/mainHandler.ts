@@ -1,38 +1,26 @@
-import { joinChannel, leaveChannel } from '../socket/socketController.ts';
+import { joinChannel, leaveChannel, updateServerUsersInChannels } from '../socket/socketController.ts';
 import { serverDATA } from '../types/types.ts';
-import { removeUserFromChannel, renderServerInfo, renderUserToChannel } from '../ui-kit/index.ts';
+import { renderServerInfo } from '../ui-kit/index.ts';
 import {
-  getInCheck,
   guestLoginHandler,
   handleLogin,
   handleRegister,
 } from '../utils/authController.ts';
 import { showLogin, showRegister } from '../utils/authUIController.ts';
-import { getData, updateCache } from '../utils/cache.ts';
+import { updateCache } from '../utils/cache.ts';
 
 async function serverClickHandler(serverId: string) {
-  const cachedServerData = localStorage.getItem(`server_${serverId}`);
-  let serverData: serverDATA | null = null;
-  console.log('serverClickHandler');
-
-  if (cachedServerData) {
-    try {
-      console.log('Отрисовываем сервер из кэша');
-      serverData = JSON.parse(cachedServerData) as serverDATA;
-      renderServerInfo(serverData);
-    } catch (error) {
-      console.error('Ошибка парсинга serverData:', error);
-    }
-  }
-
-  if (!serverData) {
-    await updateCache.serverInfo(serverId);
-    const updatedServerData = localStorage.getItem(`server_${serverId}`);
-    if (updatedServerData) {
-      serverData = JSON.parse(updatedServerData) as serverDATA;
-      renderServerInfo(serverData);
-      console.log('Отрисовка обновлённых данных сервера');
-    }
+  await updateCache.serverInfo(serverId);
+  const updatedServerData = localStorage.getItem(`server_${serverId}`);
+  if (updatedServerData) {
+    const serverData = JSON.parse(updatedServerData) as serverDATA;
+    renderServerInfo(serverData);
+    console.log('Отрисовка обновлённых данных сервера');
+    updateServerUsersInChannels(serverId);
+    console.log('Отрисовали активных пользователей сервера');
+  } else {
+    console.error('Failed to load server info');
+    return;
   }
 }
 
@@ -44,15 +32,6 @@ async function voiceChannelClick(serverId: string, channelId: string) {
   }
 
   joinChannel(serverId, channelId);
-  // getInCheck()
-  // const DATA = getData();
-  // renderUserToChannel(
-  //   serverId,
-  //   channelId,
-  //   DATA.userId,
-  //   DATA.username,
-  //   DATA.userAvatar,
-  // );
   document.getElementById('in_conversation_things')?.classList.remove('hidden');
   currentChannelId = channelId;
 }
@@ -67,8 +46,6 @@ function voiceChannelLeave() {
   }
 
   leaveChannel(serverId, currentChannelId as string);
-  // const DATA = getData();
-  // removeUserFromChannel(serverId, currentChannelId as string, DATA.userId)
   document.getElementById('in_conversation_things')?.classList.add('hidden');
   currentChannelId = null;
 }

@@ -13,7 +13,7 @@ export function connectSocket() {
 
   socket.onopen = () => {
     console.log('WebSocket connection opened');
-    joinToAllMyServers(); // Подключение ко всем серверам после открытия соединения
+    joinToAllMyServers();
   };
 
   socket.onclose = () => {
