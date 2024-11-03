@@ -42,8 +42,10 @@ export function serverCategory(category: category, serverId: string) {
   </div>`;
 }
 
-export function myProfile(username: string) {
-  return `<div class="profile_avatar">
+export function myProfile(username: string, userAvatar: string) {
+  return `<div class="profile_avatar" style="background-image: url(${
+    userAvatar !== 'null' ? userAvatar : '/default_profile.jpg'
+  });">
   </div><div class="profile_name">${username}</div>
   <div class="profile_buttons">${SVG.micro}${SVG.headphones}</div>`;
 }

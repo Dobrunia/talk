@@ -95,7 +95,7 @@
 }
 
 .profile_avatar {
-  @apply w-[44px] h-[44px] rounded-full bg-cover bg-center
+  @apply w-[42px] h-[42px] rounded-full bg-cover bg-center
 }
 
 .profile_name {

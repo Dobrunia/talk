@@ -47,7 +47,12 @@ export function renderProfile() {
     console.error('username in localStorage not found!');
     return;
   }
-  profile.innerHTML = myProfile(username);
+  const userAvatar = localStorage.getItem('userAvatar');
+  if (!userAvatar) {
+    console.error('userAvatar in localStorage not found!');
+    return;
+  }
+  profile.innerHTML = myProfile(username, userAvatar);
 }
 
 export function renderUserToChannel(
@@ -57,9 +62,12 @@ export function renderUserToChannel(
   username: string,
   userAvatar: string,
 ) {
-  const openedServerId = document.getElementById('server_id')?.getAttribute('data-serverId');
+  const openedServerId = document
+    .getElementById('server_id')
+    ?.getAttribute('data-serverId');
   const user_list = document.getElementById(`user_list_${channelId}`);
-  if ((openedServerId == serverId) && user_list) {//TODO: null  == undefined
+  if (openedServerId == serverId && user_list) {
+    //TODO: null  == undefined
     user_list.insertAdjacentHTML(
       'beforeend',
       userInChannel(userId, username, userAvatar),
@@ -72,7 +80,9 @@ export function removeUserFromChannel(
   channelId: string,
   userId: string,
 ) {
-  const openedServerId = document.getElementById('server_id')?.getAttribute('data-serverId');
+  const openedServerId = document
+    .getElementById('server_id')
+    ?.getAttribute('data-serverId');
   const user_list = document.getElementById(`user_list_${channelId}`);
   if (openedServerId && serverId && user_list) {
     document.getElementById(`user_in_channel_${userId}`)?.remove();
