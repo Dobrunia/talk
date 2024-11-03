@@ -55,7 +55,6 @@ export function setupWebSocket(server: http.Server) {
         handleSocketMessage(ws, message);
       });
       ws.on('close', () => {
-        //leaveChannel(ws, serverId, channelId);
         handleClientDisconnect(ws);
       });
     } catch (error) {
