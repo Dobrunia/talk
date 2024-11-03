@@ -2,6 +2,11 @@ import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import {
+  broadcastToChannel,
+  registerClient,
+  unregisterClient,
+} from '../WebRTC/WebRTCHandler';
 
 dotenv.config();
 
@@ -46,8 +51,12 @@ export function setupWebSocket(server: http.Server) {
 
       console.log(`WebSocket connection established with userId: ${id}`);
 
-      ws.on('message', (message: string) => handleSocketMessage(ws, message));
-      ws.on('close', () => handleClientDisconnect(ws));
+      ws.on('message', (message: string) => {
+        handleSocketMessage(ws, message);
+      });
+      ws.on('close', () => {
+        handleClientDisconnect(ws);
+      });
     } catch (error) {
       console.error('Invalid token:', error);
       ws.close(1008, 'Invalid token');
@@ -78,10 +87,18 @@ function handleSocketMessage(ws: WebSocket, message: string) {
         leaveServer(ws);
         break;
       case 'join_channel':
+        registerClient(ws, (clients.get(ws) as ClientData).userId, data.serverId, data.channelId);
         broadcastUserJoinChannel(ws, data.serverId, data.channelId);
         break;
       case 'leave_channel':
+        unregisterClient(ws);
         broadcastUserLeaveChannel(ws, data.serverId, data.channelId);
+        break;
+      case 'offer':
+      case 'answer':
+      case 'ice-candidate':
+        console.log('data ', data)
+        broadcastToChannel(ws, data.serverId, data.channelId, data);
         break;
       default:
         console.warn('Unknown message type:', data.type);

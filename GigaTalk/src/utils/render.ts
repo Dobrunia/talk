@@ -1,6 +1,5 @@
 import { serverDATA } from '../types/types.ts';
 import { renderProfile, renderServersList } from '../ui-kit/index.ts';
-import { userInChannel } from '../ui-kit/components.ts';
 import { updateCache } from './cache.ts';
 
 async function loadServers() {

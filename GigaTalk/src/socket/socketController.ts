@@ -1,6 +1,13 @@
 import { serverDATA } from '../types/types.ts';
 import { removeUserFromChannel, renderUserToChannel } from '../ui-kit/index.ts';
 import { updateCache } from '../utils/cache.ts';
+import {
+  endCall,
+  handleAnswer,
+  handleICECandidate,
+  handleOffer,
+  startCall,
+} from '../WebRTC/WebRTC.ts';
 import { sendSocketMessage } from './socket.ts';
 
 export function handleSocketMessage(data: any) {
@@ -12,6 +19,7 @@ export function handleSocketMessage(data: any) {
       console.log('Пользователь покинул сервер', data);
       break;
     case 'user_join_channel':
+      startCall(data.serverId, data.channelId);
       renderUserToChannel(
         data.serverId,
         data.channelId,
@@ -22,8 +30,19 @@ export function handleSocketMessage(data: any) {
       console.log('Пользователь подключился к каналу', data);
       break;
     case 'user_leave_channel':
+      endCall();
       removeUserFromChannel(data.serverId, data.channelId, data.user.userId);
       console.log('Пользователь покинул канал', data);
+      break;
+    case 'server_offer':
+      console.log('ОНО = ', data.offer);
+      handleOffer(data.offer, data.serverId, data.channelId);
+      break;
+    case 'server_answer':
+      handleAnswer(data.answer);
+      break;
+    case 'server_ice-candidate':
+      handleICECandidate(data.candidate);
       break;
     default:
       console.warn('Неизвестный тип сообщения:', data.type);
