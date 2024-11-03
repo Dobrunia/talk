@@ -3,9 +3,9 @@ import http from 'http';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import {
-  broadcastToChannel,
-  registerClient,
-  unregisterClient,
+  addUserToChannel,
+  removeUserFromAllChannels,
+  removeUserFromChannel,
 } from '../WebRTC/WebRTCHandler';
 
 dotenv.config();
@@ -14,7 +14,7 @@ type ClientData = {
   userId: string;
   username: string;
   userAvatar: string;
-  serverId: string | null; // Новый параметр для сервера
+  serverId: string | null;
   channelId: string | null;
 };
 
@@ -68,8 +68,9 @@ export function setupWebSocket(server: http.Server) {
 // Обработка отключения клиента
 function handleClientDisconnect(ws: WebSocket) {
   const clientData = clients.get(ws);
+  removeUserFromAllChannels(ws);
   if (clientData) {
-    //if (clientData.channelId) leaveChannel(ws);
+    //if (clientData.channelId) removeUserFromChannel(ws, clientData.serverId, clientData.channelId);
     if (clientData.serverId) leaveServer(ws);
   }
   clients.delete(ws);
@@ -106,9 +107,6 @@ function handleSocketMessage(ws: WebSocket, message: string) {
   }
 }
 
-// Создание объекта для хранения пользователей по каналам
-const channelClients: Record<string, WebSocket[]> = {};
-
 function joinChannel(ws: WebSocket, serverId: string, channelId: string) {
   const clientData = clients.get(ws);
   if (!clientData) {
@@ -118,6 +116,14 @@ function joinChannel(ws: WebSocket, serverId: string, channelId: string) {
   clientData.serverId = serverId;
   clientData.channelId = channelId;
   clients.set(ws, clientData);
+  addUserToChannel(
+    ws,
+    serverId,
+    channelId,
+    clientData.userId,
+    clientData.username,
+    clientData.userAvatar,
+  );
 }
 
 function leaveChannel(ws: WebSocket, serverId: string, channelId: string) {
@@ -129,23 +135,7 @@ function leaveChannel(ws: WebSocket, serverId: string, channelId: string) {
   clientData.serverId = serverId;
   clientData.channelId = null;
   clients.set(ws, clientData);
-}
-
-// Запуск обмена между двумя пользователями
-function initiateExchange(
-  clients: WebSocket[],
-  serverId: string,
-  channelId: string,
-) {
-  clients.forEach((client) => {
-    client.send(
-      JSON.stringify({
-        type: 'exchange_start',
-        serverId,
-        channelId,
-      }),
-    );
-  });
+  removeUserFromChannel(ws, serverId, channelId);
 }
 
 // Подключение к серверу

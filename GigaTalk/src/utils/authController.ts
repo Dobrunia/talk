@@ -2,6 +2,7 @@ import { closeAuthModal, showLogin } from './authUIController';
 import { authApi } from '../api/authApi';
 import { saveUserData } from './cache';
 import { logInRender } from './render';
+import { connectSocket } from '../socket/socket';
 
 export async function guestLoginHandler() {
   try {
@@ -60,6 +61,7 @@ export async function handleLogin(event: Event) {
     saveUserData(data.userId, data.username, data.userAvatar);
     closeAuthModal();
     logInRender();
+    connectSocket();
   } catch (error) {
     if (error instanceof Error && (error as any).response) {
       const axiosError = error as any;
