@@ -2,11 +2,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import {
-  addUserToChannel,
-  removeUserFromAllChannels,
-  removeUserFromChannel,
-} from '../mediasoup/mediasoupManager.ts';
+import { Consumer, Producer, WebRtcTransport } from 'mediasoup/node/lib/types';
 
 dotenv.config();
 
@@ -16,11 +12,23 @@ type ClientData = {
   userAvatar: string;
   serverId: string | null;
   channelId: string | null;
+  transports?: {
+    sendTransport?: WebRtcTransport;
+    recvTransport?: WebRtcTransport;
+  };
+  producers?: {
+    audioProducer?: Producer;
+    videoProducer?: Producer;
+    screenProducer?: Producer;
+  };
+  consumers?: Array<Consumer>;
 };
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
-const servers: Record<string, Set<WebSocket>> = {}; // Серверы как комнаты
+const servers: Record<string, Set<WebSocket>> = {}; // Servers as rooms
 const clients = new Map<WebSocket, ClientData>();
+const yellow = '\x1b[33m';
+const reset = '\x1b[0m';
 
 export function setupWebSocket(server: http.Server) {
   const wss = new WebSocketServer({ server });
@@ -64,19 +72,18 @@ export function setupWebSocket(server: http.Server) {
   });
 }
 
-// Обработка отключения клиента
+// Handle client disconnection
 function handleClientDisconnect(ws: WebSocket) {
   const clientData = clients.get(ws);
-  removeUserFromAllChannels(ws);
   if (clientData) {
-    //if (clientData.channelId) removeUserFromChannel(ws, clientData.serverId, clientData.channelId);
-    if (clientData.serverId) leaveServer(ws);
+    removeUserFromChannel(ws, clientData.serverId, clientData.channelId);
+    leaveServer(ws);
+    clients.delete(ws);
+    console.log(`User ${clientData.username} disconnected`);
   }
-  clients.delete(ws);
-  console.log(`User ${clientData?.username} disconnected`);
 }
 
-// Обработка сообщений WebSocket
+// Handle WebSocket messages
 function handleSocketMessage(ws: WebSocket, message: string) {
   try {
     const data = JSON.parse(message);
@@ -113,14 +120,6 @@ function joinChannel(ws: WebSocket, serverId: string, channelId: string) {
   clientData.serverId = serverId;
   clientData.channelId = channelId;
   clients.set(ws, clientData);
-  addUserToChannel(
-    ws,
-    serverId,
-    channelId,
-    clientData.userId,
-    clientData.username,
-    clientData.userAvatar,
-  );
   broadcastUserJoinChannel(ws, serverId, channelId);
 }
 
@@ -130,11 +129,26 @@ function leaveChannel(ws: WebSocket, serverId: string, channelId: string) {
     console.error('Client not found');
     return;
   }
-  clientData.serverId = serverId;
   clientData.channelId = null;
   clients.set(ws, clientData);
-  removeUserFromChannel(ws, serverId, channelId);
   broadcastUserLeaveChannel(ws, serverId, channelId);
+}
+
+function removeUserFromChannel(
+  ws: WebSocket,
+  serverId: string | null,
+  channelId: string | null,
+) {
+  if (!serverId || !channelId) return;
+  const channelUsers = Array.from(clients.values()).filter(
+    (client) => client.serverId === serverId && client.channelId === channelId,
+  );
+
+  if (channelUsers.length === 0) {
+    console.log(
+      `Channel ${channelId} on server ${serverId} is now empty and removed.`,
+    );
+  }
 }
 
 function joinServer(ws: WebSocket, serverId: string) {
@@ -143,7 +157,6 @@ function joinServer(ws: WebSocket, serverId: string) {
     clientData.serverId = serverId;
     clients.set(ws, clientData);
 
-    // Добавляем пользователя в сервер
     if (!servers[serverId]) {
       servers[serverId] = new Set();
     }
@@ -159,7 +172,7 @@ function leaveServer(ws: WebSocket) {
   if (clientData && clientData.serverId) {
     const { serverId } = clientData;
     clientData.serverId = null;
-    clientData.channelId = null; // Удаляем из канала при выходе из сервера
+    clientData.channelId = null;
     clients.set(ws, clientData);
 
     if (servers[serverId]) {
@@ -271,9 +284,8 @@ function broadcastUserLeaveChannel(
 }
 
 function broadcastUsersInChannels(ws: WebSocket, serverId: string) {
-  // Создаем массив для хранения данных пользователей
   const usersInChannels = Array.from(clients.values())
-    .filter((client) => client.serverId === serverId) // Фильтруем пользователей по serverId
+    .filter((client) => client.serverId === serverId)
     .map((client) => ({
       userId: client.userId,
       username: client.username,
@@ -281,14 +293,12 @@ function broadcastUsersInChannels(ws: WebSocket, serverId: string) {
       channelId: client.channelId,
     }));
 
-  // Формируем сообщение с данными пользователей
   const returnUsersInChannels = JSON.stringify({
     type: 'return_server_users_in_channels',
     serverId,
     users: usersInChannels,
   });
 
-  // Отправляем сообщение только запрашивающему клиенту
   if (ws.readyState === WebSocket.OPEN) {
     ws.send(returnUsersInChannels);
   }
