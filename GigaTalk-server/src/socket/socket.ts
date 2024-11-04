@@ -3,7 +3,6 @@ import http from 'http';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { Consumer, Producer, WebRtcTransport } from 'mediasoup/node/lib/types';
-import { createTransport, handleConsume, handleJoinChannel, handleProduce } from '../mediasoup/mediasoupManager';
 
 dotenv.config();
 
@@ -97,7 +96,6 @@ async function handleSocketMessage(ws: WebSocket, message: string) {
         break;
       case 'join_channel':
         joinChannel(ws, data.serverId, data.channelId);
-        await handleJoinChannel(ws, data.serverId, data.channelId);
         console.log(`${yellow}handleJoinChannel done!${reset}`);
         break;
       case 'leave_channel':
@@ -106,15 +104,6 @@ async function handleSocketMessage(ws: WebSocket, message: string) {
       case 'update_server_users_in_channels':
         broadcastUsersInChannels(ws, data.serverId);
         break;
-        case 'createTransport':
-          await createTransport(ws, data.serverId, data.channelId, data.direction);
-          break;
-        case 'produce':
-          await handleProduce(ws, data.transportId, data.kind, data.rtpParameters);
-          break;
-        case 'consume':
-          await handleConsume(ws, data.producerId, data.rtpCapabilities);
-          break;
       default:
         console.warn('Unknown message type:', data.type);
     }

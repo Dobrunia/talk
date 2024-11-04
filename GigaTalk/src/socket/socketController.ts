@@ -1,4 +1,3 @@
-import { handleNewProducer, handleTransportOptions } from '../mediasoupClient/mediasoupClientSetup.ts';
 import { serverDATA } from '../types/types.ts';
 import {
   removeUserFromChannel,
@@ -8,7 +7,8 @@ import {
 import { updateCache } from '../utils/cache.ts';
 import { sendSocketMessage } from './socket.ts';
 
-export function handleSocketMessage(data: any, socket: WebSocket) {
+export function handleSocketMessage(data: any) {
+  console.log('Handling socket message of type:', data.type);
   switch (data.type) {
     case 'user_join_server':
       console.log('Пользователь подключился к серверу', data);
