@@ -24,7 +24,7 @@ app.use(errorHandler);
 const server = http.createServer(app);
 
 async function startServer() {
-  await initializeWorkers(); // Убедитесь, что воркеры инициализированы до WebSocket
+  //await initializeWorkers();
   setupWebSocket(server);
   server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

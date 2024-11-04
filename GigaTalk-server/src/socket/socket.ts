@@ -3,6 +3,7 @@ import http from 'http';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { Consumer, Producer, WebRtcTransport } from 'mediasoup/node/lib/types';
+import { createWebRtcTransportForClient } from '../mediasoup/mediasoupManager';
 
 dotenv.config();
 
@@ -12,9 +13,9 @@ type ClientData = {
   userAvatar: string | null;
   serverId: string | null;
   channelId: string | null;
-  transports?: {
-    sendTransport?: WebRtcTransport;
-    recvTransport?: WebRtcTransport;
+  transports: {
+    sendTransport: WebRtcTransport | null;
+    recvTransport: WebRtcTransport | null;
   };
   producers?: {
     audioProducer?: Producer;
@@ -55,6 +56,10 @@ export function setupWebSocket(server: http.Server) {
         userAvatar,
         serverId: null,
         channelId: null,
+        transports: {
+          sendTransport: null,
+          recvTransport: null,
+        },
       });
 
       console.log(`WebSocket connection established with userId: ${id}`);
@@ -95,7 +100,7 @@ async function handleSocketMessage(ws: WebSocket, message: string) {
         leaveServer(ws);
         break;
       case 'join_channel':
-        joinChannel(ws, data.serverId, data.channelId);
+        await joinChannel(ws, data.serverId, data.channelId);
         console.log(`${yellow}handleJoinChannel done!${reset}`);
         break;
       case 'leave_channel':
@@ -112,15 +117,23 @@ async function handleSocketMessage(ws: WebSocket, message: string) {
   }
 }
 
-function joinChannel(ws: WebSocket, serverId: string, channelId: string) {
+async function joinChannel(ws: WebSocket, serverId: string, channelId: string) {
   const clientData = clients.get(ws);
   if (!clientData) {
     console.error('Client not found');
     return;
   }
+
+  const sendTransportParams = await createWebRtcTransportForClient(channelId);
+  const recvTransportParams = await createWebRtcTransportForClient(channelId);
+
   clientData.serverId = serverId;
   clientData.channelId = channelId;
+  clientData.transports.sendTransport = sendTransportParams;
+  clientData.transports.recvTransport = recvTransportParams;
+
   clients.set(ws, clientData);
+  broadcastInfoToUser(ws, { sendTransportParams, recvTransportParams });
   broadcastUserJoinChannel(ws, serverId, channelId);
 }
 
@@ -302,5 +315,19 @@ function broadcastUsersInChannels(ws: WebSocket, serverId: string) {
 
   if (ws.readyState === WebSocket.OPEN) {
     ws.send(returnUsersInChannels);
+  }
+}
+
+function broadcastInfoToUser(ws: WebSocket, message: any) {
+  const infoMessage = JSON.stringify({
+    type: 'transportsCreated',
+    data: {
+      sendTransportParams: message.sendTransportParams,
+      recvTransportParams: message.recvTransportParams,
+    },
+  });
+
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(infoMessage);
   }
 }
