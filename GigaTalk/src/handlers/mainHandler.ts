@@ -1,4 +1,4 @@
-import { joinChannel, leaveChannel, updateServerUsersInChannels } from '../socket/socketController.ts';
+import { sendSocketMessage } from '../socket/socket.ts';
 import { serverDATA } from '../types/types.ts';
 import { renderServerInfo } from '../ui-kit/index.ts';
 import {
@@ -16,7 +16,10 @@ async function serverClickHandler(serverId: string) {
     const serverData = JSON.parse(updatedServerData) as serverDATA;
     renderServerInfo(serverData);
     console.log('Отрисовка обновлённых данных сервера');
-    updateServerUsersInChannels(serverId);
+    sendSocketMessage({
+      type: 'update_server_users_in_channels',
+      serverId,
+    });
     console.log('Отрисовали активных пользователей сервера');
   } else {
     console.error('Failed to load server info');
@@ -31,7 +34,11 @@ async function voiceChannelClick(serverId: string, channelId: string) {
     return;
   }
 
-  joinChannel(serverId, channelId);
+  sendSocketMessage({
+    type: 'join_channel',
+    serverId,
+    channelId,
+  });
   document.getElementById('in_conversation_things')?.classList.remove('hidden');
   currentChannelId = channelId;
 }
@@ -45,7 +52,11 @@ function voiceChannelLeave() {
     return;
   }
 
-  leaveChannel(serverId, currentChannelId as string);
+  sendSocketMessage({
+    type: 'leave_channel',
+    serverId,
+    channelId: currentChannelId as string,
+  });
   document.getElementById('in_conversation_things')?.classList.add('hidden');
   currentChannelId = null;
 }

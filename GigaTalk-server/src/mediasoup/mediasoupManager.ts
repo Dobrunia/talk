@@ -1,19 +1,40 @@
+import {
+  Consumer,
+  Producer,
+  Router,
+  WebRtcTransport,
+} from 'mediasoup/node/lib/types';
 import WebSocket from 'ws';
+import { getNextWorker } from './worker';
 
 const yellow = '\x1b[33m';
 const reset = '\x1b[0m';
 
 // Map для хранения информации о каналах и пользователях
-const channelUsers = new Map<
+export const channelUsers = new Map<
   string,
   {
     serverId: string;
     channelId: string;
+    router?: Router; // Router для комнаты, созданный через Mediasoup
     users: Array<{
-      ws: WebSocket;
+      ws: WebSocket; // WebSocket соединение пользователя
       userId: string;
       username: string;
       userAvatar: string;
+
+      transports?: {
+        sendTransport?: WebRtcTransport; // Transport для отправки медиа от клиента к серверу
+        recvTransport?: WebRtcTransport; // Transport для приема медиа от сервера к клиенту
+      };
+
+      producers?: {
+        audioProducer?: Producer; // Producer для аудио потока
+        videoProducer?: Producer; // Producer для видео потока с камеры
+        screenProducer?: Producer; // Producer для потока экрана
+      };
+
+      consumers?: Array<Consumer>; // Массив Consumers для приема медиа от других пользователей
     }>;
   }
 >();
@@ -28,23 +49,21 @@ export function addUserToChannel(
 ) {
   const channelKey = `${serverId}_${channelId}`;
 
-  // Проверяем, есть ли уже канал
+  // Если канала нет, создаем новую запись и привязываем Router
   if (!channelUsers.has(channelKey)) {
-    // Если канала нет, создаем новую запись
+    const { router } = getNextWorker(); // Получаем Router из следующего доступного Worker
     channelUsers.set(channelKey, {
       serverId,
       channelId,
+      router,
       users: [],
     });
+    console.log(`Router создан для канала ${channelKey}`);
   }
 
   // Добавляем пользователя в канал
   const channel = channelUsers.get(channelKey);
   channel?.users.push({ ws, userId, username, userAvatar });
-
-  console.log(
-    `${yellow}WedRTC:${reset} User ${username} has joined channel ${channelId} on server ${serverId}`,
-  );
 }
 
 export function removeUserFromChannel(
@@ -90,19 +109,19 @@ export function removeUserFromChannel(
 
 export function removeUserFromAllChannels(ws: WebSocket) {
   channelUsers.forEach((channel, channelKey) => {
-    const userIndex = channel.users.findIndex(user => user.ws === ws);
+    const userIndex = channel.users.findIndex((user) => user.ws === ws);
 
     if (userIndex !== -1) {
       const removedUser = channel.users.splice(userIndex, 1)[0];
       console.log(
-        `${yellow}WedRTC:${reset} User ${removedUser.username} has left channel ${channel.channelId} on server ${channel.serverId}`
+        `${yellow}WedRTC:${reset} User ${removedUser.username} has left channel ${channel.channelId} on server ${channel.serverId}`,
       );
 
       // Если после удаления пользователей в канале больше нет, удаляем канал
       if (channel.users.length === 0) {
         channelUsers.delete(channelKey);
         console.log(
-          `${yellow}WedRTC:${reset} Channel ${channel.channelId} on server ${channel.serverId} is now empty and removed.`
+          `${yellow}WedRTC:${reset} Channel ${channel.channelId} on server ${channel.serverId} is now empty and removed.`,
         );
       }
     }

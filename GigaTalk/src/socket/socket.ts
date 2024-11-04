@@ -27,7 +27,11 @@ export function connectSocket() {
 
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    handleSocketMessage(data);
+    if (socket) {
+      handleSocketMessage(data, socket);
+    } else {
+      console.warn('WebSocket connection is not established.');
+    }
   };
 }
 

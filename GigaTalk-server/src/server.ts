@@ -5,6 +5,7 @@ import { router } from './router.ts';
 import { setupWebSocket } from './socket/socket.ts';
 import { errorHandler } from './middleware/errorHandler.ts';
 import './db/sessionCleanup.ts';
+import { initializeWorkers } from './mediasoup/worker.ts';
 
 const app = express();
 const port = 3000;
@@ -22,10 +23,14 @@ app.use(errorHandler);
 
 const server = http.createServer(app);
 
-// Инициализация WebSocket сервера
-setupWebSocket(server);
+async function startServer() {
+  await initializeWorkers(); // Убедитесь, что воркеры инициализированы до WebSocket
+  setupWebSocket(server);
+  server.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+}
 
-
-server.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+startServer().catch(error => {
+  console.error('Ошибка запуска сервера:', error);
 });

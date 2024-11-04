@@ -1,3 +1,4 @@
+import { handleNewProducer, handleTransportOptions } from '../mediasoupClient/mediasoupClientSetup.ts';
 import { serverDATA } from '../types/types.ts';
 import {
   removeUserFromChannel,
@@ -7,7 +8,7 @@ import {
 import { updateCache } from '../utils/cache.ts';
 import { sendSocketMessage } from './socket.ts';
 
-export function handleSocketMessage(data: any) {
+export function handleSocketMessage(data: any, socket: WebSocket) {
   switch (data.type) {
     case 'user_join_server':
       console.log('Пользователь подключился к серверу', data);
@@ -44,7 +45,10 @@ export async function joinToAllMyServers() {
     return;
   }
   JSON.parse(cachedServers).forEach((element: serverDATA) => {
-    joinServer(element.id);
+    sendSocketMessage({
+      type: 'join_server',
+      serverId: element.id,
+    });
   });
   console.log('Подключился ко всем моим серверам');
 }
@@ -57,34 +61,4 @@ export async function leaveFromAllMyServers() {
   }
   sendSocketMessage({ type: 'leave_server' });
   console.log('Отключился от всех моих серверов');
-}
-
-function joinServer(serverId: string) {
-  sendSocketMessage({
-    type: 'join_server',
-    serverId,
-  });
-}
-
-export function joinChannel(serverId: string, channelId: string) {
-  sendSocketMessage({
-    type: 'join_channel',
-    serverId,
-    channelId,
-  });
-}
-
-export function leaveChannel(serverId: string, channelId: string) {
-  sendSocketMessage({
-    type: 'leave_channel',
-    serverId,
-    channelId,
-  });
-}
-
-export function updateServerUsersInChannels(serverId: string) {
-  sendSocketMessage({
-    type: 'update_server_users_in_channels',
-    serverId,
-  });
 }

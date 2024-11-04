@@ -6,7 +6,7 @@ import {
   addUserToChannel,
   removeUserFromAllChannels,
   removeUserFromChannel,
-} from '../WebRTC/WebRTCHandler';
+} from '../mediasoup/mediasoupManager.ts';
 
 dotenv.config();
 
@@ -137,7 +137,6 @@ function leaveChannel(ws: WebSocket, serverId: string, channelId: string) {
   removeUserFromChannel(ws, serverId, channelId);
 }
 
-// Подключение к серверу
 function joinServer(ws: WebSocket, serverId: string) {
   const clientData = clients.get(ws);
   if (clientData) {
@@ -155,7 +154,6 @@ function joinServer(ws: WebSocket, serverId: string) {
   }
 }
 
-// Отключение от сервера
 function leaveServer(ws: WebSocket) {
   const clientData = clients.get(ws);
   if (clientData && clientData.serverId) {
