@@ -11,7 +11,7 @@ const yellow = '\x1b[33m';
 const reset = '\x1b[0m';
 
 // Map для хранения информации о каналах и пользователях
-export const channelUsers = new Map<
+const channelUsers = new Map<
   string,
   {
     serverId: string;

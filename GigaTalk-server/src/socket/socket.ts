@@ -89,11 +89,9 @@ function handleSocketMessage(ws: WebSocket, message: string) {
         break;
       case 'join_channel':
         joinChannel(ws, data.serverId, data.channelId);
-        broadcastUserJoinChannel(ws, data.serverId, data.channelId);
         break;
       case 'leave_channel':
         leaveChannel(ws, data.serverId, data.channelId);
-        broadcastUserLeaveChannel(ws, data.serverId, data.channelId);
         break;
       case 'update_server_users_in_channels':
         broadcastUsersInChannels(ws, data.serverId);
@@ -123,6 +121,7 @@ function joinChannel(ws: WebSocket, serverId: string, channelId: string) {
     clientData.username,
     clientData.userAvatar,
   );
+  broadcastUserJoinChannel(ws, serverId, channelId);
 }
 
 function leaveChannel(ws: WebSocket, serverId: string, channelId: string) {
@@ -135,6 +134,7 @@ function leaveChannel(ws: WebSocket, serverId: string, channelId: string) {
   clientData.channelId = null;
   clients.set(ws, clientData);
   removeUserFromChannel(ws, serverId, channelId);
+  broadcastUserLeaveChannel(ws, serverId, channelId);
 }
 
 function joinServer(ws: WebSocket, serverId: string) {
