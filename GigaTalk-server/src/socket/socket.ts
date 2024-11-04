@@ -9,7 +9,7 @@ dotenv.config();
 type ClientData = {
   userId: string;
   username: string;
-  userAvatar: string;
+  userAvatar: string | null;
   serverId: string | null;
   channelId: string | null;
   transports?: {
