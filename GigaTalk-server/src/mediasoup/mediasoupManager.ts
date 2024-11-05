@@ -1,11 +1,16 @@
 import * as mediasoup from 'mediasoup';
 import { Worker, Router, WebRtcTransport } from 'mediasoup/node/lib/types';
+import { clients, findTransportById } from '../socket/socket';
 
 // Хранение воркеров и роутеров для каждого канала
 const channelWorkers = new Map<string, { worker: Worker; router: Router }>();
 
+export function getRouter(key: string) {
+  return channelWorkers.get(key)?.router;
+}
+
 // Функция для получения или создания воркера и роутера для канала
-async function getOrCreateWorkerAndRouter(
+export async function getOrCreateWorkerAndRouter(
   channelId: string,
 ): Promise<{ worker: Worker; router: Router }> {
   if (channelWorkers.has(channelId)) {
@@ -54,15 +59,26 @@ export async function createWebRtcTransportForClient(channelId: string): Promise
   const transport: WebRtcTransport = await router.createWebRtcTransport(
     transportOptions,
   );
+  // clients.forEach((clientData, ws) => {
+  //   // Проверяем, соответствует ли `channelId`
+  //   if (clientData.channelId === channelId) {
+  //     // Обновляем `transport` для найденного клиента
+  //     clientData.transport = transport;
+  //     console.log(`Transport updated for user ${clientData.userId} in channel ${channelId}`);
+  //   }
+  // });
+  //findTransportById(channelId)
 
+  console.log('createWebRtcTransportForClient transport ', transport);
   // Устанавливаем максимальную входящую скорость (опционально)
   //await transport.setMaxIncomingBitrate(1500000);
 
   // Возвращаем параметры транспорта клиенту
-  return {
-    id: transport.id,
-    iceParameters: transport.iceParameters,
-    iceCandidates: transport.iceCandidates,
-    dtlsParameters: transport.dtlsParameters,
-  };
+  return transport;
+  // {
+  //   id: transport.id,
+  //   iceParameters: transport.iceParameters,
+  //   iceCandidates: transport.iceCandidates,
+  //   dtlsParameters: transport.dtlsParameters,
+  // };
 }

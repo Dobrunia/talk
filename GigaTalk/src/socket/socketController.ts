@@ -1,3 +1,11 @@
+import {
+  checkDevice,
+  consumeHandler,
+  createTransports,
+  newProducerHandler,
+  producerClosedHandler,
+  setDevice,
+} from '../mediasoupClient/mediasoupClientSetup.ts';
 import { serverDATA } from '../types/types.ts';
 import {
   removeUserFromChannel,
@@ -7,7 +15,7 @@ import {
 import { updateCache } from '../utils/cache.ts';
 import { sendSocketMessage } from './socket.ts';
 
-export function handleSocketMessage(data: any) {
+export async function handleSocketMessage(socket: WebSocket, data: any) {
   console.log('Handling socket message of type:', data.type);
   switch (data.type) {
     case 'user_join_server':
@@ -32,6 +40,43 @@ export function handleSocketMessage(data: any) {
       break;
     case 'return_server_users_in_channels':
       renderServerUsersInChannels(data);
+      break;
+    case 'transportsCreated':
+      // Загружаем устройство если его нет
+      //console.log(data.data.sendTransportParams, data.data.recvTransportParams);
+      await checkDevice(
+        socket,
+        data.data.sendTransportParams,
+        data.data.recvTransportParams,
+      );
+      break;
+    case 'returnRtpCapabilities':
+      console.log('returnRtpCapabilities ', data.data);
+      await setDevice(data.data.rtpCapabilities);
+
+      await createTransports(
+        socket,
+        data.data.sendTransportParams,
+        data.data.recvTransportParams,
+      );
+      break;
+    case 'newProducer':
+      newProducerHandler(socket, data.data.producerId);
+      break;
+    case 'consume':
+      console.log(data.data)
+      if (data.data) {
+        await consumeHandler(
+          data.data.consumerId,
+          data.data.producerId,
+          data.data.kind,
+          data.data.rtpParameters,
+        );
+      }
+
+      break;
+    case 'producerClosed':
+      producerClosedHandler(data.data.producerId);
       break;
     default:
       console.warn('Неизвестный тип сообщения:', data.type);

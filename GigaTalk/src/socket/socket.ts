@@ -1,3 +1,4 @@
+import { RtpCapabilities } from 'mediasoup-client/lib/types';
 import {
   handleSocketMessage,
   joinToAllMyServers,
@@ -28,7 +29,7 @@ export function connectSocket() {
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     if (socket) {
-      handleSocketMessage(data);
+      handleSocketMessage(socket, data);
     } else {
       console.warn('WebSocket connection is not established.');
     }
