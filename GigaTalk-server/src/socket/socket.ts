@@ -1,11 +1,12 @@
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
-import { handleMessage } from './messageHandler';
-import { handleDisconnect } from './disconnectHandler';
-import { clients, JWT_SECRET } from '../data';
-import { socketController } from '../controllers/SocketController';
-import { connectRoom } from './soketFunctions';
+import { handleMessage } from './messageHandler.ts';
+import { handleDisconnect } from './disconnectHandler.ts';
+import { clients, JWT_SECRET } from '../data.ts';
+import { socketController } from '../controllers/SocketController.ts';
+import { connectRoom } from './soketFunctions.ts';
+import { handleMediasoupRequest } from '../mediasoup/mediasoupManager.ts';
 
 const cyan = '\x1b[36m';
 const reset = '\x1b[0m';
@@ -77,6 +78,11 @@ export function initializeSocket(server: HttpServer): Server {
     initializeSocketServerRooms(socket);
     // Подключаем обработчик события 'message'
     socket.on('message', (data) => handleMessage(socket, data));
+
+    // Общий обработчик для всех событий 'mediasoup'
+    socket.on('mediasoup', (data, callback) => {
+      handleMediasoupRequest(socket, data, callback);
+    });
 
     // Подключаем обработчик события 'disconnect'
     socket.on('disconnect', async () => await handleDisconnect(socket));

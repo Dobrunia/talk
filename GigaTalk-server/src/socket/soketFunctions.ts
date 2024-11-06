@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io';
-import { ClientData } from '../types/types';
+import { ClientData } from '../types/types.ts';
 
 const cyan = '\x1b[36m';
 const reset = '\x1b[0m';

@@ -1,12 +1,12 @@
 import { Socket } from 'socket.io';
-import { ClientData, UserInfo } from './types/types';
+import { ClientData, UserInfo } from './types/types.ts';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 export const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 export const clients = new Map<Socket, ClientData>(); // Хранилище для данных клиентов
-const usersByChannels = new Map<string, ClientData[]>(); // Структура для хранения пользователей по уникальным каналам
+export const usersByChannels = new Map<string, ClientData[]>(); // Структура для хранения пользователей по уникальным каналам
 
 export function getUsersInChannels(channelIds: (string | number)[]): {
   [key: string]: UserInfo[];

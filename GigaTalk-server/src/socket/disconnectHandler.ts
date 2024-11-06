@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io';
-import { clients, removeUserFromChannel } from '../data';
-import { ClientData } from '../types/types';
-import { socketController } from '../controllers/SocketController';
+import { clients, removeUserFromChannel } from '../data.ts';
+import { ClientData } from '../types/types.ts';
+import { socketController } from '../controllers/SocketController.ts';
 
 const cyan = '\x1b[36m';
 const reset = '\x1b[0m';

@@ -1,84 +1,170 @@
-import * as mediasoup from 'mediasoup';
-import { Worker, Router, WebRtcTransport } from 'mediasoup/node/lib/types';
-import { clients, findTransportById } from '../socket/socket';
+import { WebRtcTransport, Producer, Consumer, Router, Worker, MediaKind } from "mediasoup/node/lib/types";
+import { Socket } from "socket.io";
+import { clients, addUserToChannel, removeUserFromChannel, usersByChannels } from "../data.ts";
+import dotenv from "dotenv";
+import { getWorker } from "./worker.ts";
+import { OPTIONS } from './options.ts';
 
-// Хранение воркеров и роутеров для каждого канала
-const channelWorkers = new Map<string, { worker: Worker; router: Router }>();
+dotenv.config();
 
-export function getRouter(key: string) {
-  return channelWorkers.get(key)?.router;
-}
+const consM = `\x1b[33mmediasoup\x1b[0m `;
 
-// Функция для получения или создания воркера и роутера для канала
-export async function getOrCreateWorkerAndRouter(
-  channelId: string,
-): Promise<{ worker: Worker; router: Router }> {
-  if (channelWorkers.has(channelId)) {
-    return channelWorkers.get(channelId)!;
-  } else {
-    // Создаем воркер
-    const worker = await mediasoup.createWorker();
+const roomRouters = new Map<string, Router>(); // New map to store routers for each room
 
-    // Создаем роутер с поддерживаемыми медиа-кодеками
-    const router = await worker.createRouter({
-      mediaCodecs: [
-        {
-          kind: 'audio',
-          mimeType: 'audio/opus',
-          clockRate: 48000,
-          channels: 2,
-        },
-        // Добавьте видеокодеки, если необходимо
-      ],
-    });
-
-    // Сохраняем воркер и роутер для канала
-    channelWorkers.set(channelId, { worker, router });
-
-    return { worker, router };
+export async function handleMediasoupRequest(socket: Socket, data: any, callback: (response: any) => void) {
+  const { type, payload } = data;
+  console.error(`${consM}handleMediasoupRequest get type: ${type}`);
+  try {
+    let response;
+    switch (type) {
+      case 'joinRoom':
+        response = await joinRoom(socket, payload.roomName, callback);
+        break;
+      case 'createTransport':
+        response = await createWebRtcTransport(socket, callback);
+        break;
+      case 'connectTransport':
+        response = await connectTransport(socket, payload.transportId, payload.dtlsParameters);
+        callback(response);
+        break;
+      case 'produce':
+        response = await produce(socket, payload.transportId, payload.kind, payload.rtpParameters);
+        callback(response);
+        break;
+      case 'consume':
+        response = await consume(socket, payload.producerId, payload.rtpCapabilities);
+        callback(response);
+        break;
+      case 'resumeConsumer':
+        await resumeConsumer(socket, payload.serverConsumerId);
+        callback({ resumed: true });
+        break;
+      default:
+        console.warn(`Unknown mediasoup action type: ${type}`);
+        callback({ error: 'Unknown action type' });
+    }
+    callback(response);
+  } catch (error) {
+    console.error(`${consM}Error handling mediasoup action "${type}":`, error);
+    callback({ error: `Failed to handle ${type}` });
   }
 }
 
-export async function createWebRtcTransportForClient(channelId: string): Promise<any> {
-  const { router } = await getOrCreateWorkerAndRouter(channelId);
+export async function joinRoom(socket: Socket, roomName: string, callback: (response: any) => void) {
+  let router = roomRouters.get(roomName);
+  if (!router) {
+    router = await createRoom(roomName);
+  }
+  const clientData = clients.get(socket);
+  if (clientData) {
+    addUserToChannel(socket, roomName, clientData);
+  }
+  callback({ rtpCapabilities: router.rtpCapabilities });
+}
 
-  // Опции для WebRtcTransport
-  const transportOptions = {
-    listenIps: [
-      {
-        ip: '0.0.0.0', // Прослушивать на всех сетевых интерфейсах
-        announcedIp: '127.0.0.1', // Для localhost используем 127.0.0.1
-      },
-    ],
+async function createRoom(roomName: string): Promise<Router> {
+  const worker = getWorker();
+  const router = await worker.createRouter({ mediaCodecs: OPTIONS.mediaCodecs });
+  roomRouters.set(roomName, router);
+  usersByChannels.set(roomName, []);
+  return router;
+}
+
+export async function createWebRtcTransport(socket: Socket, callback: (response: any) => void) {
+  const clientData = clients.get(socket);
+  if (!clientData || !clientData.currentChannelId) {
+    callback({ error: 'Client not part of any room' });
+    return;
+  }
+  const roomName = clientData.currentChannelId;
+  const router = roomRouters.get(roomName);
+  if (!router) {
+    callback({ error: 'Room not found' });
+    return;
+  }
+  const transport = await router.createWebRtcTransport({
+    listenIps: [{ ip: "0.0.0.0", announcedIp: process.env.ANNOUNCED_IP || '' }],
     enableUdp: true,
     enableTcp: true,
     preferUdp: true,
+  });
+  clientData.transports.sendTransport = transport;
+  clients.set(socket, clientData);
+  callback({
+    id: transport.id,
+    iceParameters: transport.iceParameters,
+    iceCandidates: transport.iceCandidates,
+    dtlsParameters: transport.dtlsParameters,
+  });
+}
+
+export async function connectTransport(socket: Socket, transportId: string, dtlsParameters: any) {
+  const clientData = clients.get(socket);
+  if (!clientData) {
+    throw new Error('Client not found');
+  }
+  const transport = clientData.transports.sendTransport;
+  if (!transport || transport.id !== transportId) {
+    throw new Error('Transport not found');
+  }
+  await transport.connect({ dtlsParameters });
+  return { connected: true };
+}
+
+export async function produce(socket: Socket, transportId: string, kind: MediaKind, rtpParameters: any) {
+  const clientData = clients.get(socket);
+  if (!clientData) {
+    throw new Error('Client not found');
+  }
+  const transport = clientData.transports.sendTransport;
+  if (!transport || transport.id !== transportId) {
+    throw new Error('Transport not found');
+  }
+  const producer = await transport.produce({ kind, rtpParameters });
+  if (kind === 'audio') {
+    clientData.producers.audioProducer = producer;
+  } else if (kind === 'video') {
+    clientData.producers.videoProducer = producer;
+  } else if (kind === 'screen') {
+    clientData.producers.screenProducer = producer;
+  }
+  clients.set(socket, clientData);
+  return { id: producer.id };
+}
+
+export async function consume(socket: Socket, producerId: string, rtpCapabilities: any) {
+  const clientData = clients.get(socket);
+  if (!clientData || !clientData.currentChannelId) {
+    throw new Error('Client not found or not part of any room');
+  }
+  const roomName = clientData.currentChannelId;
+  const router = roomRouters.get(roomName);
+  if (!router) throw new Error('Room not found');
+  if (!router.canConsume({ producerId, rtpCapabilities })) throw new Error('Cannot consume');
+
+  const recvTransport = clientData.transports.recvTransport;
+  if (!recvTransport) throw new Error('Receive transport not found');
+
+  const consumer = await recvTransport.consume({
+    producerId,
+    rtpCapabilities,
+    paused: true,
+  });
+  clientData.consumers?.push(consumer);
+  clients.set(socket, clientData);
+  return {
+    id: consumer.id,
+    producerId,
+    kind: consumer.kind,
+    rtpParameters: consumer.rtpParameters,
   };
+}
 
-  // Создаем транспорт
-  const transport: WebRtcTransport = await router.createWebRtcTransport(
-    transportOptions,
-  );
-  // clients.forEach((clientData, ws) => {
-  //   // Проверяем, соответствует ли `channelId`
-  //   if (clientData.channelId === channelId) {
-  //     // Обновляем `transport` для найденного клиента
-  //     clientData.transport = transport;
-  //     console.log(`Transport updated for user ${clientData.userId} in channel ${channelId}`);
-  //   }
-  // });
-  //findTransportById(channelId)
-
-  console.log('createWebRtcTransportForClient transport ', transport);
-  // Устанавливаем максимальную входящую скорость (опционально)
-  //await transport.setMaxIncomingBitrate(1500000);
-
-  // Возвращаем параметры транспорта клиенту
-  return transport;
-  // {
-  //   id: transport.id,
-  //   iceParameters: transport.iceParameters,
-  //   iceCandidates: transport.iceCandidates,
-  //   dtlsParameters: transport.dtlsParameters,
-  // };
+export async function resumeConsumer(socket: Socket, serverConsumerId: string) {
+  const clientData = clients.get(socket);
+  if (!clientData || !clientData.consumers) {
+    throw new Error('Client not found or no consumers available');
+  }
+  const consumer = clientData.consumers.find(c => c.id === serverConsumerId);
+  if (consumer) await consumer.resume();
 }
