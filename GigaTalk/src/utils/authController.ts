@@ -1,8 +1,8 @@
-import { closeAuthModal, showLogin } from './authUIController';
-import { authApi } from '../api/authApi';
-import { saveUserData } from './cache';
-import { logInRender } from './render';
-import { connectSocket } from '../socket/socket';
+import { closeAuthModal, showLogin } from './authUIController.ts';
+import { authApi } from '../api/authApi.ts';
+import { saveUserData } from './cache.ts';
+import { logInRender } from './render.ts';
+import { connectSocket } from '../socket/socket.ts';
 
 export async function guestLoginHandler() {
   try {

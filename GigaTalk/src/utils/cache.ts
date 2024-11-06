@@ -1,5 +1,5 @@
 import { serverDATA } from '../types/types.ts';
-import { serverApi } from '../api/serverApi';
+import { serverApi } from '../api/serverApi.ts';
 
 export const updateCache = {
   async serversList() {
