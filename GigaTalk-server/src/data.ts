@@ -41,42 +41,46 @@ export function getUsersInChannels(channelIds: (string | number)[]): {
 }
 
 export function addUserToChannel(
-  socket: Socket,
   channelId: string | number,
   clientData: ClientData,
 ): void {
-  // Проверяем, существует ли уже массив для данного канала
+  // Преобразуем channelId в строку для единообразия ключей
   channelId = String(channelId);
-  if (!usersByChannels.has(channelId)) {
-    // Если канал не существует, создаем новый массив для пользователей
-    usersByChannels.set(channelId, []);
+  console.log('channelId', channelId);
+
+  // Получаем текущий массив пользователей для канала или создаем новый
+  let usersInChannel = usersByChannels.get(channelId) || [];
+
+  console.log('usersByChannels 1)', usersByChannels);
+  console.log('usersInChannel 1)', usersInChannel);
+
+  // Проверяем наличие пользователя и добавляем его, если его еще нет
+  if (!usersInChannel.some(user => user.userId === clientData.userId)) {
     console.log(
-      `Если канал не существует, создаем новый массив для пользователей ${usersByChannels}`,
+      `Пользователь ${clientData.userId} не найден, добавляем его.`,
+    );
+    // Создаем новый массив с обновленным списком пользователей
+    usersInChannel = [...usersInChannel, clientData];
+    usersByChannels.set(channelId, usersInChannel);
+    console.log(
+      `Пользователь ${clientData.userId} добавлен в канал ${channelId}`,
     );
   }
 
-  // Получаем массив пользователей для данного канала
-  const usersInChannel = usersByChannels.get(channelId)!;
-
-  // Добавляем пользователя в массив, если его еще нет
-  if (!usersInChannel.some((user) => user.userId === clientData.userId)) {
-    usersInChannel.push(clientData);
-    clientData.currentChannelId = channelId;
-    clients.set(socket, clientData);
-    console.log(
-      `Добавляем пользователя в массив, если его еще нет ${usersByChannels}`,
-    );
-  }
+  console.log('usersByChannels 2)', usersByChannels);
+  console.log('usersInChannel 2)', usersInChannel);
 }
+
 
 export function removeUserFromChannel(socket: Socket): void {
   // Получаем данные клиента
   const clientData = clients.get(socket);
   if (!clientData) return;
 
-  const channelId = clientData.currentChannelId;
+  const channelId = getCurrentUsersChannelId(clientData);
   if (!channelId) return; // Если текущий канал не установлен, выходим
 
+  // Получаем массив пользователей для данного канала
   const usersInChannel = usersByChannels.get(channelId);
   if (!usersInChannel) return; // Если канал не существует, выходим
 
@@ -91,17 +95,28 @@ export function removeUserFromChannel(socket: Socket): void {
     console.log(
       `Пользователь ${clientData.username} удалён из канала ${channelId}`,
     );
-  }
 
-  // Если после удаления массив пуст, удаляем канал из `usersByChannels`
-  if (usersInChannel.length === 0) {
-    usersByChannels.delete(channelId);
-    console.log(
-      `Канал ${channelId} удалён из usersByChannels, так как он пуст.`,
-    );
-  }
+    // Обновляем `Map` после удаления пользователя
+    usersByChannels.set(channelId, usersInChannel);
 
-  // Обновляем данные клиента
-  clientData.currentChannelId = null;
-  clients.set(socket, clientData);
+    // Если после удаления массив пуст, удаляем канал из `usersByChannels`
+    if (usersInChannel.length === 0) {
+      usersByChannels.delete(channelId);
+      console.log(
+        `Канал ${channelId} удалён из usersByChannels, так как он пуст.`,
+      );
+    }
+  }
+}
+
+export function getCurrentUsersChannelId(
+  clientData: ClientData,
+): string | null {
+  for (const [channelId, users] of usersByChannels.entries()) {
+    // Проверяем, существует ли пользователь с таким userId в массиве
+    if (users.some((user) => user.userId === clientData.userId)) {
+      return channelId; // Возвращаем channelId, если пользователь найден
+    }
+  }
+  return null; // Возвращаем null, если пользователь не найден ни в одном канале
 }

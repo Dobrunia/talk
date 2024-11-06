@@ -1,5 +1,9 @@
 import { Socket } from 'socket.io';
-import { clients, removeUserFromChannel } from '../data.ts';
+import {
+  clients,
+  getCurrentUsersChannelId,
+  removeUserFromChannel,
+} from '../data.ts';
 import { ClientData } from '../types/types.ts';
 import { socketController } from '../controllers/SocketController.ts';
 
@@ -10,12 +14,12 @@ export async function handleDisconnect(socket: Socket): Promise<void> {
   // Удаляем из map с каналами, если пользователь в каком-то сидел
   const clientData = clients.get(socket);
   if (!clientData) return;
-  if (!clientData.currentChannelId) return;
-  
+  const chId = getCurrentUsersChannelId(clientData);
+  if (!chId) return;
   console.log('clientData', clientData);
-  const roomId = await socketController.getServerIdByChannelId(clientData.currentChannelId);
+  const roomId = await socketController.getServerIdByChannelId(chId);
   removeUserFromChannel(socket);
-  console.log('roomId', roomId, 'clientData', clientData)
+  console.log('roomId', roomId, 'clientData', clientData);
   if (!roomId) return;
   // Отправляем всем в комнате, включая отправителя, информацию о пользователе
   const data = {

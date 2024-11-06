@@ -52,7 +52,6 @@ export function initializeSocket(server: HttpServer): Server {
         username,
         userAvatar,
         permission,
-        currentChannelId: null,
         transports: {
           sendTransport: null,
           recvTransport: null,

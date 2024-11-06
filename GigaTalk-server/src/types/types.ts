@@ -5,7 +5,7 @@ export type ClientData = {
   username: string;
   userAvatar: string | null;
   permission: number | null;
-  currentChannelId: string | null;
+  // currentChannelId: string | null;
   transports: {
     sendTransport: WebRtcTransport | null;
     recvTransport: WebRtcTransport | null;

@@ -7,6 +7,7 @@ import {
   clients,
   addUserToChannel,
   usersByChannels,
+  getCurrentUsersChannelId,
 } from '../data.ts';
 import dotenv from 'dotenv';
 import { getWorker } from './worker.ts';
@@ -86,7 +87,7 @@ async function joinRoom(
   }
   const clientData = clients.get(socket);
   if (clientData) {
-    addUserToChannel(socket, roomName, clientData);
+    addUserToChannel(roomName, clientData);
   }
   callback({ rtpCapabilities: router.rtpCapabilities });
 }
@@ -106,13 +107,16 @@ async function createWebRtcTransport(
   callback: (response: any) => void,
 ) {
   const clientData = clients.get(socket);
-  if (!clientData || !clientData.currentChannelId) {
+  if (!clientData) return;
+  const chId = getCurrentUsersChannelId(clientData);
+  if (!chId) {
+    console.log('Client not part of any room')
     callback({ error: 'Client not part of any room' });
     return;
   }
-  const roomName = clientData.currentChannelId;
-  const router = roomRouters.get(roomName);
+  const router = roomRouters.get(chId);
   if (!router) {
+    console.log('Room not found')
     callback({ error: 'Room not found' });
     return;
   }
@@ -181,11 +185,12 @@ async function consume(
   rtpCapabilities: any,
 ) {
   const clientData = clients.get(socket);
-  if (!clientData || !clientData.currentChannelId) {
-    throw new Error('Client not found or not part of any room');
+  if (!clientData) return;
+  const chId = getCurrentUsersChannelId(clientData);
+  if (!chId) {
+    throw new Error('Client not part of any room');
   }
-  const roomName = clientData.currentChannelId;
-  const router = roomRouters.get(roomName);
+  const router = roomRouters.get(chId);
   if (!router) throw new Error('Room not found');
   if (!router.canConsume({ producerId, rtpCapabilities }))
     throw new Error('Cannot consume');

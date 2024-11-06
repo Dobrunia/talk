@@ -2,6 +2,7 @@ import { Socket } from 'socket.io';
 import {
   addUserToChannel,
   clients,
+  getCurrentUsersChannelId,
   getUsersInChannels,
   removeUserFromChannel,
 } from '../data.ts';
@@ -63,7 +64,7 @@ async function joinChannel(socket: Socket, channelId: string) {
   const clientData = clients.get(socket);
   if (!clientData) return;
   //TODO:: проверка, что есть доступ к каналу
-  addUserToChannel(socket, channelId, clientData);
+  addUserToChannel(channelId, clientData);
   const roomId = await socketController.getServerIdByChannelId(channelId);
   if (!roomId) return;
   // Отправляем всем в комнате, включая отправителя, информацию о пользователе
@@ -85,12 +86,12 @@ async function joinChannel(socket: Socket, channelId: string) {
 async function leaveChannel(socket: Socket) {
   const clientData = clients.get(socket);
   if (!clientData) return;
-  if (!clientData.currentChannelId) return;
-  
+  const chId = getCurrentUsersChannelId(clientData);
+  if (!chId) return;
   console.log('clientData', clientData);
-  const roomId = await socketController.getServerIdByChannelId(clientData.currentChannelId);
+  const roomId = await socketController.getServerIdByChannelId(chId);
   removeUserFromChannel(socket);
-  console.log('roomId', roomId, 'clientData', clientData)
+  console.log('roomId', roomId, 'clientData', clientData);
   if (!roomId) return;
   // Отправляем всем в комнате, включая отправителя, информацию о пользователе
   const data = {
