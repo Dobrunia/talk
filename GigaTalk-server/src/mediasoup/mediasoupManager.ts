@@ -50,7 +50,7 @@ export async function handleMediasoupRequest(socket: Socket, data: any, callback
   }
 }
 
-export async function joinRoom(socket: Socket, roomName: string, callback: (response: any) => void) {
+async function joinRoom(socket: Socket, roomName: string, callback: (response: any) => void) {
   let router = roomRouters.get(roomName);
   if (!router) {
     router = await createRoom(roomName);
@@ -70,7 +70,7 @@ async function createRoom(roomName: string): Promise<Router> {
   return router;
 }
 
-export async function createWebRtcTransport(socket: Socket, callback: (response: any) => void) {
+async function createWebRtcTransport(socket: Socket, callback: (response: any) => void) {
   const clientData = clients.get(socket);
   if (!clientData || !clientData.currentChannelId) {
     callback({ error: 'Client not part of any room' });
@@ -98,7 +98,7 @@ export async function createWebRtcTransport(socket: Socket, callback: (response:
   });
 }
 
-export async function connectTransport(socket: Socket, transportId: string, dtlsParameters: any) {
+async function connectTransport(socket: Socket, transportId: string, dtlsParameters: any) {
   const clientData = clients.get(socket);
   if (!clientData) {
     throw new Error('Client not found');
@@ -111,7 +111,7 @@ export async function connectTransport(socket: Socket, transportId: string, dtls
   return { connected: true };
 }
 
-export async function produce(socket: Socket, transportId: string, kind: MediaKind, rtpParameters: any) {
+async function produce(socket: Socket, transportId: string, kind: MediaKind, rtpParameters: any) {
   const clientData = clients.get(socket);
   if (!clientData) {
     throw new Error('Client not found');
@@ -132,7 +132,7 @@ export async function produce(socket: Socket, transportId: string, kind: MediaKi
   return { id: producer.id };
 }
 
-export async function consume(socket: Socket, producerId: string, rtpCapabilities: any) {
+async function consume(socket: Socket, producerId: string, rtpCapabilities: any) {
   const clientData = clients.get(socket);
   if (!clientData || !clientData.currentChannelId) {
     throw new Error('Client not found or not part of any room');
@@ -160,7 +160,7 @@ export async function consume(socket: Socket, producerId: string, rtpCapabilitie
   };
 }
 
-export async function resumeConsumer(socket: Socket, serverConsumerId: string) {
+async function resumeConsumer(socket: Socket, serverConsumerId: string) {
   const clientData = clients.get(socket);
   if (!clientData || !clientData.consumers) {
     throw new Error('Client not found or no consumers available');
