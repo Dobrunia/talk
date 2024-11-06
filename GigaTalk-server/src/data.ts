@@ -51,8 +51,8 @@ export function addUserToChannel(
   // Получаем текущий массив пользователей для канала или создаем новый
   let usersInChannel = usersByChannels.get(channelId) || [];
 
-  console.log('usersByChannels 1)', usersByChannels);
-  console.log('usersInChannel 1)', usersInChannel);
+  console.log('usersByChannels ', usersByChannels);
+  console.log('usersInChannel ', usersInChannel);
 
   // Проверяем наличие пользователя и добавляем его, если его еще нет
   if (!usersInChannel.some(user => user.userId === clientData.userId)) {
@@ -66,9 +66,6 @@ export function addUserToChannel(
       `Пользователь ${clientData.userId} добавлен в канал ${channelId}`,
     );
   }
-
-  console.log('usersByChannels 2)', usersByChannels);
-  console.log('usersInChannel 2)', usersInChannel);
 }
 
 
@@ -81,7 +78,7 @@ export function removeUserFromChannel(socket: Socket): void {
   if (!channelId) return; // Если текущий канал не установлен, выходим
 
   // Получаем массив пользователей для данного канала
-  const usersInChannel = usersByChannels.get(channelId);
+  let usersInChannel = usersByChannels.get(channelId);
   if (!usersInChannel) return; // Если канал не существует, выходим
 
   // Находим индекс пользователя в массиве
@@ -91,16 +88,20 @@ export function removeUserFromChannel(socket: Socket): void {
 
   // Если пользователь найден, удаляем его из массива
   if (userIndex !== -1) {
-    usersInChannel.splice(userIndex, 1);
+    // Создаем новый массив с удалением пользователя
+    usersInChannel = [
+      ...usersInChannel.slice(0, userIndex),
+      ...usersInChannel.slice(userIndex + 1),
+    ];
     console.log(
       `Пользователь ${clientData.username} удалён из канала ${channelId}`,
     );
 
-    // Обновляем `Map` после удаления пользователя
-    usersByChannels.set(channelId, usersInChannel);
-
-    // Если после удаления массив пуст, удаляем канал из `usersByChannels`
-    if (usersInChannel.length === 0) {
+    // Обновляем `Map` новым массивом
+    if (usersInChannel.length > 0) {
+      usersByChannels.set(channelId, usersInChannel);
+    } else {
+      // Если после удаления массив пуст, удаляем канал из `usersByChannels`
       usersByChannels.delete(channelId);
       console.log(
         `Канал ${channelId} удалён из usersByChannels, так как он пуст.`,
