@@ -1,4 +1,4 @@
-import { sendSocketMessage } from '../socket/socket.ts';
+import { handleJoinRoom, sendSocketMessage } from '../socket/socket.ts';
 import { serverDATA } from '../types/types.ts';
 import { renderServerInfo } from '../ui-kit/index.ts';
 import {
@@ -37,6 +37,7 @@ async function voiceChannelClick(channelId: string) {
     type: 'join_channel',
     channelId,
   });
+  handleJoinRoom(channelId);
   document.getElementById('in_conversation_things')?.classList.remove('hidden');
   currentChannelId = channelId;
 }
