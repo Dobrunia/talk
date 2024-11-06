@@ -1,4 +1,3 @@
-import { Request, Response, NextFunction } from 'express';
 import { RowDataPacket } from 'mysql2';
 import connection from '../db/connection.ts';
 

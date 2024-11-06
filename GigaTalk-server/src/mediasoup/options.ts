@@ -1,5 +1,5 @@
 import { MediaKind, RtpCodecCapability } from 'mediasoup/node/lib/types';
-import mediasoup, { types as MediasoupTypes } from 'mediasoup';
+import { types as MediasoupTypes } from 'mediasoup';
 
 export const OPTIONS = {
   mediaCodecs: [

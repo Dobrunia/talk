@@ -1,4 +1,4 @@
-import { serverDATA, category } from '../types/types';
+import { serverDATA, category } from '../types/types.ts';
 import SVG from './svgs';
 
 export function serverListAddServerElement() {

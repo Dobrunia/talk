@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import connection from '../db/connection';
-import { JWT_SECRET } from '../data';
+import connection from '../db/connection.ts';
+import { JWT_SECRET } from '../data.ts';
 
 const TOKEN_EXPIRATION = '10d'; // Срок действия токена
 const GUEST_EXPIRATION_DAYS = 7; // Время жизни гостевых аккаунтов в днях

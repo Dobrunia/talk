@@ -1,4 +1,3 @@
-import { channel } from './../types/types';
 import { serverDATA } from '../types/types.ts';
 import {
   serverName,
