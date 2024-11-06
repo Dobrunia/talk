@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { RowDataPacket } from 'mysql2';
 import connection from '../db/connection.ts';
-import { console } from 'inspector';
 
 class ServerController {
   async getAllMyServers(req: Request, res: Response, next: NextFunction) {

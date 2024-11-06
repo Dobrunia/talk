@@ -17,7 +17,7 @@ async function serverClickHandler(serverId: string) {
     renderServerInfo(serverData);
     console.log('Отрисовка обновлённых данных сервера');
     sendSocketMessage({
-      type: 'update_server_users_in_channels',
+      type: 'user_opened_server',
       serverId,
     });
     console.log('Отрисовали активных пользователей сервера');
@@ -28,15 +28,13 @@ async function serverClickHandler(serverId: string) {
 }
 
 let currentChannelId: string | null = null;
-async function voiceChannelClick(serverId: string, channelId: string) {
+async function voiceChannelClick(channelId: string) {
   if (channelId === currentChannelId) {
     console.log('Вы уже в этом канале');
     return;
   }
-
   sendSocketMessage({
     type: 'join_channel',
-    serverId,
     channelId,
   });
   document.getElementById('in_conversation_things')?.classList.remove('hidden');
@@ -44,19 +42,7 @@ async function voiceChannelClick(serverId: string, channelId: string) {
 }
 
 function voiceChannelLeave() {
-  const serverId = document
-    .getElementById('server_id')
-    ?.getAttribute('data-serverId');
-  if (!serverId) {
-    console.error('Server ID not found!');
-    return;
-  }
-
-  sendSocketMessage({
-    type: 'leave_channel',
-    serverId,
-    channelId: currentChannelId as string,
-  });
+  sendSocketMessage({ type: 'leave_channel' });
   document.getElementById('in_conversation_things')?.classList.add('hidden');
   currentChannelId = null;
 }

@@ -2,17 +2,19 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import { router } from './router.ts';
-import { setupWebSocket } from './socket/socket.ts';
 import { errorHandler } from './middleware/errorHandler.ts';
 import './db/sessionCleanup.ts';
-import { initializeWorkers } from './mediasoup/worker.ts';
+import { initializeSocket } from './socket/socket.ts';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.SERVER_PORT || 3000;
 
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: '*',
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
   }),
@@ -23,14 +25,18 @@ app.use(errorHandler);
 
 const server = http.createServer(app);
 
+// Запуск сервера с обработкой ошибок
 async function startServer() {
-  await initializeWorkers();
-  setupWebSocket(server);
-  server.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-  });
+  try {
+    // Инициализируем сокеты
+    initializeSocket(server);
+    server.listen(port, () => {
+      console.log(`Server is running on ${port}`);
+    });
+  } catch (error) {
+    console.error('Ошибка запуска сервера:', error);
+    process.exit(1); // Завершаем процесс при ошибке
+  }
 }
 
-startServer().catch(error => {
-  console.error('Ошибка запуска сервера:', error);
-});
+startServer();

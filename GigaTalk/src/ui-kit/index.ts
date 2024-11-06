@@ -1,3 +1,4 @@
+import { channel } from './../types/types';
 import { serverDATA } from '../types/types.ts';
 import {
   serverName,
@@ -56,17 +57,13 @@ export function renderProfile() {
 }
 
 export function renderUserToChannel(
-  serverId: string,
   channelId: string,
   userId: string,
   username: string,
   userAvatar: string,
 ) {
-  const openedServerId = document
-    .getElementById('server_id')
-    ?.getAttribute('data-serverId');
   const user_list = document.getElementById(`user_list_${channelId}`);
-  if (openedServerId == serverId && user_list) {
+  if (user_list) {
     //TODO: null  == undefined
     user_list.insertAdjacentHTML(
       'beforeend',
@@ -75,35 +72,24 @@ export function renderUserToChannel(
   }
 }
 
-export function removeUserFromChannel(
-  serverId: string,
-  channelId: string,
-  userId: string,
-) {
-  const openedServerId = document
-    .getElementById('server_id')
-    ?.getAttribute('data-serverId');
-  const user_list = document.getElementById(`user_list_${channelId}`);
-  if (openedServerId && serverId && user_list) {
-    document.getElementById(`user_in_channel_${userId}`)?.remove();
-  }
+export function removeUserFromChannel(userId: string) {
+  document.getElementById(`user_in_channel_${userId}`)?.remove();
 }
 
-export function renderServerUsersInChannels(data: any) {
-  console.log(data.users);
-  const openedServerId = document
-    .getElementById('server_id')
-    ?.getAttribute('data-serverId');
-  data.users.forEach((user: any) => {
-    if (user.channelId && openedServerId) {
+export function renderServerUsersInChannels(channelsWithUsers: any) {
+  console.log(channelsWithUsers);
+
+  for (const channelId in channelsWithUsers) {
+    const users = channelsWithUsers[channelId];
+
+    users.forEach((user: any) => {
       renderUserToChannel(
-        openedServerId,
-        user.channelId,
+        channelId,
         user.userId,
         user.username,
         user.userAvatar,
       );
-      console.log('Отрисовали', user.username);
-    }
-  });
+      console.log('Отрисовали', user.username, 'в канале', channelId);
+    });
+  }
 }

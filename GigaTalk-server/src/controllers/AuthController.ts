@@ -2,10 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import connection from '../db/connection';
-import dotenv from 'dotenv';
+import { JWT_SECRET } from '../data';
 
-dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 const TOKEN_EXPIRATION = '10d'; // Срок действия токена
 const GUEST_EXPIRATION_DAYS = 7; // Время жизни гостевых аккаунтов в днях
 
@@ -52,34 +50,50 @@ class AuthController {
       const { username, password } = req.body;
 
       // Проверка пользователя
-      const [users] = await connection.query('SELECT * FROM users WHERE username = ?', [username]);
+      const [users] = await connection.query(
+        'SELECT * FROM users WHERE username = ?',
+        [username],
+      );
       if ((users as any[]).length === 0) {
         res.status(401).json({ error: 'Неверное имя пользователя или пароль' });
         return;
       }
-  
+
       const user = (users as any[])[0];
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
       if (!isPasswordCorrect) {
         res.status(401).json({ error: 'Неверное имя пользователя или пароль' });
         return;
       }
-  
+
       // Создание JWT токена с userAvatar
       const token = jwt.sign(
-        { id: user.id, username: user.username, userAvatar: user.avatar },
+        {
+          id: user.id,
+          username: user.username,
+          userAvatar: user.avatar,
+          permission: user.permission,
+        },
         JWT_SECRET,
-        { expiresIn: TOKEN_EXPIRATION }
+        { expiresIn: TOKEN_EXPIRATION },
       );
-  
+
       // Добавление записи в `active_sessions`
       await connection.query(
         'INSERT INTO active_sessions (user_id, token, expires_at, is_guest) VALUES (?, ?, NOW() + INTERVAL 1 DAY, FALSE)',
         [user.id, token],
       );
-  
+
       // Возвращаем токен, userId, username и userAvatar
-      res.status(200).json({ token, userId: user.id, username: user.username, userAvatar: user.avatar });
+      res
+        .status(200)
+        .json({
+          token,
+          userId: user.id,
+          username: user.username,
+          userAvatar: user.avatar,
+          permission: user.permission,
+        });
     } catch (error) {
       next(error);
     }

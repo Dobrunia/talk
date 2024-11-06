@@ -24,6 +24,7 @@ export const authMiddleware = (
       id: number;
       username: string;
       userAvatar: string;
+      permission: number;
     };
 
     // Выполняем асинхронный запрос к базе данных для проверки активной сессии
@@ -44,6 +45,7 @@ export const authMiddleware = (
         (req as any).userId = decoded.id;
         (req as any).username = decoded.username;
         (req as any).userAvatar = decoded.userAvatar;
+        (req as any).permission = decoded.permission;
         next();
       })
       .catch((error) => {

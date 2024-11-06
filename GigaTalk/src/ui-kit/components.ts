@@ -21,9 +21,7 @@ export function serverCategory(category: category, serverId: string) {
   let ch = '';
   category.channels?.forEach((channel) => {
     ch += `<li class="channel_item">
-    <div class="channel_name" onclick="voiceChannelClick(${serverId},${
-      channel.id
-    })">
+    <div class="channel_name" onclick="voiceChannelClick(${channel.id})">
       ${channel.type === 'voice' ? SVG.voiceIco : '#'}
       <div>${channel.name}</div>
     </div>
