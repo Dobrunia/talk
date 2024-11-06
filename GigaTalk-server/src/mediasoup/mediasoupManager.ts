@@ -1,8 +1,20 @@
-import { WebRtcTransport, Producer, Consumer, Router, Worker, MediaKind } from "mediasoup/node/lib/types";
-import { Socket } from "socket.io";
-import { clients, addUserToChannel, removeUserFromChannel, usersByChannels } from "../data.ts";
-import dotenv from "dotenv";
-import { getWorker } from "./worker.ts";
+import {
+  WebRtcTransport,
+  Producer,
+  Consumer,
+  Router,
+  Worker,
+  MediaKind,
+} from 'mediasoup/node/lib/types';
+import { Socket } from 'socket.io';
+import {
+  clients,
+  addUserToChannel,
+  removeUserFromChannel,
+  usersByChannels,
+} from '../data.ts';
+import dotenv from 'dotenv';
+import { getWorker } from './worker.ts';
 import { OPTIONS } from './options.ts';
 
 dotenv.config();
@@ -11,7 +23,11 @@ const consM = `\x1b[33mmediasoup\x1b[0m `;
 
 const roomRouters = new Map<string, Router>(); // New map to store routers for each room
 
-export async function handleMediasoupRequest(socket: Socket, data: any, callback: (response: any) => void) {
+export async function handleMediasoupRequest(
+  socket: Socket,
+  data: any,
+  callback: (response: any) => void,
+) {
   const { type, payload } = data;
   console.error(`${consM}handleMediasoupRequest get type: ${type}`);
   try {
@@ -24,15 +40,28 @@ export async function handleMediasoupRequest(socket: Socket, data: any, callback
         response = await createWebRtcTransport(socket, callback);
         break;
       case 'connectTransport':
-        response = await connectTransport(socket, payload.transportId, payload.dtlsParameters);
+        response = await connectTransport(
+          socket,
+          payload.transportId,
+          payload.dtlsParameters,
+        );
         callback(response);
         break;
       case 'produce':
-        response = await produce(socket, payload.transportId, payload.kind, payload.rtpParameters);
+        response = await produce(
+          socket,
+          payload.transportId,
+          payload.kind,
+          payload.rtpParameters,
+        );
         callback(response);
         break;
       case 'consume':
-        response = await consume(socket, payload.producerId, payload.rtpCapabilities);
+        response = await consume(
+          socket,
+          payload.producerId,
+          payload.rtpCapabilities,
+        );
         callback(response);
         break;
       case 'resumeConsumer':
@@ -50,7 +79,12 @@ export async function handleMediasoupRequest(socket: Socket, data: any, callback
   }
 }
 
-async function joinRoom(socket: Socket, roomName: string, callback: (response: any) => void) {
+async function joinRoom(
+  socket: Socket,
+  roomName: string,
+  callback: (response: any) => void,
+) {
+  roomName = String(roomName);
   let router = roomRouters.get(roomName);
   if (!router) {
     router = await createRoom(roomName);
@@ -64,13 +98,18 @@ async function joinRoom(socket: Socket, roomName: string, callback: (response: a
 
 async function createRoom(roomName: string): Promise<Router> {
   const worker = getWorker();
-  const router = await worker.createRouter({ mediaCodecs: OPTIONS.mediaCodecs });
+  const router = await worker.createRouter({
+    mediaCodecs: OPTIONS.mediaCodecs,
+  });
   roomRouters.set(roomName, router);
   usersByChannels.set(roomName, []);
   return router;
 }
 
-async function createWebRtcTransport(socket: Socket, callback: (response: any) => void) {
+async function createWebRtcTransport(
+  socket: Socket,
+  callback: (response: any) => void,
+) {
   const clientData = clients.get(socket);
   if (!clientData || !clientData.currentChannelId) {
     callback({ error: 'Client not part of any room' });
@@ -83,7 +122,7 @@ async function createWebRtcTransport(socket: Socket, callback: (response: any) =
     return;
   }
   const transport = await router.createWebRtcTransport({
-    listenIps: [{ ip: "0.0.0.0", announcedIp: process.env.ANNOUNCED_IP || '' }],
+    listenIps: [{ ip: '0.0.0.0', announcedIp: '127.0.0.1' }],
     enableUdp: true,
     enableTcp: true,
     preferUdp: true,
@@ -98,7 +137,11 @@ async function createWebRtcTransport(socket: Socket, callback: (response: any) =
   });
 }
 
-async function connectTransport(socket: Socket, transportId: string, dtlsParameters: any) {
+async function connectTransport(
+  socket: Socket,
+  transportId: string,
+  dtlsParameters: any,
+) {
   const clientData = clients.get(socket);
   if (!clientData) {
     throw new Error('Client not found');
@@ -111,7 +154,12 @@ async function connectTransport(socket: Socket, transportId: string, dtlsParamet
   return { connected: true };
 }
 
-async function produce(socket: Socket, transportId: string, kind: MediaKind, rtpParameters: any) {
+async function produce(
+  socket: Socket,
+  transportId: string,
+  kind: MediaKind,
+  rtpParameters: any,
+) {
   const clientData = clients.get(socket);
   if (!clientData) {
     throw new Error('Client not found');
@@ -132,7 +180,11 @@ async function produce(socket: Socket, transportId: string, kind: MediaKind, rtp
   return { id: producer.id };
 }
 
-async function consume(socket: Socket, producerId: string, rtpCapabilities: any) {
+async function consume(
+  socket: Socket,
+  producerId: string,
+  rtpCapabilities: any,
+) {
   const clientData = clients.get(socket);
   if (!clientData || !clientData.currentChannelId) {
     throw new Error('Client not found or not part of any room');
@@ -140,7 +192,8 @@ async function consume(socket: Socket, producerId: string, rtpCapabilities: any)
   const roomName = clientData.currentChannelId;
   const router = roomRouters.get(roomName);
   if (!router) throw new Error('Room not found');
-  if (!router.canConsume({ producerId, rtpCapabilities })) throw new Error('Cannot consume');
+  if (!router.canConsume({ producerId, rtpCapabilities }))
+    throw new Error('Cannot consume');
 
   const recvTransport = clientData.transports.recvTransport;
   if (!recvTransport) throw new Error('Receive transport not found');
@@ -165,6 +218,6 @@ async function resumeConsumer(socket: Socket, serverConsumerId: string) {
   if (!clientData || !clientData.consumers) {
     throw new Error('Client not found or no consumers available');
   }
-  const consumer = clientData.consumers.find(c => c.id === serverConsumerId);
+  const consumer = clientData.consumers.find((c) => c.id === serverConsumerId);
   if (consumer) await consumer.resume();
 }
