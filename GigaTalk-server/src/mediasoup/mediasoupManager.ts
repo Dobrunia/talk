@@ -1,16 +1,11 @@
 import {
-  WebRtcTransport,
-  Producer,
-  Consumer,
   Router,
-  Worker,
   MediaKind,
 } from 'mediasoup/node/lib/types';
 import { Socket } from 'socket.io';
 import {
   clients,
   addUserToChannel,
-  removeUserFromChannel,
   usersByChannels,
 } from '../data.ts';
 import dotenv from 'dotenv';
