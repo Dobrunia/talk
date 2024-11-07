@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { handleSocketMessage } from './socketController.ts';
-import { joinRoom } from '../mediasoupClient/mediasoupClientSetup.ts';
+import { joinMediasoupRoom } from '../mediasoupClient/mediasoupClientSetup.ts';
 
 let socket: Socket | null = null;
 
@@ -48,9 +48,9 @@ export function sendSocketMessage(message: object) {
   }
 }
 
-export function handleJoinRoom(roomName: string) {
+export function handleJoinMediasoupRoom(roomName: string) {
   if (socket && socket.connected) {
-    joinRoom(socket, roomName);
+    joinMediasoupRoom(socket, String(roomName));
   } else {
     console.warn('Socket.IO connection is not open.');
   }

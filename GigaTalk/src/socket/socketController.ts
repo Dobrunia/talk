@@ -16,7 +16,7 @@ export async function handleSocketMessage(message: any) {
       console.log('Пользователь офлайн', data);
       break;
     case 'user_joined_channel':
-      console.log(data)
+      console.log(data);
       renderUserToChannel(
         data.userInfo.channelId,
         data.userInfo.userId,
@@ -26,7 +26,7 @@ export async function handleSocketMessage(message: any) {
       console.log('Пользователь подключился к каналу', data);
       break;
     case 'user_leave_channel':
-      console.log(data)
+      console.log(data);
       removeUserFromChannel(data.userId);
       console.log('Пользователь покинул канал', data);
       break;

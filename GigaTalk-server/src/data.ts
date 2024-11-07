@@ -41,19 +41,11 @@ export function getUsersInChannels(channelIds: (string | number)[]): {
 }
 
 export function addUserToChannel(
-  channelId: string | number,
+  channelId: string,
   clientData: ClientData,
 ): void {
-  // Преобразуем channelId в строку для единообразия ключей
-  channelId = String(channelId);
-  console.log('channelId', channelId);
-
   // Получаем текущий массив пользователей для канала или создаем новый
   let usersInChannel = usersByChannels.get(channelId) || [];
-
-  console.log('usersByChannels ', usersByChannels);
-  console.log('usersInChannel ', usersInChannel);
-
   // Проверяем наличие пользователя и добавляем его, если его еще нет
   if (!usersInChannel.some(user => user.userId === clientData.userId)) {
     console.log(
@@ -68,13 +60,24 @@ export function addUserToChannel(
   }
 }
 
+export function getUserCurrentChannelId(
+  clientData: ClientData,
+): string | null {
+  for (const [channelId, users] of usersByChannels.entries()) {
+    // Проверяем, существует ли пользователь с таким userId в массиве
+    if (users.some((user) => user.userId === clientData.userId)) {
+      return channelId; // Возвращаем channelId, если пользователь найден
+    }
+  }
+  return null; // Возвращаем null, если пользователь не найден ни в одном канале
+}
 
 export function removeUserFromChannel(socket: Socket): void {
   // Получаем данные клиента
   const clientData = clients.get(socket);
   if (!clientData) return;
 
-  const channelId = getCurrentUsersChannelId(clientData);
+  const channelId = getUserCurrentChannelId(clientData);
   if (!channelId) return; // Если текущий канал не установлен, выходим
 
   // Получаем массив пользователей для данного канала
@@ -108,16 +111,4 @@ export function removeUserFromChannel(socket: Socket): void {
       );
     }
   }
-}
-
-export function getCurrentUsersChannelId(
-  clientData: ClientData,
-): string | null {
-  for (const [channelId, users] of usersByChannels.entries()) {
-    // Проверяем, существует ли пользователь с таким userId в массиве
-    if (users.some((user) => user.userId === clientData.userId)) {
-      return channelId; // Возвращаем channelId, если пользователь найден
-    }
-  }
-  return null; // Возвращаем null, если пользователь не найден ни в одном канале
 }

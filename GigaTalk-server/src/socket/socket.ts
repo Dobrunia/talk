@@ -5,7 +5,7 @@ import { handleMessage } from './messageHandler.ts';
 import { handleDisconnect } from './disconnectHandler.ts';
 import { clients, JWT_SECRET } from '../data.ts';
 import { socketController } from '../controllers/SocketController.ts';
-import { connectRoom } from './soketFunctions.ts';
+import { connectSocketRoom } from './soketFunctions.ts';
 import { handleMediasoupRequest } from '../mediasoup/mediasoupManager.ts';
 
 const cyan = '\x1b[36m';
@@ -97,6 +97,6 @@ async function initializeSocketServerRooms(socket: Socket) {
   const serverIds = await socketController.getAllMyServerIds(clientData.userId);
   if (!serverIds) return;
   serverIds.forEach((serverId) => {
-    connectRoom(socket, serverId, clientData);
+    connectSocketRoom(socket, serverId, clientData);
   });
 }

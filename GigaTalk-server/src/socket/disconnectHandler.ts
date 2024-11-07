@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io';
 import {
   clients,
-  getCurrentUsersChannelId,
+  getUserCurrentChannelId,
   removeUserFromChannel,
 } from '../data.ts';
 import { ClientData } from '../types/types.ts';
@@ -14,7 +14,7 @@ export async function handleDisconnect(socket: Socket): Promise<void> {
   // Удаляем из map с каналами, если пользователь в каком-то сидел
   const clientData = clients.get(socket);
   if (!clientData) return;
-  const chId = getCurrentUsersChannelId(clientData);
+  const chId = getUserCurrentChannelId(clientData);
   if (!chId) return;
   console.log('clientData', clientData);
   const roomId = await socketController.getServerIdByChannelId(chId);
@@ -34,22 +34,22 @@ export async function handleDisconnect(socket: Socket): Promise<void> {
   );
 }
 
-function disconnectRoom(
-  socket: Socket,
-  roomId: string,
-  client: ClientData,
-): void {
-  // Добавляем сокет в комнату с помощью встроенного метода join
-  socket.leave(roomId);
+// function disconnectRoom(
+//   socket: Socket,
+//   roomId: string,
+//   client: ClientData,
+// ): void {
+//   // Добавляем сокет в комнату с помощью встроенного метода join
+//   socket.leave(roomId);
 
-  // Уведомляем всех остальных пользователей в комнате, что новый пользователь отключился
-  const data = {
-    type: 'user_offline',
-    client,
-  };
-  socket.broadcast.to(roomId).emit('message', JSON.stringify(data));
+//   // Уведомляем всех остальных пользователей в комнате, что новый пользователь отключился
+//   const data = {
+//     type: 'user_offline',
+//     client,
+//   };
+//   socket.broadcast.to(roomId).emit('message', JSON.stringify(data));
 
-  console.log(
-    `${cyan}Socket:${reset} User ${client.username} left room ${roomId}`,
-  );
-}
+//   console.log(
+//     `${cyan}Socket:${reset} User ${client.username} left room ${roomId}`,
+//   );
+// }

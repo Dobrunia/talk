@@ -2,7 +2,7 @@ import { Socket } from 'socket.io';
 import {
   addUserToChannel,
   clients,
-  getCurrentUsersChannelId,
+  getUserCurrentChannelId,
   getUsersInChannels,
   removeUserFromChannel,
 } from '../data.ts';
@@ -25,7 +25,7 @@ export function handleMessage(socket: Socket, message: any) {
       case 'leave_server':
         break;
       case 'join_channel':
-        joinChannel(socket, data.channelId);
+        //joinChannel(socket, data.channelId);
         break;
       case 'leave_channel':
         leaveChannel(socket);
@@ -59,8 +59,7 @@ async function userOpenedServer(socket: Socket, serverId: string) {
   socket.emit('message', data);
 }
 
-async function joinChannel(socket: Socket, channelId: string) {
-  channelId = String(channelId);
+export async function joinChannel(socket: Socket, channelId: string) {
   const clientData = clients.get(socket);
   if (!clientData) return;
   //TODO:: проверка, что есть доступ к каналу
@@ -86,7 +85,7 @@ async function joinChannel(socket: Socket, channelId: string) {
 async function leaveChannel(socket: Socket) {
   const clientData = clients.get(socket);
   if (!clientData) return;
-  const chId = getCurrentUsersChannelId(clientData);
+  const chId = getUserCurrentChannelId(clientData);
   if (!chId) return;
   console.log('clientData', clientData);
   const roomId = await socketController.getServerIdByChannelId(chId);

@@ -10,7 +10,7 @@ const reset = '\x1b[0m';
  * @param roomId - идентификатор комнаты (например, serverId)
  * @param client - данные пользователя, присоединяющегося к комнате
  */
-export function connectRoom(
+export function connectSocketRoom(
   socket: Socket,
   roomId: string,
   client: ClientData,

@@ -10,10 +10,10 @@ let device: Device;
 let sendTransport: Transport;
 let recvTransport: Transport;
 
-export function joinRoom(socket: Socket, roomName: string): void {
+export function joinMediasoupRoom(socket: Socket, roomId: string): void {
   socket.emit(
     'mediasoup',
-    { type: 'joinRoom', payload: { roomName } },
+    { type: 'joinRoom', payload: { roomId } },
     async (response: { error?: string; rtpCapabilities?: RtpCapabilities }) => {
       if (response.error) {
         console.error('Failed to join room:', response.error);
@@ -22,15 +22,12 @@ export function joinRoom(socket: Socket, roomName: string): void {
 
       if (response.rtpCapabilities) {
         await initializeDevice(response.rtpCapabilities);
-        await createSendTransport(socket);
+        await createTransport(socket);
+        // После создания Transport слушаем новых производителей медиа
 
-        // После создания устройства и транспорта отправки создаем транспорт приема
-        await createRecvTransport(socket);
-
-        // После создания recvTransport слушаем новых производителей медиа
-        socket.on('newProducer', async (producerId: string) => {
-          await consume(socket, producerId);
-        });
+        // socket.on('newProducer', async (producerId: string) => {
+        //   await consume(socket, producerId);
+        // });
       }
     },
   );
@@ -48,7 +45,12 @@ async function initializeDevice(
   }
 }
 
-async function createSendTransport(socket: Socket): Promise<void> {
+async function createTransport(socket: Socket): Promise<void> {
+  // Добавьте логирование перед отправкой запроса
+  console.log('Sending request to createTransport:', {
+    type: 'createTransport',
+  });
+
   socket.emit(
     'mediasoup',
     { type: 'createTransport', payload: {} },
@@ -59,189 +61,128 @@ async function createSendTransport(socket: Socket): Promise<void> {
       iceCandidates: any[];
       dtlsParameters: any;
     }) => {
+      console.log('Response from createTransport:', response);
       if (response.error) {
         console.error('Failed to create transport:', response.error);
         return;
       }
 
-      sendTransport = device.createSendTransport(response);
+      // Проверка, что данные получены правильно
+      if (!response.id || !response.iceParameters || !response.dtlsParameters) {
+        console.error('Incomplete response received for createTransport');
+        return;
+      }
+      // сохранение транспорта на клиенте
+      saveTransport(socket, response);
+    },
+  );
+  // socket.emit('mediasoup', {
+  //   type: 'produce',
+  //   //какой тут транспорт id на получение?
+  //   payload: { transportId: recvTransport.id, kind: 'audio', rtpParameters: },
+  // });
+  // Получаем доступ к медиастриму (аудио и/или видео)
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false,
+    });
+    const audioTrack = stream.getAudioTracks()[0];
 
-      sendTransport.on(
-        'connect',
-        async (
-          { dtlsParameters }: { dtlsParameters: DtlsParameters },
-          callback: () => void,
-          errback: (error: any) => void,
-        ) => {
-          socket.emit(
-            'mediasoup',
-            {
-              type: 'connectTransport',
-              payload: { transportId: sendTransport.id, dtlsParameters },
-            },
-            (response: { error?: string }) => {
-              if (response.error) {
-                errback(response.error);
-              } else {
-                callback();
-              }
-            },
-          );
+    if (audioTrack) {
+      // Вызываем produce() для создания трека
+      const producer = await sendTransport.produce({ track: audioTrack });
+
+      // Отправляем rtpParameters на сервер через сокет
+      socket.emit('mediasoup', {
+        type: 'produce',
+        payload: {
+          transportId: sendTransport.id, // ID транспорта для отправки
+          kind: producer.kind, // 'audio' или 'video'
+          rtpParameters: producer.rtpParameters, // Параметры RTP
         },
-      );
-
-      sendTransport.on(
-        'produce',
-        (
-          { kind, rtpParameters }: { kind: string; rtpParameters: any },
-          callback: ({ id }: { id: string }) => void,
-          errback: (error: any) => void,
-        ) => {
-          socket.emit(
-            'mediasoup',
-            {
-              type: 'produce',
-              payload: { transportId: sendTransport.id, kind, rtpParameters },
-            },
-            (response: { error?: string; id?: string }) => {
-              if (response.error) {
-                errback(response.error);
-              } else if (response.id) {
-                callback({ id: response.id });
-              }
-            },
-          );
-        },
-      );
-
-      navigator.permissions.query({ name: 'camera' as PermissionName }).then((cameraPermission) => {
-        if (cameraPermission.state === 'denied') {
-          alert('Camera access is required to participate in this room. Please enable camera permissions.');
-          return;
-        }
-  
-        navigator.permissions.query({ name: 'microphone' as PermissionName }).then((micPermission) => {
-          if (micPermission.state === 'denied') {
-            alert('Microphone access is required to participate in this room. Please enable microphone permissions.');
-            return;
-          }
-  
-          navigator.mediaDevices
-            .getUserMedia({ video: true, audio: true })
-            .then((stream) => {
-              const videoTrack = stream.getVideoTracks()[0];
-              const audioTrack = stream.getAudioTracks()[0];
-  
-              if (videoTrack) {
-                sendTransport.produce({ track: videoTrack }).catch((error) => {
-                  console.error('Failed to produce video track:', error);
-                });
-              }
-              if (audioTrack) {
-                sendTransport.produce({ track: audioTrack }).catch((error) => {
-                  console.error('Failed to produce audio track:', error);
-                });
-              }
-            })
-            .catch((error) => {
-              console.error('Failed to get user media:', error);
-              alert('Please allow access to your camera and microphone to participate in this room.');
-            });
-        });
       });
-    },
-  );
-}
 
-async function createRecvTransport(socket: Socket): Promise<void> {
-  socket.emit(
-    'mediasoup',
-    { type: 'createTransport', payload: {} },
-    (response: {
-      error?: string;
-      id: string;
-      iceParameters: any;
-      iceCandidates: any[];
-      dtlsParameters: any;
-    }) => {
-      if (response.error) {
-        console.error('Failed to create transport:', response.error);
-        return;
-      }
-
-      recvTransport = device.createRecvTransport(response);
-
-      recvTransport.on(
-        'connect',
-        (
-          { dtlsParameters }: { dtlsParameters: DtlsParameters },
-          callback: () => void,
-          errback: (error: any) => void,
-        ) => {
-          socket.emit(
-            'mediasoup',
-            {
-              type: 'connectTransport',
-              payload: { transportId: recvTransport.id, dtlsParameters },
-            },
-            (response: { error?: string }) => {
-              if (response.error) {
-                errback(response.error);
-              } else {
-                callback();
-              }
-            },
-          );
-        },
+      console.log(
+        'Audio track produced with RTP parameters:',
+        producer.rtpParameters,
       );
-    },
+    }
+  } catch (error) {
+    console.error('Failed to get user media or produce track:', error);
+  }
+
+  socket.on('consume', (data) => {
+    consume(socket, data);
+  });
+}
+
+function saveTransport(socket: Socket, response: any) {
+  sendTransport = device.createSendTransport(response);
+  recvTransport = device.createRecvTransport(response);
+  sendTransport.on(
+    'connect',
+    ({ dtlsParameters }, callback, errback) => {
+      socket.emit(
+        'mediasoup',
+        {
+          type: 'connectTransport',
+          payload: { transportId: sendTransport.id, dtlsParameters },
+        },
+        (response) => {
+          if (response.error) {
+            errback(response.error);
+          } else {
+            callback();
+          }
+        }
+      );
+    }
+  );
+
+  // Добавляем обработчик события 'produce' для sendTransport
+  sendTransport.on(
+    'produce',
+    ({ kind, rtpParameters }, callback, errback) => {
+      socket.emit(
+        'mediasoup',
+        {
+          type: 'produce',
+          payload: { transportId: sendTransport.id, kind, rtpParameters },
+        },
+        (response) => {
+          if (response.error) {
+            errback(response.error);
+          } else {
+            callback({ id: response.id });
+          }
+        }
+      );
+    }
   );
 }
 
-async function consume(socket: Socket, producerId: string): Promise<void> {
-  socket.emit(
-    'mediasoup',
-    {
-      type: 'consume',
-      payload: { producerId, rtpCapabilities: device.rtpCapabilities },
-    },
-    (response: {
-      error?: string;
-      id: string;
-      kind: 'video' | 'audio';
-      rtpParameters: any;
-    }) => {
-      if (response.error) {
-        console.error('Failed to consume:', response.error);
-        return;
-      }
+export async function consume(socket: Socket, data: any): Promise<void> {
+  console.log('Consume event received:', data);
 
-      const { id, kind, rtpParameters } = response;
-      recvTransport
-        .consume({ id, producerId, kind, rtpParameters })
-        .then(async (consumer) => {
-          const stream = new MediaStream();
-          await stream.addTrack(consumer.track);
+  // Создание `RTCRtpReceiver` и воспроизведение потока
+  const consumer = await recvTransport.consume({
+    id: data.id,
+    producerId: data.producerId,
+    kind: data.kind,
+    rtpParameters: data.rtpParameters,
+  });
 
-          if (kind === 'video') {
-            const videoElement = document.getElementById(
-              'remoteVideo',
-            ) as HTMLVideoElement;
-            videoElement.srcObject = stream;
-            videoElement.play();
-          } else if (kind === 'audio') {
-            const audioElement = document.getElementById(
-              'remoteAudio',
-            ) as HTMLAudioElement;
-            audioElement.srcObject = stream;
-            audioElement.play();
-          }
-        })
-        .catch((error) => {
-          console.error('Failed to consume:', error);
-        });
-    },
-  );
+  const stream = new MediaStream();
+  stream.addTrack(consumer.track);
+
+  // Воспроизведение потока
+  const audioElement = document.createElement('audio');
+  audioElement.srcObject = stream;
+  audioElement.play();
+
+  // Отправка подтверждения на сервер для возобновления потока
+  socket.emit('consumer-resume', data.id);
 }
 
 // Пример использования consume после создания recvTransport

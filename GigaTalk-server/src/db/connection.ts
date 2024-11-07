@@ -25,6 +25,6 @@ setInterval(async () => {
   } catch (error) {
     console.error('Error keeping the MySQL connection alive:', error);
   }
-}, 240000);
+}, 200000);
 
 export default connection;
