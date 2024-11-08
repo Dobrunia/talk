@@ -18,6 +18,7 @@ export async function joinMediasoupRoom(
       await initializeDevice(response.rtpCapabilities);
       await createTransport(socket);
 
+      await startSendingMedia(socket);
       socket.emit('mediasoup', {
         type: 'createConsumersForClient',
         payload: { rtpCapabilities: response.rtpCapabilities },
@@ -144,5 +145,23 @@ async function setupTransportEventHandlers(
         },
       );
     });
+  }
+}
+
+async function startSendingMedia(socket: Socket) {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true, // или { video: true, audio: true }
+      audio: true,
+    });
+
+    for (const track of stream.getTracks()) {
+      await sendTransport.produce({ track });
+    }
+
+    console.log('Медиапоток отправляется');
+  } catch (error) {
+    console.error('Ошибка при попытке отправить медиапоток:', error);
+    alert('Доступ к камере и микрофону запрещен. Проверьте настройки вашего браузера.');
   }
 }

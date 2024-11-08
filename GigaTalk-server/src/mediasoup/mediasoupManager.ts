@@ -185,6 +185,7 @@ async function produce(
     rtpParameters,
   });
 
+  console.log('producer', kind)
   if (producer.kind === 'audio') {
     clientData.producers.audioProducer = producer;
   } else if (producer.kind === 'video') {
@@ -230,6 +231,11 @@ async function createConsumersForClient(
   }
 
   for (const user of usersInChannel) {
+    console.log('clientData', clientData)
+    if (user.userId === clientData.userId) {
+      console.log('Самого себя слышать нет смысла');
+      return;
+    }
     for (const producer of [
       user.producers.audioProducer,
       user.producers.videoProducer,
