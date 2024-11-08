@@ -23,8 +23,8 @@ export function connectSocketRoom(
     type: 'user_online',
     message: client,
   };
-  socket.broadcast.to(roomId).emit('message', JSON.stringify(data));
-  socket.emit('message', JSON.stringify(data));
+  //socket.broadcast.to(roomId).emit('message', JSON.stringify(data));
+  //socket.emit('message', JSON.stringify(data));
   console.log(
     `${cyan}Socket:${reset} User ${client.username} joined room ${roomId}`,
   );

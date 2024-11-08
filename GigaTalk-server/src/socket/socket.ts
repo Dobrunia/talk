@@ -48,6 +48,7 @@ export function initializeSocket(server: HttpServer): Server {
       };
 
       clients.set(socket, {
+        socket,
         userId: id,
         username,
         userAvatar,

@@ -1,6 +1,8 @@
 import { Consumer, Producer, WebRtcTransport } from 'mediasoup/node/lib/types';
+import { Socket } from 'socket.io';
 
 export type ClientData = {
+  socket: Socket;
   userId: string;
   username: string;
   userAvatar: string | null;

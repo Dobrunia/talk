@@ -55,3 +55,25 @@ export function handleJoinMediasoupRoom(roomName: string) {
     console.warn('Socket.IO connection is not open.');
   }
 }
+
+export async function emitMediasoupEvent(
+  socket: Socket,
+  eventType: string,
+  payload: any,
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    socket.emit(
+      'mediasoup',
+      { type: eventType, payload },
+      (response: { error?: string; [key: string]: any }) => {
+        if (response.error) {
+          console.error(`Failed to handle ${eventType}:`, response.error);
+          reject(response.error);
+        } else {
+          console.log(`Response from ${eventType}:`, response);
+          resolve(response);
+        }
+      },
+    );
+  });
+}
