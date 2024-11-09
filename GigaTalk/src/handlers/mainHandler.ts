@@ -75,7 +75,6 @@ async function handleNicknameChange(event: Event): Promise<void> {
   }
 }
 
-
 function closeProfileModal() {
   const profileModal = document.getElementById('profileModal');
   if (profileModal) {
