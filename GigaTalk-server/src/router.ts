@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { serverController } from './controllers/ServerController.ts';
 import { authController } from './controllers/AuthController.ts';
 import { authMiddleware } from './middleware/authMiddleware.ts';
+import { userController } from './controllers/UserController.ts';
 
 const router = Router();
 
@@ -17,5 +18,8 @@ router.post('/login', authController.login);
 
 // Маршрут проверки токена
 router.get('/verify-token', authMiddleware, authController.verifyToken);
+
+// Маршруты смены информации о пользователе
+router.post('/changeAvatar', authMiddleware, userController.changeAvatar);
 
 export { router };

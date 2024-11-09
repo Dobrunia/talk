@@ -1,3 +1,4 @@
+import { userApi } from '../api/userApi.ts';
 import { handleJoinMediasoupRoom, sendSocketMessage } from '../socket/socket.ts';
 import { serverDATA } from '../types/types.ts';
 import { renderServerInfo } from '../ui-kit/index.ts';
@@ -61,13 +62,31 @@ function handleNicknameChange(event: Event): void {
 function handleAvatarChange(event: Event): void {
   event.preventDefault();
   const avatarInput = document.getElementById('change_avatar') as HTMLInputElement | null;
+
   if (avatarInput && avatarInput.files && avatarInput.files.length > 0) {
     const file = avatarInput.files[0];
-    console.log('Аватар выбран:', file.name);
+    const reader = new FileReader();
+
+    reader.onload = async function() {
+      if (reader.result) {
+        const base64String = reader.result.toString();
+        const result = await userApi.changeAvatar(base64String);
+        console.log('Аватар в формате Base64:', result);
+        // Здесь можно отправить строку base64String на сервер для сохранения в БД
+      }
+    };
+
+    reader.onerror = function() {
+      console.error('Ошибка при чтении файла:', reader.error);
+      alert('Произошла ошибка при преобразовании файла.');
+    };
+
+    reader.readAsDataURL(file); // Читаем файл как Data URL для получения строки Base64
   } else {
     alert('Выберите файл аватара');
   }
 }
+
 
 window.voiceChannelClick = voiceChannelClick;
 window.voiceChannelLeave = voiceChannelLeave;
