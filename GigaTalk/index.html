@@ -10,7 +10,7 @@
     <div class="app">
       <div class="servers_block">
         <div class="servers_list" id="servers_list"></div>
-        <div class="settings" id="settings" onclick="console.log('настройки')"></div>
+        <div class="settings" id="settings" onclick="openSettingsModal()"></div>
       </div>
       <div
         class="flex flex-col items-center justify-between bg-server_components_dg"
@@ -202,6 +202,48 @@
           </button>
         </div>
       </div>
+      <div
+        id="settingsModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
+      >
+        <div class="bg-gray-800 text-white p-6 rounded-lg w-96">
+          <h2 class="text-xl font-semibold mb-4">Настройки пользователя</h2>
+
+          <!-- Ползунок для громкости -->
+          <div class="mb-4">
+            <label for="volume" class="block text-sm mb-2">Громкость</label>
+            <input type="range" id="volume" min="0" max="100" class="w-full" />
+          </div>
+
+          <!-- Выбор микрофона -->
+          <div class="mb-[60px]">
+            <label for="microphone" class="block text-sm mb-2"
+              >Выбор микрофона</label
+            >
+            <select id="microphone" class="w-full p-2 bg-gray-700 rounded-md">
+              <option>Микрофон 1</option>
+              <option>Микрофон 2</option>
+              <option>Микрофон 3</option>
+            </select>
+          </div>
+
+          <!-- Кнопка выхода -->
+          <button
+            onclick="logOut()"
+            class="w-full bg-red-600 hover:bg-red-700 p-2 rounded-md mb-4"
+          >
+            Выйти из аккаунта
+          </button>
+
+          <!-- Кнопка закрытия -->
+          <button
+            onclick="closeSettingsModal()"
+            class="w-full bg-gray-600 hover:bg-gray-700 p-2 rounded-md"
+          >
+            Закрыть
+          </button>
+        </div>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
     <script type="module" src="/src/handlers/mainHandler.ts"></script>
@@ -249,6 +291,14 @@
           previewImage.src = '';
           previewImage.classList.add('hidden');
         }
+      }
+
+      function openSettingsModal() {
+        document.getElementById('settingsModal').classList.remove('hidden');
+      }
+
+      function closeSettingsModal() {
+        document.getElementById('settingsModal').classList.add('hidden');
       }
     </script>
   </body>
