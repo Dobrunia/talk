@@ -7,6 +7,7 @@ import {
   myProfile,
   userInChannel,
   serverId,
+  settingsSvg,
 } from '../ui-kit/components.ts';
 
 export function renderServerInfo(serverData: serverDATA) {
@@ -91,4 +92,8 @@ export function renderServerUsersInChannels(channelsWithUsers: any) {
       console.log('Отрисовали', user.username, 'в канале', channelId);
     });
   }
+}
+
+export function renderSettings() {
+  document.getElementById('settings').innerHTML = settingsSvg();
 }

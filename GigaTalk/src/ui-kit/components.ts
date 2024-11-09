@@ -42,7 +42,9 @@ export function serverCategory(category: category, serverId: string) {
 
 export function myProfile(username: string, userAvatar: string) {
   return `<div class="profile_avatar" onclick="openProfileModal()" style="background-image: url('${
-    userAvatar && userAvatar.startsWith('data:image/') ? userAvatar : '/default_profile.jpg'
+    userAvatar && userAvatar.startsWith('data:image/')
+      ? userAvatar
+      : '/default_profile.jpg'
   }');">
   </div><div class="profile_name">${username}</div>
   <div class="profile_buttons">${SVG.micro}${SVG.headphones}</div>`;
@@ -59,4 +61,8 @@ export function userInChannel(
   });"></div>
   <div class="user_in_channel_name">${username}</div>
   </div>`;
+}
+
+export function settingsSvg() {
+  return `${SVG.settings}`;
 }

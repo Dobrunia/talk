@@ -106,7 +106,7 @@
   @apply w-[72px] h-[48px] flex items-center justify-between
 }
 
-.profile_buttons svg:hover{
+.profile_buttons svg:hover {
   cursor: pointer;
 }
 
@@ -152,4 +152,12 @@
 
 .remoteAudio {
   @apply hidden
+}
+
+.settings {
+  @apply w-[60px] h-[60px] flex items-center justify-center cursor-pointer
+}
+
+.settings:hover svg path {
+  fill: #374151 !important;
 }

@@ -1,5 +1,5 @@
 import { serverDATA } from '../types/types.ts';
-import { renderProfile, renderServersList } from '../ui-kit/index.ts';
+import { renderProfile, renderServersList, renderSettings } from '../ui-kit/index.ts';
 import { updateCache } from './cache.ts';
 
 async function loadServers() {
@@ -32,4 +32,5 @@ async function loadServers() {
 export function logInRender() {
   renderProfile();
   loadServers();
+  renderSettings();
 }
