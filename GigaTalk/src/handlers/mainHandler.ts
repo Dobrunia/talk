@@ -139,7 +139,11 @@ function logOut() {
     // Логика выхода из аккаунта
     console.log("Выход из аккаунта выполнен");
     // Здесь можно добавить логику для выхода, например, перенаправление на страницу входа
-    // window.location.href = '/login';
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userAvatar');
+    window.location.reload(); // Обновление страницы для удаления всех сессий и кэшированных данных
   } else {
     console.log("Выход из аккаунта отменен");
   }
