@@ -21,10 +21,7 @@ export const authMiddleware = (
   try {
     // Проверка валидности токена и извлечение данных пользователя
     const decoded = jwt.verify(token, JWT_SECRET) as {
-      id: number;
-      username: string;
-      userAvatar: string;
-      permission: number;
+      id: number
     };
 
     // Выполняем асинхронный запрос к базе данных для проверки активной сессии
@@ -43,9 +40,6 @@ export const authMiddleware = (
 
         // Добавляем данные пользователя в объект req для дальнейшего использования
         (req as any).userId = decoded.id;
-        (req as any).username = decoded.username;
-        (req as any).userAvatar = decoded.userAvatar;
-        (req as any).permission = decoded.permission;
         next();
       })
       .catch((error) => {

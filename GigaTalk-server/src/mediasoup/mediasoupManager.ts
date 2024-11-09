@@ -30,13 +30,13 @@ export async function handleMediasoupRequest(
 ) {
   const { type, payload } = data;
   console.error(`${consM}handleMediasoupRequest get type: ${type}`);
-  console.error(
-    `${consM}handleMediasoupRequest get payload: ${JSON.stringify(
-      payload,
-      null,
-      2,
-    )}`,
-  );
+  // console.error(
+  //   `${consM}handleMediasoupRequest get payload: ${JSON.stringify(
+  //     payload,
+  //     null,
+  //     2,
+  //   )}`,
+  // );
   try {
     switch (type) {
       case 'joinRoom':
@@ -185,7 +185,7 @@ async function produce(
     rtpParameters,
   });
 
-  console.log('producer', kind)
+  //console.log('producer', kind)
   if (producer.kind === 'audio') {
     clientData.producers.audioProducer = producer;
   } else if (producer.kind === 'video') {
@@ -194,6 +194,22 @@ async function produce(
 
   clients.set(socket, clientData);
   callback({ id: producer.id });
+  // Notify other clients in the room to create consumers
+  // const roomId = getUserCurrentChannelId(clientData);
+  // if (roomId) {
+  //   let router = roomRouters.get(roomId)
+  //   const usersInChannel = usersByChannels.get(roomId);
+  //   console.log('пиво1')
+  //   if (usersInChannel && router) {
+  //     usersInChannel.forEach((user) => {
+  //       console.log('пиво2')
+  //       if (user.userId !== clientData.userId) {
+  //         console.log('пиво3')
+  //         createConsumersForClient(user.socket, router.rtpCapabilities);
+  //       }
+  //     });
+  //   }
+  // }
 }
 
 async function createConsumersForClient(
