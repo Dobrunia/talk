@@ -12,5 +12,6 @@ declare global {
     voiceChannelLeave: typeof voiceChannelLeave;
     handleNicknameChange: typeof handleNicknameChange;
     handleAvatarChange: typeof handleAvatarChange;
+    closeProfileModal: typeof closeProfileModal;
   }
 }

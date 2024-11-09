@@ -7,6 +7,9 @@ import { clients, JWT_SECRET } from '../data.ts';
 import { socketController } from '../controllers/SocketController.ts';
 import { connectSocketRoom } from './soketFunctions.ts';
 import { handleMediasoupRequest } from '../mediasoup/mediasoupManager.ts';
+import connection from '../db/connection.ts';
+import { RowDataPacket } from 'mysql2';
+import { verifyAndInitializeClientData } from '../utils/authSocketUtils.ts';
 
 const cyan = '\x1b[36m';
 const reset = '\x1b[0m';
@@ -20,54 +23,18 @@ export function initializeSocket(server: HttpServer): Server {
     },
   });
 
-  io.use((socket, next) => {
-    // Извлекаем токен из URL при подключении
+  io.use(async (socket, next) => {
     const token = socket.handshake.query.token as string;
 
     if (!token) {
-      // Отказываем в подключении, если токен отсутствует
-      return next(new Error(`${cyan}Socket:${reset} Token is required`));
+      return next(new Error('Token is required'));
     }
 
     try {
-      // Проверка токена
-      const decoded = jwt.verify(token, JWT_SECRET) as {
-        id: string;
-        username: string;
-        userAvatar: string;
-        permission: number;
-      };
-      const { id, username, userAvatar, permission } = decoded;
-
-      // Сохраняем данные пользователя в socket.data для дальнейшего использования
-      socket.data.user = {
-        userId: id,
-        username,
-        userAvatar,
-        permission,
-      };
-
-      clients.set(socket, {
-        socket,
-        userId: id,
-        username,
-        userAvatar,
-        permission,
-        transports: {
-          sendTransport: null,
-          recvTransport: null,
-        },
-        producers: {
-          audioProducer: null,
-          videoProducer: null,
-          screenProducer: null,
-        },
-      });
-
+      await verifyAndInitializeClientData(token, clients, socket);
       next();
     } catch (error) {
-      // Отклоняем подключение при ошибке аутентификации
-      return next(new Error(`${cyan}Socket:${reset} Authentication error`));
+      next(new Error('Authentication error'));
     }
   });
 

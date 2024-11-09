@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+export const TOKEN_EXPIRATION = '10d'; // Срок действия токена
+export const GUEST_EXPIRATION_DAYS = 7; // Время жизни гостевых аккаунтов в днях
 export const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 export const clients = new Map<Socket, ClientData>(); // Хранилище для данных клиентов
 export const usersByChannels = new Map<string, ClientData[]>(); // Структура для хранения пользователей по уникальным каналам

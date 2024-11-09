@@ -1,7 +1,10 @@
 import { userApi } from '../api/userApi.ts';
-import { handleJoinMediasoupRoom, sendSocketMessage } from '../socket/socket.ts';
+import {
+  handleJoinMediasoupRoom,
+  sendSocketMessage,
+} from '../socket/socket.ts';
 import { serverDATA } from '../types/types.ts';
-import { renderServerInfo } from '../ui-kit/index.ts';
+import { renderProfile, renderServerInfo } from '../ui-kit/index.ts';
 import {
   guestLoginHandler,
   handleLogin,
@@ -51,7 +54,9 @@ function voiceChannelLeave() {
 
 function handleNicknameChange(event: Event): void {
   event.preventDefault();
-  const nicknameInput = document.getElementById('change_nickname') as HTMLInputElement | null;
+  const nicknameInput = document.getElementById(
+    'change_nickname',
+  ) as HTMLInputElement | null;
   if (nicknameInput && nicknameInput.value.trim()) {
     console.log('Ник:', nicknameInput.value);
   } else {
@@ -59,34 +64,63 @@ function handleNicknameChange(event: Event): void {
   }
 }
 
-function handleAvatarChange(event: Event): void {
+function closeProfileModal() {
+  const profileModal = document.getElementById('profileModal');
+  if (profileModal) {
+    profileModal.classList.add('hidden');
+  }
+}
+
+async function handleAvatarChange(event: Event): Promise<void> {
   event.preventDefault();
-  const avatarInput = document.getElementById('change_avatar') as HTMLInputElement | null;
+  const avatarInput = document.getElementById(
+    'change_avatar',
+  ) as HTMLInputElement | null;
 
   if (avatarInput && avatarInput.files && avatarInput.files.length > 0) {
     const file = avatarInput.files[0];
     const reader = new FileReader();
 
-    reader.onload = async function() {
+    reader.onload = async function () {
       if (reader.result) {
         const base64String = reader.result.toString();
-        const result = await userApi.changeAvatar(base64String);
-        console.log('Аватар в формате Base64:', result);
-        // Здесь можно отправить строку base64String на сервер для сохранения в БД
+
+        try {
+          const response = await userApi.changeAvatar(base64String);
+
+          if (response && response.userAvatar) {
+            console.log('Аватар успешно обновлен:', response);
+            localStorage.setItem('userAvatar', response.userAvatar);
+            renderProfile();
+            closeProfileModal();
+            alert(response.message || 'Аватар успешно обновлен');
+          } else {
+            console.error('Ошибка сервера:', response);
+            alert(
+              `Ошибка: ${response.message || 'Не удалось обновить аватар'}`,
+            );
+          }
+        } catch (error) {
+          if (error.response.status === 413) {
+            alert(`Ошибка: Размер файла слишком велик. Пожалуйста, выберите файл меньшего размера.`);
+            return;
+          }
+          console.error('Ошибка при отправке данных на сервер:', error);
+          alert('Произошла ошибка при обновлении аватара. Попробуйте позже.');
+        }
       }
     };
 
-    reader.onerror = function() {
+    reader.onerror = function () {
       console.error('Ошибка при чтении файла:', reader.error);
       alert('Произошла ошибка при преобразовании файла.');
     };
 
-    reader.readAsDataURL(file); // Читаем файл как Data URL для получения строки Base64
+    reader.readAsDataURL(file); // Инициализация чтения файла как Data URL
   } else {
     alert('Выберите файл аватара');
   }
 }
-
 
 window.voiceChannelClick = voiceChannelClick;
 window.voiceChannelLeave = voiceChannelLeave;
@@ -98,3 +132,4 @@ window.showLogin = showLogin;
 window.showRegister = showRegister;
 window.handleNicknameChange = handleNicknameChange;
 window.handleAvatarChange = handleAvatarChange;
+window.closeProfileModal = closeProfileModal;

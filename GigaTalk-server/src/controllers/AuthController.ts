@@ -2,10 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import connection from '../db/connection.ts';
-import { JWT_SECRET } from '../data.ts';
-
-const TOKEN_EXPIRATION = '10d'; // Срок действия токена
-const GUEST_EXPIRATION_DAYS = 7; // Время жизни гостевых аккаунтов в днях
+import {
+  GUEST_EXPIRATION_DAYS,
+  JWT_SECRET,
+  TOKEN_EXPIRATION,
+} from '../data.ts';
 
 class AuthController {
   async register(
@@ -67,33 +68,16 @@ class AuthController {
       }
 
       // Создание JWT токена с userAvatar
-      const token = jwt.sign(
-        {
-          id: user.id,
-          username: user.username,
-          userAvatar: user.avatar,
-          permission: user.permission,
-        },
-        JWT_SECRET,
-        { expiresIn: TOKEN_EXPIRATION },
-      );
-
-      // Добавление записи в `active_sessions`
-      await connection.query(
-        'INSERT INTO active_sessions (user_id, token, expires_at, is_guest) VALUES (?, ?, NOW() + INTERVAL 1 DAY, FALSE)',
-        [user.id, token],
-      );
+      const token = await authController.createAndStoreToken(user.id);
 
       // Возвращаем токен, userId, username и userAvatar
-      res
-        .status(200)
-        .json({
-          token,
-          userId: user.id,
-          username: user.username,
-          userAvatar: user.avatar,
-          permission: user.permission,
-        });
+      res.status(200).json({
+        token,
+        userId: user.id,
+        username: user.username,
+        userAvatar: user.avatar,
+        permission: user.permission,
+      });
     } catch (error) {
       next(error);
     }
@@ -174,6 +158,31 @@ class AuthController {
     } catch (error) {
       res.status(401).json({ error: 'Недействительный токен' });
     }
+  }
+
+  async createAndStoreToken(userId: number): Promise<string> {
+    // Генерация нового JWT токена
+    const newToken = jwt.sign(
+      {
+        id: userId,
+      },
+      JWT_SECRET,
+      { expiresIn: TOKEN_EXPIRATION },
+    );
+
+    // Добавление записи в `active_sessions`
+    try {
+      await connection.query(
+        'INSERT INTO active_sessions (user_id, token, expires_at, is_guest) VALUES (?, ?, NOW() + INTERVAL 1 DAY, FALSE)',
+        [userId, newToken],
+      );
+      console.log(`Токен успешно создан и сохранен для userId ${userId}`);
+    } catch (error) {
+      console.error('Ошибка при добавлении записи в active_sessions:', error);
+      throw new Error('Ошибка при добавлении сессии');
+    }
+
+    return newToken;
   }
 }
 

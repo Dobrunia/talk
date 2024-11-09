@@ -101,11 +101,11 @@ export async function getInCheck() {
 
   const response = await checkTokenValidity(token);
   if (response.valid) {
-    saveUserData(
-      response.decoded.id,
-      response.decoded.username,
-      response.decoded.userAvatar,
-    );
+    // saveUserData(
+    //   response.decoded.id,
+    //   response.username,
+    //   response.userAvatar,
+    // );
     return true;
   } else {
     // Если токен недействителен, удаляем его и показываем модальное окно

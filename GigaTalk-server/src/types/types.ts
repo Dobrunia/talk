@@ -25,3 +25,7 @@ export type UserInfo = {
   username: string;
   userAvatar: string | null;
 };
+
+export interface DecodedToken {
+  id: string;
+}
