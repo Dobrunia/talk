@@ -37,7 +37,46 @@ class UserController {
       next(error);
     }
   }
+  async changeUsername(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = (req as any).userId;
+      const { newUsername } = req.body;
 
+      if (!newUsername) {
+        res.status(400).json({ message: 'Новое имя пользователя обязательно' });
+        return;
+      }
+
+      // Обновление имени пользователя в базе данных
+      await connection.query<RowDataPacket[]>(
+        'UPDATE users SET username = ? WHERE id = ?',
+        [newUsername, userId],
+      );
+
+      // Получение обновленных данных пользователя
+      const [updatedUsername] = await connection.query<RowDataPacket[]>(
+        'SELECT username FROM users WHERE id = ?',
+        [userId],
+      );
+
+      if (updatedUsername.length === 0) {
+        res.status(404).json({ message: 'Пользователь не найден' });
+        return;
+      }
+
+      res.status(200).json({
+        message: 'Имя пользователя успешно обновлено',
+        username: updatedUsername[0].username,
+      });
+    } catch (error) {
+      console.error('Ошибка при изменении имени пользователя:', error);
+      next(error);
+    }
+  }
   async changeAvatar(
     req: Request,
     res: Response,

@@ -52,17 +52,29 @@ function voiceChannelLeave() {
   currentChannelId = null;
 }
 
-function handleNicknameChange(event: Event): void {
+async function handleNicknameChange(event: Event): Promise<void> {
   event.preventDefault();
-  const nicknameInput = document.getElementById(
-    'change_nickname',
-  ) as HTMLInputElement | null;
-  if (nicknameInput && nicknameInput.value.trim()) {
-    console.log('Ник:', nicknameInput.value);
-  } else {
-    alert('Введите новый ник');
+  try {
+    const nicknameInput = document.getElementById(
+      'change_nickname',
+    ) as HTMLInputElement | null;
+
+    if (nicknameInput && nicknameInput.value.trim()) {
+      const response = await userApi.changeUsername(nicknameInput.value.trim());
+      localStorage.setItem('username', response.username);
+      renderProfile();
+      closeProfileModal();
+      console.log('Новый ник:', response.username);
+      alert('Имя пользователя успешно обновлено');
+    } else {
+      alert('Введите новый ник');
+    }
+  } catch (error) {
+    console.error('Ошибка при изменении ника:', error);
+    alert('Произошла ошибка при изменении ника. Попробуйте позже.');
   }
 }
+
 
 function closeProfileModal() {
   const profileModal = document.getElementById('profileModal');

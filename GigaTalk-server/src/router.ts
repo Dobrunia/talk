@@ -20,6 +20,7 @@ router.post('/login', authController.login);
 router.get('/verify-token', authMiddleware, authController.verifyToken);
 
 // Маршруты смены информации о пользователе
+router.post('/changeUsername', authMiddleware, userController.changeUsername);
 router.post('/changeAvatar', authMiddleware, userController.changeAvatar);
 
 export { router };
