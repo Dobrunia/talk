@@ -147,12 +147,8 @@
         class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden"
       >
         <div class="bg-gray-800 text-white p-6 rounded-lg w-96">
-          <!-- Заголовок -->
           <h2 class="text-xl font-semibold mb-4">Поменять аватарку</h2>
 
-          <!-- Форма для смены ника -->
-
-          <!-- Форма для смены аватара -->
           <form
             id="avatarForm"
             class="space-y-4 mt-4"
@@ -170,7 +166,22 @@
                 class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none file:bg-gray-600 file:text-white file:border-none file:rounded-md file:px-4 file:py-2 hover:file:bg-gray-700"
               />
             </div>
-            <!-- Кнопка сохранения изменений для аватара -->
+
+            <!-- Предварительный просмотр изображения -->
+            <div class="mt-4">
+              <label class="block text-sm mb-2"
+                >Предварительный просмотр:</label
+              >
+              <div class="flex justify-center">
+                <img
+                  id="previewImage"
+                  class="w-32 h-32 rounded-full object-cover hidden"
+                  src=""
+                  alt="Предварительный просмотр"
+                />
+              </div>
+            </div>
+
             <button
               type="button"
               onclick="handleAvatarChange(event)"
@@ -180,7 +191,6 @@
             </button>
           </form>
 
-          <!-- Кнопка отмены -->
           <button
             onclick="closeProfileModal()"
             class="mt-4 w-full bg-gray-600 hover:bg-gray-700 p-2 rounded-md text-sm"
@@ -215,6 +225,26 @@
         const profileModal = document.getElementById('profileModal');
         if (profileModal) {
           profileModal.classList.remove('hidden');
+        }
+      }
+      document
+        .getElementById('change_avatar')
+        .addEventListener('change', previewImage);
+
+      function previewImage(event) {
+        const file = event.target.files[0];
+        const previewImage = document.getElementById('previewImage');
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            previewImage.src = e.target.result;
+            previewImage.classList.remove('hidden');
+          };
+          reader.readAsDataURL(file);
+        } else {
+          previewImage.src = '';
+          previewImage.classList.add('hidden');
         }
       }
     </script>
