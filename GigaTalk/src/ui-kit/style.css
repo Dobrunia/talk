@@ -141,3 +141,15 @@
 .user_in_channel_name {
   @apply truncate max-w-[100px]
 }
+
+.media_tracks {
+  @apply w-full h-full flex items-center justify-center
+}
+
+.remoteVideo {
+  @apply w-[80%] h-auto rounded-lg
+}
+
+.remoteAudio {
+  @apply hidden
+}

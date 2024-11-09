@@ -34,14 +34,24 @@ export async function joinMediasoupRoom(
             rtpParameters: consumerData.rtpParameters,
           });
 
-          // Обрабатываем медиапоток в зависимости от его типа
+          // Создаем элемент для воспроизведения медиа-потока
           const mediaElement = document.createElement(
             consumer.kind === 'audio' ? 'audio' : 'video',
           );
+          
+          mediaElement.id = `${consumer.kind}_${consumer.id}`;
+          mediaElement.classList.add(consumer.kind === 'audio' ? 'remoteAudio' : 'remoteVideo')
+
+          // Присваиваем поток и устанавливаем свойства
           mediaElement.srcObject = new MediaStream([consumer.track]);
           mediaElement.autoplay = true;
-          //mediaElement.playsInline = true;
-          document.body.appendChild(mediaElement);
+
+          // Добавляем элемент в список
+          const media_tracks_list =
+            document.getElementById('media_tracks_list');
+          if (media_tracks_list) {
+            media_tracks_list.appendChild(mediaElement);
+          }
 
           // Начинаем воспроизведение потока
           await consumer.resume();
@@ -162,6 +172,8 @@ async function startSendingMedia(socket: Socket) {
     console.log('Медиапоток отправляется');
   } catch (error) {
     console.error('Ошибка при попытке отправить медиапоток:', error);
-    alert('Доступ к камере и микрофону запрещен. Проверьте настройки вашего браузера.');
+    alert(
+      'Доступ к камере и микрофону запрещен. Проверьте настройки вашего браузера.',
+    );
   }
 }
