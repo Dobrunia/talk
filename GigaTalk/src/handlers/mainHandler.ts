@@ -48,13 +48,26 @@ function voiceChannelLeave() {
   currentChannelId = null;
 }
 
-function openProfileModal() {
-  const profileModal = document.getElementById('profileModal');
-  if (profileModal) {
-    profileModal.classList.remove('hidden');
+function handleNicknameChange(event: Event): void {
+  event.preventDefault();
+  const nicknameInput = document.getElementById('change_nickname') as HTMLInputElement | null;
+  if (nicknameInput && nicknameInput.value.trim()) {
+    console.log('Ник:', nicknameInput.value);
+  } else {
+    alert('Введите новый ник');
   }
 }
 
+function handleAvatarChange(event: Event): void {
+  event.preventDefault();
+  const avatarInput = document.getElementById('change_avatar') as HTMLInputElement | null;
+  if (avatarInput && avatarInput.files && avatarInput.files.length > 0) {
+    const file = avatarInput.files[0];
+    console.log('Аватар выбран:', file.name);
+  } else {
+    alert('Выберите файл аватара');
+  }
+}
 
 window.voiceChannelClick = voiceChannelClick;
 window.voiceChannelLeave = voiceChannelLeave;
@@ -64,4 +77,5 @@ window.handleRegister = handleRegister;
 window.handleLogin = handleLogin;
 window.showLogin = showLogin;
 window.showRegister = showRegister;
-window.openProfileModal = openProfileModal;
+window.handleNicknameChange = handleNicknameChange;
+window.handleAvatarChange = handleAvatarChange;

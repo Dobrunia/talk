@@ -157,34 +157,48 @@
             onsubmit="handleNicknameChange(event)"
           >
             <div>
-              <label for="nickname" class="block text-sm">Новый ник</label>
+              <label for="change_nickname" class="block text-sm">Новый ник</label>
               <input
                 type="text"
-                id="nickname"
-                name="nickname"
+                id="change_nickname"
+                name="change_nickname"
                 required
                 class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none"
               />
             </div>
+            <!-- Кнопка сохранения изменений для ника -->
+            <button
+              type="button"
+              onclick="handleNicknameChange(event)"
+              class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded-md"
+            >
+              Сохранить ник
+            </button>
+          </form>
 
-            <!-- Форма для смены аватара -->
+          <!-- Форма для смены аватара -->
+          <form
+            id="avatarForm"
+            class="space-y-4 mt-4"
+            onsubmit="handleAvatarChange(event)"
+          >
             <div>
-              <label for="avatar" class="block text-sm">Новый аватар</label>
+              <label for="change_avatar" class="block text-sm">Новый аватар</label>
               <input
                 type="file"
-                id="avatar"
-                name="avatar"
+                id="change_avatar"
+                name="change_avatar"
                 accept="image/*"
                 class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none file:bg-gray-600 file:text-white file:border-none file:rounded-md file:px-4 file:py-2 hover:file:bg-gray-700"
               />
             </div>
-
-            <!-- Кнопка сохранения изменений -->
+            <!-- Кнопка сохранения изменений для аватара -->
             <button
-              type="submit"
+              type="button"
+              onclick="handleAvatarChange(event)"
               class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded-md"
             >
-              Сохранить изменения
+              Сохранить аватар
             </button>
           </form>
 
@@ -223,6 +237,13 @@
         const profileModal = document.getElementById('profileModal');
         if (profileModal) {
           profileModal.classList.add('hidden');
+        }
+      }
+
+      function openProfileModal() {
+        const profileModal = document.getElementById('profileModal');
+        if (profileModal) {
+          profileModal.classList.remove('hidden');
         }
       }
     </script>
