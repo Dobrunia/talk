@@ -41,7 +41,7 @@ export function serverCategory(category: category, serverId: string) {
 }
 
 export function myProfile(username: string, userAvatar: string) {
-  return `<div class="profile_avatar" style="background-image: url(${
+  return `<div class="profile_avatar" onclick="openProfileModal()" style="background-image: url(${
     userAvatar !== 'null' ? userAvatar : '/default_profile.jpg'
   });">
   </div><div class="profile_name">${username}</div>

@@ -48,6 +48,14 @@ function voiceChannelLeave() {
   currentChannelId = null;
 }
 
+function openProfileModal() {
+  const profileModal = document.getElementById('profileModal');
+  if (profileModal) {
+    profileModal.classList.remove('hidden');
+  }
+}
+
+
 window.voiceChannelClick = voiceChannelClick;
 window.voiceChannelLeave = voiceChannelLeave;
 window.serverClickHandler = serverClickHandler;
@@ -56,3 +64,4 @@ window.handleRegister = handleRegister;
 window.handleLogin = handleLogin;
 window.showLogin = showLogin;
 window.showRegister = showRegister;
+window.openProfileModal = openProfileModal;

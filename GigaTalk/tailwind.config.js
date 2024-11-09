@@ -9,6 +9,13 @@ export default {
       colors: {
         servers_list_dg: '#151618',
         server_components_dg: `#202124`,
+        /* политра
+        bg-black
+        bg-gray-800
+        bg-gray-700
+        bg-blue-600
+        bg-blue-700
+        */
       },
       backgroundImage: {},
       borderRadius: {},
