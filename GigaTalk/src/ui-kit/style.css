@@ -21,6 +21,11 @@
   @apply w-[80px] h-full bg-servers_list_dg flex flex-col items-center justify-start
 }
 
+.servers_list {
+  min-height: calc(100% - 60px);
+  @apply w-full h-max
+}
+
 .server_list_element {
   @apply w-[60px] h-[60px] rounded-md bg-[#EB4C42] my-default cursor-pointer relative bg-cover bg-center
 }
