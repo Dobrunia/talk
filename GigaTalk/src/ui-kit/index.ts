@@ -95,5 +95,7 @@ export function renderServerUsersInChannels(channelsWithUsers: any) {
 }
 
 export function renderSettings() {
-  document.getElementById('settings').innerHTML = settingsSvg();
+  const settings = document.getElementById('settings');
+  if (!settings) return;
+  settings.innerHTML = settingsSvg();
 }
