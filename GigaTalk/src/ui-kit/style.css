@@ -23,7 +23,7 @@
 
 .servers_list {
   min-height: calc(100% - 60px);
-  @apply w-full h-max
+  @apply w-[80px] h-max flex flex-col items-center justify-start
 }
 
 .server_list_element {

@@ -13,5 +13,6 @@ declare global {
     // handleNicknameChange: typeof handleNicknameChange;
     handleAvatarChange: typeof handleAvatarChange;
     closeProfileModal: typeof closeProfileModal;
+    logOut: typeof logOut;
   }
 }

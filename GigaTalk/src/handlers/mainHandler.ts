@@ -133,6 +133,19 @@ async function handleAvatarChange(event: Event): Promise<void> {
   }
 }
 
+function logOut() {
+  const confirmation = window.confirm("Вы уверены, что хотите выйти?");
+  if (confirmation) {
+    // Логика выхода из аккаунта
+    console.log("Выход из аккаунта выполнен");
+    // Здесь можно добавить логику для выхода, например, перенаправление на страницу входа
+    // window.location.href = '/login';
+  } else {
+    console.log("Выход из аккаунта отменен");
+  }
+}
+
+
 window.voiceChannelClick = voiceChannelClick;
 window.voiceChannelLeave = voiceChannelLeave;
 window.serverClickHandler = serverClickHandler;
@@ -144,3 +157,4 @@ window.showRegister = showRegister;
 // window.handleNicknameChange = handleNicknameChange;
 window.handleAvatarChange = handleAvatarChange;
 window.closeProfileModal = closeProfileModal;
+window.logOut = logOut;
