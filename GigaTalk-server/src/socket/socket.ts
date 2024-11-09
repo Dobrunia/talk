@@ -35,6 +35,7 @@ export function initializeSocket(server: HttpServer): Server {
       next();
     } catch (error) {
       next(new Error('Authentication error'));
+      return;
     }
   });
 
