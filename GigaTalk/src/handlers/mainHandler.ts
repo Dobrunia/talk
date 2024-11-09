@@ -52,28 +52,28 @@ function voiceChannelLeave() {
   currentChannelId = null;
 }
 
-async function handleNicknameChange(event: Event): Promise<void> {
-  event.preventDefault();
-  try {
-    const nicknameInput = document.getElementById(
-      'change_nickname',
-    ) as HTMLInputElement | null;
+// async function handleNicknameChange(event: Event): Promise<void> {
+//   event.preventDefault();
+//   try {
+//     const nicknameInput = document.getElementById(
+//       'change_nickname',
+//     ) as HTMLInputElement | null;
 
-    if (nicknameInput && nicknameInput.value.trim()) {
-      const response = await userApi.changeUsername(nicknameInput.value.trim());
-      localStorage.setItem('username', response.username);
-      renderProfile();
-      closeProfileModal();
-      console.log('Новый ник:', response.username);
-      alert('Имя пользователя успешно обновлено');
-    } else {
-      alert('Введите новый ник');
-    }
-  } catch (error) {
-    console.error('Ошибка при изменении ника:', error);
-    alert('Произошла ошибка при изменении ника. Попробуйте позже.');
-  }
-}
+//     if (nicknameInput && nicknameInput.value.trim()) {
+//       const response = await userApi.changeUsername(nicknameInput.value.trim());
+//       localStorage.setItem('username', response.username);
+//       renderProfile();
+//       closeProfileModal();
+//       console.log('Новый ник:', response.username);
+//       alert('Имя пользователя успешно обновлено');
+//     } else {
+//       alert('Введите новый ник');
+//     }
+//   } catch (error) {
+//     console.error('Ошибка при изменении ника:', error);
+//     alert('Произошла ошибка при изменении ника. Попробуйте позже.');
+//   }
+// }
 
 function closeProfileModal() {
   const profileModal = document.getElementById('profileModal');
@@ -141,6 +141,6 @@ window.handleRegister = handleRegister;
 window.handleLogin = handleLogin;
 window.showLogin = showLogin;
 window.showRegister = showRegister;
-window.handleNicknameChange = handleNicknameChange;
+// window.handleNicknameChange = handleNicknameChange;
 window.handleAvatarChange = handleAvatarChange;
 window.closeProfileModal = closeProfileModal;

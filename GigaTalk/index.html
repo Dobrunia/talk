@@ -148,33 +148,9 @@
       >
         <div class="bg-gray-800 text-white p-6 rounded-lg w-96">
           <!-- Заголовок -->
-          <h2 class="text-xl font-semibold mb-4">Смена ника и аватара</h2>
+          <h2 class="text-xl font-semibold mb-4">Поменять аватарку</h2>
 
           <!-- Форма для смены ника -->
-          <form
-            id="nicknameForm"
-            class="space-y-4"
-            onsubmit="handleNicknameChange(event)"
-          >
-            <div>
-              <label for="change_nickname" class="block text-sm">Новый ник</label>
-              <input
-                type="text"
-                id="change_nickname"
-                name="change_nickname"
-                required
-                class="w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none"
-              />
-            </div>
-            <!-- Кнопка сохранения изменений для ника -->
-            <button
-              type="button"
-              onclick="handleNicknameChange(event)"
-              class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded-md"
-            >
-              Сохранить ник
-            </button>
-          </form>
 
           <!-- Форма для смены аватара -->
           <form
@@ -183,7 +159,9 @@
             onsubmit="handleAvatarChange(event)"
           >
             <div>
-              <label for="change_avatar" class="block text-sm">Новый аватар</label>
+              <label for="change_avatar" class="block text-sm"
+                >Новый аватар</label
+              >
               <input
                 type="file"
                 id="change_avatar"

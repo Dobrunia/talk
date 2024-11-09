@@ -10,7 +10,7 @@ declare global {
     handleLogin: typeof handleLogin;
     voiceChannelClick: typeof voiceChannelClick;
     voiceChannelLeave: typeof voiceChannelLeave;
-    handleNicknameChange: typeof handleNicknameChange;
+    // handleNicknameChange: typeof handleNicknameChange;
     handleAvatarChange: typeof handleAvatarChange;
     closeProfileModal: typeof closeProfileModal;
   }
