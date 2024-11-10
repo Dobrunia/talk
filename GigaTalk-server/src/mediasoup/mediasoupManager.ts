@@ -75,13 +75,13 @@ async function joinMediasoupRoom(
 ) {
   let router = roomRouters.get(roomId);
   if (!router) {
-    router = await createRoom(roomId);
+    router = await createRoomRouter(roomId);
   }
   joinChannel(socket, roomId);
   callback({ rtpCapabilities: router.rtpCapabilities });
 }
 
-async function createRoom(roomId: string): Promise<Router> {
+async function createRoomRouter(roomId: string): Promise<Router> {
   const worker = getWorker();
   const router = await worker.createRouter({
     mediaCodecs: OPTIONS.mediaCodecs,
