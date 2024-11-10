@@ -8,7 +8,6 @@ import {
 import { Socket } from 'socket.io';
 import {
   clients,
-  addUserToChannel,
   usersByChannels,
   getUserCurrentChannelId,
 } from '../data.ts';
@@ -19,7 +18,7 @@ import { joinChannel } from '../socket/messageHandler.ts';
 
 dotenv.config();
 
-const consM = `\x1b[33mmediasoup\x1b[0m `;
+const mmedia = `\x1b[33mmediasoup\x1b[0m `;
 
 const roomRouters = new Map<string, Router>(); // New map to store routers for each room
 
@@ -29,9 +28,9 @@ export async function handleMediasoupRequest(
   callback: (response: any) => void,
 ) {
   const { type, payload } = data;
-  console.error(`${consM}handleMediasoupRequest get type: ${type}`);
+  console.error(`${mmedia}handleMediasoupRequest get type: ${type}`);
   // console.error(
-  //   `${consM}handleMediasoupRequest get payload: ${JSON.stringify(
+  //   `${mmedia}handleMediasoupRequest get payload: ${JSON.stringify(
   //     payload,
   //     null,
   //     2,
@@ -64,7 +63,7 @@ export async function handleMediasoupRequest(
         callback({ error: 'Unknown action type' });
     }
   } catch (error) {
-    console.error(`${consM}Error handling mediasoup action "${type}":`, error);
+    console.error(`${mmedia}Error handling mediasoup action "${type}":`, error);
     callback({ error: `Failed to handle ${type}` });
   }
 }

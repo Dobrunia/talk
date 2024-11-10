@@ -29,7 +29,7 @@ export function getUsersInChannels(channelIds: (string | number)[]): {
         userAvatar: clientData.userAvatar,
       }));
 
-      console.log(`Пользователи в канале ${channelId}:`, users);
+      console.log(`Пользователи в канале ${channelId}:`, users.length);
 
       // Добавляем массив пользователей в `result`, используя `channelId` как ключ
       result[channelId] = users;
