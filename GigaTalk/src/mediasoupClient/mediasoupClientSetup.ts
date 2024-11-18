@@ -1,18 +1,20 @@
-import { Device } from 'mediasoup-client';
-import { Socket } from 'socket.io-client';
-import { RtpCapabilities, Transport } from 'mediasoup-client/lib/types';
-import { emitMediasoupEvent } from '../socket/socket';
+import { Device } from "mediasoup-client";
+import { Socket } from "socket.io-client";
+import { RtpCapabilities, Transport } from "mediasoup-client/lib/types";
+import { emitMediasoupEvent } from "../socket/socket";
 
 let device: Device;
-let sendTransport: Transport;
-let recvTransport: Transport;
+let sendTransport: Transport | null;
+let recvTransport: Transport | null;
 
 export async function joinMediasoupRoom(
   socket: Socket,
-  roomId: string,
+  roomId: string
 ): Promise<void> {
   try {
-    const response = await emitMediasoupEvent(socket, 'joinRoom', { roomId });
+    await cleanUpTransports(); // Clean up transports to avoid conflicts
+
+    const response = await emitMediasoupEvent(socket, "joinRoom", { roomId });
 
     if (response.rtpCapabilities) {
       await initializeDevice(response.rtpCapabilities);
@@ -23,85 +25,89 @@ export async function joinMediasoupRoom(
         type: 'createConsumersForClient',
         payload: { rtpCapabilities: response.rtpCapabilities },
       });
+      
+    
+      if (!socket.hasListeners("newConsumer")) {
+        socket.on("newConsumer", async (consumerData) => {
+          console.log("Handling newConsumer:", consumerData);
+          try {          
 
-      // Слушаем событие 'newConsumer' для создания consumer на стороне клиента
-      socket.on('newConsumer', async (consumerData) => {
-        try {
-          const consumer = await recvTransport.consume({
-            id: consumerData.id,
-            producerId: consumerData.producerId,
-            kind: consumerData.kind,
-            rtpParameters: consumerData.rtpParameters,
-          });
+            const consumer = await recvTransport.consume({
+              id: consumerData.id,
+              producerId: consumerData.producerId,
+              kind: consumerData.kind,
+              rtpParameters: consumerData.rtpParameters,
+            });
 
-          // Создаем элемент для воспроизведения медиа-потока
-          const mediaElement = document.createElement(
-            consumer.kind === 'audio' ? 'audio' : 'video',
-          );
-          
-          mediaElement.id = `${consumer.kind}_${consumer.id}`;
-          mediaElement.classList.add(consumer.kind === 'audio' ? 'remoteAudio' : 'remoteVideo')
-
-          // Присваиваем поток и устанавливаем свойства
-          mediaElement.srcObject = new MediaStream([consumer.track]);
-          mediaElement.autoplay = true;
-
-          // Добавляем элемент в список
-          const media_tracks_list =
-            document.getElementById('media_tracks_list');
-          if (media_tracks_list) {
-            media_tracks_list.appendChild(mediaElement);
+            const mediaElement = document.createElement(
+              consumer.kind === 'audio' ? 'audio' : 'video',
+            );
+            
+            mediaElement.id = `${consumer.kind}_${consumer.id}`;
+            mediaElement.classList.add(consumer.kind === 'audio' ? 'remoteAudio' : 'remoteVideo')
+  
+            // Присваиваем поток и устанавливаем свойства
+            mediaElement.srcObject = new MediaStream([consumer.track]);
+            mediaElement.autoplay = true;
+  
+            // Добавляем элемент в список
+            const media_tracks_list =
+              document.getElementById('media_tracks_list');
+            if (media_tracks_list) {
+              media_tracks_list.appendChild(mediaElement);
+            }
+  
+            
+            await consumer.resume();
+            console.log(`Consumer ${consumer.id} created and streaming`);
+          } catch (error) {
+            console.error("Error creating consumer:", error);
           }
-
-          // Начинаем воспроизведение потока
-          await consumer.resume();
-          console.log(
-            `Consumer ${consumer.id} успешно создан и воспроизводит поток`,
-          );
-        } catch (error) {
-          console.error('Ошибка при создании consumer:', error);
-        }
-      });
+        });
+      }
     }
   } catch (error) {
-    console.error('Failed to join room:', error);
+    console.error("Failed to join room:", error);
   }
 }
 
 async function initializeDevice(
-  rtpCapabilities: RtpCapabilities,
+  rtpCapabilities: RtpCapabilities
 ): Promise<void> {
   try {
     device = new Device();
     await device.load({ routerRtpCapabilities: rtpCapabilities });
-    console.log('Device initialized');
+    console.log("Device initialized");
   } catch (error) {
-    console.error('Failed to initialize device:', error);
+    console.error("Failed to initialize device:", error);
   }
 }
 
 async function createTransport(socket: Socket): Promise<void> {
   try {
-    const response = await emitMediasoupEvent(socket, 'createTransport', {});
+    const responseSend = await emitMediasoupEvent(socket, "createSendTransport", {});
 
-    if (!response.id || !response.iceParameters || !response.dtlsParameters) {
-      console.error('Incomplete response received for createTransport');
+    const responseRecv = await emitMediasoupEvent(socket, "createRecvTransport", {});
+
+    if (!responseSend || !responseRecv){// !response.id || !response.iceParameters || !response.dtlsParameters) {
+      console.error("Incomplete response received for createTransport");
       return;
     }
 
     // Save the transport and set up event handlers
-    saveTransport(socket, response);
+    if (!sendTransport){
+      sendTransport = device.createSendTransport(responseSend);
+      await setupTransportEventHandlers(socket, sendTransport, 'sendTransport');
+    }
+    if (!recvTransport){
+      recvTransport = device.createRecvTransport(responseRecv);
+      
+      await setupTransportEventHandlers(socket, recvTransport,  'recvTransport');
+    }
+    
   } catch (error) {
-    console.error('Failed to create transport:', error);
+    console.error("Failed to create transport:", error);
   }
-}
-
-async function saveTransport(socket: Socket, response: any) {
-  sendTransport = device.createSendTransport(response);
-  recvTransport = device.createRecvTransport(response);
-
-  await setupTransportEventHandlers(socket, sendTransport, 'sendTransport');
-  await setupTransportEventHandlers(socket, recvTransport, 'recvTransport');
 }
 
 async function setupTransportEventHandlers(
@@ -147,9 +153,13 @@ async function setupTransportEventHandlers(
             return;
           }
 
-          if (response.error) {
+          if (response.error) {            
             errback(response.error);
           } else {
+            socket.emit('mediasoup', {
+              type: 'createConsumersForNewProducer',
+              payload: { producerId: response.id, rtpCapabilities: response.rtpCapabilities },
+            });
             callback({ id: response.id });
           }
         },
@@ -165,15 +175,38 @@ async function startSendingMedia(socket: Socket) {
       audio: true,
     });
 
+    console.log(stream);
     for (const track of stream.getTracks()) {
-      await sendTransport.produce({ track });
+      await sendTransport!.produce({ track });
     }
 
-    console.log('Медиапоток отправляется');
+    console.log("Медиапоток отправляется");
   } catch (error) {
-    console.error('Ошибка при попытке отправить медиапоток:', error);
+    console.error("Ошибка при попытке отправить медиапоток:", error);
     alert(
-      'Доступ к камере и микрофону запрещен. Проверьте настройки вашего браузера.',
+      "Доступ к камере и микрофону запрещен. Проверьте настройки вашего браузера."
     );
   }
+}
+
+function cleanUpTransports() {
+  // Close the send transport if it's active
+  if (sendTransport) {
+    sendTransport.removeAllListeners();
+    sendTransport.close();
+    console.log("sendTransport closed");
+  }
+
+  // Close the receive transport if it's active
+  if (recvTransport) {
+    recvTransport.removeAllListeners();
+    recvTransport.close();
+    console.log("recvTransport closed");
+  }
+
+  // Optionally, nullify the transport objects to avoid accidental reuse
+  sendTransport = null;
+  recvTransport = null;
+
+  console.log("All transport connections cleaned up");
 }

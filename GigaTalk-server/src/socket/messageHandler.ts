@@ -63,6 +63,7 @@ export async function joinChannel(socket: Socket, channelId: string) {
   const clientData = clients.get(socket);
   if (!clientData) return;
   //TODO:: проверка, что есть доступ к каналу
+  clientData.socket = socket;
   addUserToChannel(channelId, clientData);
   const roomId = await socketController.getServerIdByChannelId(channelId);
   if (!roomId) return;
