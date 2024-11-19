@@ -443,7 +443,7 @@ async function createConsumersForNewProducer(
         const userSocket = user.socket;
         if (userSocket) {
           userSocket.emit('newConsumer', {
-            сonsumerUserId: user.userId,
+            consumerUserId: user.userId,
             producerUserId: clientData.userId,
             id: consumer.id,
             producerId: producer.id,
