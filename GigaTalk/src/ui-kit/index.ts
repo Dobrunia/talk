@@ -73,7 +73,22 @@ export function renderUserToChannel(
 }
 
 export function removeUserFromChannel(userId: string) {
+  userId = userId.toString();
   document.getElementById(`user_in_channel_${userId}`)?.remove();
+  const myId = localStorage.getItem('userId')?.toString();
+  if (myId !== userId) {
+    Array.from(document.getElementsByClassName(`mediaEl_${userId}`)).forEach(
+      (element) => {
+        element.remove();
+      },
+    );
+  } else {
+    Array.from(document.getElementsByClassName(`mediaEl`)).forEach(
+      (element) => {
+        element.remove();
+      },
+    );
+  }
 }
 
 export function renderServerUsersInChannels(channelsWithUsers: any) {

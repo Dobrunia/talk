@@ -41,7 +41,9 @@ export async function joinMediasoupRoom(
               consumer.kind === 'audio' ? 'audio' : 'video',
             );
 
-            mediaElement.id = `mediaEl_${consumerData.producerUserId}`;
+            // mediaElement.id = `mediaEl_${consumerData.producerUserId}`;
+            mediaElement.classList.add(`mediaEl_${consumerData.producerUserId}`);
+            mediaElement.classList.add('mediaEl');
             mediaElement.classList.add(
               consumer.kind === 'audio' ? 'remoteAudio' : 'remoteVideo',
             );
