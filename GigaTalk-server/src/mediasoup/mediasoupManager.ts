@@ -16,7 +16,7 @@ dotenv.config();
 
 const mmedia = `\x1b[33mmediasoup\x1b[0m `;
 
-const roomRouters = new Map<string, Router>(); // New map to store routers for each room //TODO: написать выход из канала
+export const roomRouters = new Map<string, Router>(); // New map to store routers for each room //TODO: написать выход из канала
 
 export async function handleMediasoupRequest(
   socket: Socket,

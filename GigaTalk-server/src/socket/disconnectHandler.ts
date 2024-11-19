@@ -6,27 +6,29 @@ import {
 } from '../data.ts';
 import { ClientData } from '../types/types.ts';
 import { socketController } from '../controllers/SocketController.ts';
+import { leaveChannel } from './messageHandler.ts';
 
 const cyan = '\x1b[36m';
 const reset = '\x1b[0m';
 
 export async function handleDisconnect(socket: Socket): Promise<void> {
-  // Удаляем из map с каналами, если пользователь в каком-то сидел
-  const clientData = clients.get(socket);
-  if (!clientData) return;
-  const chId = getUserCurrentChannelId(clientData);
-  if (!chId) return;
-  console.log('clientData', clientData);
-  const roomId = await socketController.getServerIdByChannelId(chId);
-  removeUserFromChannel(socket);
-  console.log('roomId', roomId, 'clientData', clientData);
-  if (!roomId) return;
-  // Отправляем всем в комнате, включая отправителя, информацию о пользователе
-  const data = {
-    type: 'user_leave_channel',
-    userId: clientData.userId,
-  };
-  socket.to(roomId).emit('message', data); // Отправляем другим пользователям
+  // // Удаляем из map с каналами, если пользователь в каком-то сидел
+  // const clientData = clients.get(socket);
+  // if (!clientData) return;
+  // const chId = getUserCurrentChannelId(clientData);
+  // if (!chId) return;
+  // console.log('clientData', clientData);
+  // const roomId = await socketController.getServerIdByChannelId(chId);
+  // removeUserFromChannel(socket);
+  // console.log('roomId', roomId, 'clientData', clientData);
+  // if (!roomId) return;
+  // // Отправляем всем в комнате, включая отправителя, информацию о пользователе
+  // const data = {
+  //   type: 'user_leave_channel',
+  //   userId: clientData.userId,
+  // };
+  // socket.to(roomId).emit('message', data); // Отправляем другим пользователям
+  await leaveChannel(socket);
   // Удаляем данные клиента из `clients` после отключения
   clients.delete(socket);
   console.log(

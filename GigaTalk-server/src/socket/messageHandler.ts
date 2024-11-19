@@ -5,8 +5,10 @@ import {
   getUserCurrentChannelId,
   getUsersInChannels,
   removeUserFromChannel,
+  usersByChannels,
 } from '../data.ts';
 import { socketController } from '../controllers/SocketController.ts';
+import { roomRouters } from '../mediasoup/mediasoupManager.ts';
 
 const cyan = '\x1b[36m';
 const reset = '\x1b[0m';
@@ -83,21 +85,82 @@ export async function joinChannel(socket: Socket, channelId: string) {
   socket.emit('message', data); // Отправляем самому отправителю
 }
 
-async function leaveChannel(socket: Socket) {
+export async function leaveChannel(socket: Socket) {
   const clientData = clients.get(socket);
   if (!clientData) return;
+
   const chId = getUserCurrentChannelId(clientData);
   if (!chId) return;
+
   console.log('clientData', clientData);
+
   const roomId = await socketController.getServerIdByChannelId(chId);
-  removeUserFromChannel(socket);
-  console.log('roomId', roomId, 'clientData', clientData);
   if (!roomId) return;
-  // Отправляем всем в комнате, включая отправителя, информацию о пользователе
+
+  // Удаляем пользователя из канала
+  removeUserFromChannel(socket);
+
+  // Отправляем всем в комнате информацию о том, что пользователь покинул канал
   const data = {
     type: 'user_leave_channel',
     userId: clientData.userId,
   };
   socket.to(roomId).emit('message', data); // Отправляем другим пользователям
   socket.emit('message', data); // Отправляем самому отправителю
+
+  console.log('roomId', roomId, 'clientData', clientData);
+
+  // Освобождаем ресурсы пользователя
+  if (clientData.transports) {
+    for (const transport of Object.values(clientData.transports)) {
+      if (transport) {
+        console.log(`Closing transport ${transport.id} for user ${clientData.userId}`);
+        transport.close();
+      }
+    }
+  }
+
+  if (clientData.producers) {
+    for (const producer of Object.values(clientData.producers)) {
+      if (producer) {
+        console.log(`Closing producer ${producer.id} for user ${clientData.userId}`);
+        producer.close();
+      }
+    }
+  }
+
+  if (clientData.consumers) {
+    for (const consumer of clientData.consumers) {
+      if (consumer) {
+        console.log(`Closing consumer ${consumer.id} for user ${clientData.userId}`);
+        consumer.close();
+      }
+    }
+  }
+
+  // // Удаляем данные пользователя из списка клиентов
+  // clients.delete(socket);
+
+  // Проверяем, остались ли пользователи в комнате
+  const usersInChannel = usersByChannels.get(chId);
+  if (!usersInChannel || usersInChannel.length === 0) {
+    // Если в комнате больше нет пользователей, удаляем Router
+    const router = roomRouters.get(chId);
+    if (router) {
+      console.log(`Closing router for room ${chId}`);
+      router.close();
+      roomRouters.delete(chId);
+    }
+    // Удаляем канал из usersByChannels
+    usersByChannels.delete(chId);
+  } else {
+    // Обновляем список пользователей в канале
+    const updatedUsers = usersInChannel.filter(
+      (user) => user.userId !== clientData.userId
+    );
+    usersByChannels.set(chId, updatedUsers);
+  }
+
+  console.log(`User ${clientData.userId} successfully left channel ${chId}`);
 }
+
