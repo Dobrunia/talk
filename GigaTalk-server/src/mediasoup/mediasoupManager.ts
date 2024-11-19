@@ -6,11 +6,7 @@ import {
   RtpCapabilities,
 } from 'mediasoup/node/lib/types';
 import { Socket } from 'socket.io';
-import {
-  clients,
-  usersByChannels,
-  getUserCurrentChannelId,
-} from '../data.ts';
+import { clients, usersByChannels, getUserCurrentChannelId } from '../data.ts';
 import dotenv from 'dotenv';
 import { getWorker } from './worker.ts';
 import { OPTIONS } from './options.ts';
@@ -20,7 +16,7 @@ dotenv.config();
 
 const mmedia = `\x1b[33mmediasoup\x1b[0m `;
 
-const roomRouters = new Map<string, Router>(); // New map to store routers for each room
+const roomRouters = new Map<string, Router>(); // New map to store routers for each room //TODO: написать выход из канала
 
 export async function handleMediasoupRequest(
   socket: Socket,
@@ -45,8 +41,8 @@ export async function handleMediasoupRequest(
         await createSendWebRtcTransport(socket, callback);
         break;
       case 'createRecvTransport':
-          await createRecvWebRtcTransport(socket, callback);
-          break;
+        await createRecvWebRtcTransport(socket, callback);
+        break;
       case 'connectTransport':
         await connectTransport(
           socket,
@@ -62,9 +58,12 @@ export async function handleMediasoupRequest(
         createConsumersForClient(socket, payload.rtpCapabilities);
         break;
       case 'createConsumersForNewProducer':
-        createConsumersForNewProducer(socket, payload.producerId, payload.rtpCapabilities);
+        createConsumersForNewProducer(
+          socket,
+          payload.producerId,
+          payload.rtpCapabilities,
+        );
         break;
-        
       default:
         console.warn(`Unknown mediasoup action type: ${type}`);
         callback({ error: 'Unknown action type' });
@@ -123,27 +122,25 @@ async function createSendWebRtcTransport(
       enableTcp: true,
       preferUdp: true,
     });
-  
-     
+
     // Store both transports in clientData
     clientData.transports.sendTransport = sendTransport;
     console.log('Send transport created:', sendTransport.id);
-    
-   // Add client data to the clients map
+
+    // Add client data to the clients map
     clients.set(socket, clientData);
-  
+
     // Return transport parameters to the client
     callback({
-        id: sendTransport.id,
-        iceParameters: sendTransport.iceParameters,
-        iceCandidates: sendTransport.iceCandidates,
-        dtlsParameters: sendTransport.dtlsParameters,
-      });
+      id: sendTransport.id,
+      iceParameters: sendTransport.iceParameters,
+      iceCandidates: sendTransport.iceCandidates,
+      dtlsParameters: sendTransport.dtlsParameters,
+    });
   } catch (error) {
     console.error('Failed to create transport:', error);
     callback({ error: 'Failed to create transport' });
   }
-  
 }
 
 async function createRecvWebRtcTransport(
@@ -173,32 +170,31 @@ async function createRecvWebRtcTransport(
       enableTcp: true,
       preferUdp: true,
     });
-  
+
     clientData.transports.recvTransport = recvTransport;
     console.log('Recv transport created:', recvTransport.id);
-  
+
     // Add client data to the clients map
     clients.set(socket, clientData);
-  
+
     // Return transport parameters to the client
     callback({
-        id: recvTransport.id,
-        iceParameters: recvTransport.iceParameters,
-        iceCandidates: recvTransport.iceCandidates,
-        dtlsParameters: recvTransport.dtlsParameters,
-      });
+      id: recvTransport.id,
+      iceParameters: recvTransport.iceParameters,
+      iceCandidates: recvTransport.iceCandidates,
+      dtlsParameters: recvTransport.dtlsParameters,
+    });
   } catch (error) {
     console.error('Failed to create transport:', error);
     callback({ error: 'Failed to create transport' });
   }
-  
 }
 
 async function connectTransport(
   socket: Socket,
   transportId: string,
   dtlsParameters: DtlsParameters,
-  callback: (response: any) => void
+  callback: (response: any) => void,
 ) {
   console.log(`Transport ${transportId} connecting...`);
 
@@ -281,12 +277,11 @@ async function produce(
   }
 
   clients.set(socket, clientData);
-  
 
   // Notify other clients in the room
   const roomId = getUserCurrentChannelId(clientData);
   let router = roomRouters.get(roomId!);
- 
+
   // Handle producer lifecycle
   producer.on('transportclose', () => {
     console.log(`Producer ${producer.id} closed due to transport closure`);
@@ -298,10 +293,9 @@ async function produce(
   callback({ id: producer.id, rtpCapabilities: router?.rtpCapabilities });
 }
 
-
 async function createConsumersForClient(
   socket: Socket,
-  rtpCapabilities: RtpCapabilities
+  rtpCapabilities: RtpCapabilities,
 ) {
   const clientData = clients.get(socket);
   if (!clientData) {
@@ -322,7 +316,7 @@ async function createConsumersForClient(
   }
 
   const usersInChannel = usersByChannels.get(roomId);
-  
+
   if (!usersInChannel) {
     console.error('Users in room not found');
     return;
@@ -335,11 +329,13 @@ async function createConsumersForClient(
       continue;
     }
     for (const producer of Object.values(user.producers)) {
-      
       if (!producer) continue;
       let router = roomRouters.get(roomId);
-      
-      if (router && !router.canConsume({ producerId: producer.id, rtpCapabilities })) {
+
+      if (
+        router &&
+        !router.canConsume({ producerId: producer.id, rtpCapabilities })
+      ) {
         console.warn(`Cannot consume producer with ID ${producer.id}`);
         continue;
       }
@@ -358,7 +354,7 @@ async function createConsumersForClient(
           producerId: producer.id,
           kind: consumer.kind,
           rtpParameters: consumer.rtpParameters,
-        });       
+        });
 
         consumer.on('transportclose', () => {
           console.log(`Transport closed for consumer ${consumer.id}`);
@@ -369,15 +365,15 @@ async function createConsumersForClient(
           consumer.close();
         });
 
-        if (!clientData.consumers){
-          clientData.consumers =[];
+        if (!clientData.consumers) {
+          clientData.consumers = [];
         }
         clientData.consumers.push(consumer);
         clients.set(socket, clientData);
       } catch (error) {
         console.error(
           `Error creating consumer for producer ${producer.id}:`,
-          error
+          error,
         );
       }
     }
@@ -387,7 +383,7 @@ async function createConsumersForClient(
 async function createConsumersForNewProducer(
   socket: Socket,
   producerId: string,
-  rtpCapabilities: RtpCapabilities
+  rtpCapabilities: RtpCapabilities,
 ) {
   const clientData = clients.get(socket);
   if (!clientData) {
@@ -402,14 +398,16 @@ async function createConsumersForNewProducer(
   }
 
   const usersInChannel = usersByChannels.get(roomId);
-  
+
   if (!usersInChannel) {
     console.error('Users in room not found');
     return;
   }
   const router = roomRouters.get(roomId);
-  const currentUser = usersInChannel.find(user => user.userId === clientData.userId);
-  if (!currentUser){
+  const currentUser = usersInChannel.find(
+    (user) => user.userId === clientData.userId,
+  );
+  if (!currentUser) {
     console.error('currentUser is not found');
     return;
   }
@@ -420,18 +418,20 @@ async function createConsumersForNewProducer(
       console.log('Skipping self');
       continue;
     }
-    for (const producer of Object.values(currentUser.producers)) {      
+    for (const producer of Object.values(currentUser.producers)) {
+      if (!producer) continue;
 
-      if (!producer) continue;      
-      
-      if (router && !router.canConsume({ producerId: producer.id, rtpCapabilities })) {
+      if (
+        router &&
+        !router.canConsume({ producerId: producer.id, rtpCapabilities })
+      ) {
         console.warn(`Cannot consume producer with ID ${producer.id}`);
         continue;
       }
 
       try {
         const recvTransport = user.transports.recvTransport;
-        if (!recvTransport){
+        if (!recvTransport) {
           console.log('No receive transport found for user:', user.userId);
           continue;
         }
@@ -440,18 +440,18 @@ async function createConsumersForNewProducer(
           rtpCapabilities,
           paused: false,
         });
-        const userSocket = user.socket; 
+        const userSocket = user.socket;
         if (userSocket) {
-            userSocket.emit('newConsumer', {
-                сonsumerUserId: user.userId,
-                producerUserId: clientData.userId,
-                id: consumer.id,
-                producerId: producer.id,
-                kind: consumer.kind,
-                rtpParameters: consumer.rtpParameters,
-            });
+          userSocket.emit('newConsumer', {
+            сonsumerUserId: user.userId,
+            producerUserId: clientData.userId,
+            id: consumer.id,
+            producerId: producer.id,
+            kind: consumer.kind,
+            rtpParameters: consumer.rtpParameters,
+          });
         } else {
-            console.warn(`Socket for user ${user.userId} not found`);
+          console.warn(`Socket for user ${user.userId} not found`);
         }
 
         consumer.on('transportclose', () => {
@@ -463,18 +463,17 @@ async function createConsumersForNewProducer(
           consumer.close();
         });
 
-        if (!clientData.consumers){
-          clientData.consumers =[];
+        if (!clientData.consumers) {
+          clientData.consumers = [];
         }
         clientData.consumers.push(consumer);
         clients.set(socket, clientData);
       } catch (error) {
         console.error(
           `Error creating consumer for producer ${producer.id}:`,
-          error
+          error,
         );
       }
     }
   }
 }
-
