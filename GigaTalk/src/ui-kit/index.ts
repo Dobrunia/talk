@@ -1,3 +1,7 @@
+import {
+  getMicrophoneMuteState,
+  getSoundMuteState,
+} from '../mediasoupClient/muteControls.ts';
 import { serverDATA } from '../types/types.ts';
 import {
   serverName,
@@ -54,6 +58,28 @@ export function renderProfile() {
     return;
   }
   profile.innerHTML = myProfile(username, userAvatar);
+}
+
+export function toggleMicVisual() {
+  const micButton = document.querySelector('.profile_buttons svg.micro');
+  if (!micButton) return;
+  let isMicMuted = getMicrophoneMuteState();
+  if (isMicMuted) {
+    micButton.classList.add('muted');
+  } else {
+    micButton.classList.remove('muted');
+  }
+}
+
+export function toggleSoundVisual() {
+  const soundButton = document.querySelector('.profile_buttons svg.headphones');
+  if (!soundButton) return;
+  let isSoundMuted = getSoundMuteState();
+  if (isSoundMuted) {
+    soundButton.classList.add('muted');
+  } else {
+    soundButton.classList.remove('muted');
+  }
 }
 
 export function renderUserToChannel(

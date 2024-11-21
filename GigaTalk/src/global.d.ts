@@ -14,5 +14,7 @@ declare global {
     handleAvatarChange: typeof handleAvatarChange;
     closeProfileModal: typeof closeProfileModal;
     logOut: typeof logOut;
+    microphoneMute: typeof microphoneMute;
+    soundMute: typeof soundMute;
   }
 }

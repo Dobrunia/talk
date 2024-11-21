@@ -1,10 +1,11 @@
 import { userApi } from '../api/userApi.ts';
+import { toggleMicrophoneMute, toggleSoundMute } from '../mediasoupClient/muteControls.ts';
 import {
   handleJoinMediasoupRoom,
   sendSocketMessage,
 } from '../socket/socket.ts';
 import { serverDATA } from '../types/types.ts';
-import { renderProfile, renderServerInfo } from '../ui-kit/index.ts';
+import { renderProfile, renderServerInfo, toggleMicVisual, toggleSoundVisual } from '../ui-kit/index.ts';
 import {
   guestLoginHandler,
   handleLogin,
@@ -149,6 +150,16 @@ function logOut() {
   }
 }
 
+function microphoneMute() {
+  toggleMicrophoneMute();
+  toggleMicVisual();
+}
+
+function soundMute() {
+  toggleSoundMute();
+  toggleSoundVisual();
+  toggleMicVisual();
+}
 
 window.voiceChannelClick = voiceChannelClick;
 window.voiceChannelLeave = voiceChannelLeave;
@@ -162,3 +173,5 @@ window.showRegister = showRegister;
 window.handleAvatarChange = handleAvatarChange;
 window.closeProfileModal = closeProfileModal;
 window.logOut = logOut;
+window.microphoneMute = microphoneMute;
+window.soundMute = soundMute;

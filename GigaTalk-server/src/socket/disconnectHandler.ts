@@ -32,7 +32,7 @@ export async function handleDisconnect(socket: Socket): Promise<void> {
   // Удаляем данные клиента из `clients` после отключения
   clients.delete(socket);
   console.log(
-    `${cyan}Socket:${reset} Client disconnected: ${socket.data.user.username}`,
+    `${cyan}Socket:${reset} Client disconnected: ${socket.data.user.id}`,
   );
 }
 

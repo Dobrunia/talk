@@ -2,6 +2,15 @@ import { Device } from 'mediasoup-client';
 import { Socket } from 'socket.io-client';
 import { RtpCapabilities, Transport } from 'mediasoup-client/lib/types';
 import { emitMediasoupEvent } from '../socket/socket';
+import { Producer, Consumer } from 'mediasoup-client/lib/types';
+
+let audioProducer: Producer | null = null;
+let videoProducer: Producer | null = null;
+export const consumers: Consumer[] = []; // Для хранения всех консьюмеров
+
+export function getAudioProducer(): Producer | null {
+  return audioProducer;
+}
 
 let device: Device;
 let sendTransport: Transport | null;
@@ -37,12 +46,17 @@ export async function joinMediasoupRoom(
               rtpParameters: consumerData.rtpParameters,
             });
 
+            consumers.push(consumer); // Сохраняем consumer
+            console.log('New consumer added:', consumer.id);
+
             const mediaElement = document.createElement(
               consumer.kind === 'audio' ? 'audio' : 'video',
             );
 
             // mediaElement.id = `mediaEl_${consumerData.producerUserId}`;
-            mediaElement.classList.add(`mediaEl_${consumerData.producerUserId}`);
+            mediaElement.classList.add(
+              `mediaEl_${consumerData.producerUserId}`,
+            );
             mediaElement.classList.add('mediaEl');
             mediaElement.classList.add(
               consumer.kind === 'audio' ? 'remoteAudio' : 'remoteVideo',
@@ -183,20 +197,25 @@ async function setupTransportEventHandlers(
 async function startSendingMedia(socket: Socket) {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: true, // или { video: true, audio: true }
+      video: true,
       audio: true,
     });
 
-    console.log(stream);
     for (const track of stream.getTracks()) {
-      await sendTransport!.produce({ track });
+      if (track.kind === 'audio') {
+        audioProducer = await sendTransport!.produce({ track });
+        console.log('Audio producer created:', audioProducer.id);
+      } else if (track.kind === 'video') {
+        videoProducer = await sendTransport!.produce({ track });
+        console.log('Video producer created:', videoProducer.id);
+      }
     }
 
-    console.log('Медиапоток отправляется');
+    console.log('Media stream sent');
   } catch (error) {
-    console.error('Ошибка при попытке отправить медиапоток:', error);
+    console.error('Error sending media:', error);
     alert(
-      'Доступ к камере и микрофону запрещен. Проверьте настройки вашего браузера.',
+      'Access to camera and microphone denied. Check your browser settings.',
     );
   }
 }
@@ -211,12 +230,20 @@ function cleanUpTransports() {
 
   // Close the receive transport if it's active
   if (recvTransport) {
+    // Закрываем каждого consumer
+    consumers.forEach((consumer) => {
+      consumer.close();
+      console.log(`Consumer ${consumer.id} closed`);
+    });
+
+    consumers.length = 0; // Очищаем массив consumers
+
     recvTransport.removeAllListeners();
     recvTransport.close();
     console.log('recvTransport closed');
   }
 
-  // Optionally, nullify the transport objects to avoid accidental reuse
+  // Nullify the transport objects to avoid accidental reuse
   sendTransport = null;
   recvTransport = null;
 

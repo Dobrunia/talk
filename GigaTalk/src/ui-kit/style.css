@@ -119,6 +119,10 @@
   fill: #B3404A !important;
 }
 
+.profile_buttons svg.muted path {
+  fill: #B3404A !important;
+}
+
 .auth-tab-active {
   @apply px-4 py-2 text-xl font-semibold text-white bg-blue-500 rounded-lg cursor-pointer border border-blue-500 focus:outline-none;
 }
