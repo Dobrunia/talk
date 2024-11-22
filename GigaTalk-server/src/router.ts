@@ -13,7 +13,7 @@ router.get('/getMyServerInfoById/:serverId', authMiddleware, serverController.ge
 // Маршруты для аутентификации
 router.post('/register', authController.register);
 router.post('/login', authController.login);
-//router.post('/guest-login', authController.guestLogin);
+router.post('/guest-login', authController.guestLogin);
 //router.post('/logout', authController.logout);
 
 // Маршрут проверки токена

@@ -26,7 +26,7 @@ async function loadServers() {
     const updatedServersList = localStorage.getItem('serversList');
     console.log('loadServers api');
 
-    if (updatedServersList) {
+    if (updatedServersList && updatedServersList.length === 0) {
       serversList = JSON.parse(updatedServersList) as serverDATA[];
       renderServersList(serversList);
     }

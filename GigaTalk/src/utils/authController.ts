@@ -8,8 +8,11 @@ export async function guestLoginHandler() {
   try {
     const data = await authApi.guestLogin();
     localStorage.setItem('token', data.token);
-    alert('Вы вошли как гость');
+    alert('Вы вошли как гость. Этот аккаунт будет удален через пару дней');
+    saveUserData(data.userId, data.username, data.userAvatar);
     closeAuthModal();
+    logInRender();
+    connectSocket();
   } catch (error) {
     console.error('Ошибка при входе как гость:', error);
     alert('Ошибка при входе как гость');

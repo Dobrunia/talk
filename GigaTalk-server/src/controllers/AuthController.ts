@@ -34,8 +34,8 @@ class AuthController {
 
       // Добавление пользователя в БД
       const [result] = await connection.query(
-        'INSERT INTO users (username, password, created_at) VALUES (?, ?, NOW())',
-        [username, hashedPassword],
+        'INSERT INTO users (username, password, permission, created_at) VALUES (?, ?, ?, NOW())',
+        [username, hashedPassword, 1],
       );
       const userId = (result as any).insertId;
 
@@ -67,7 +67,7 @@ class AuthController {
         return;
       }
 
-      // Создание JWT токена с userAvatar
+      // Создание JWT токена
       const token = await authController.createAndStoreToken(user.id);
 
       // Возвращаем токен, userId, username и userAvatar
@@ -94,27 +94,39 @@ class AuthController {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Создание гостевого пользователя
-      const [result] = await connection.query(
-        'INSERT INTO users (username, password, permission, created_at) VALUES (?, ?, ?, NOW())',
-        [username, hashedPassword, 0],
+      const [insertResult] = await connection.query(
+        'INSERT INTO users (username, password, permission, is_guest, created_at) VALUES (?, ?, ?, ?, NOW())',
+        [username, hashedPassword, 1, true],
       );
-      const userId = (result as any).insertId;
+
+      const userId = (insertResult as any).insertId;
+
+      // Получение созданного пользователя
+      const [userRows] = await connection.query(
+        'SELECT * FROM users WHERE id = ?',
+        [userId],
+      );
+
+      if ((userRows as any[]).length === 0) {
+        res
+          .status(500)
+          .json({ error: 'Ошибка при создании пользователя в БД' });
+        return;
+      }
+
+      const user = (userRows as any[])[0];
 
       // Создание JWT токена
-      const token = jwt.sign(
-        { id: userId, username, guest: true },
-        JWT_SECRET,
-        { expiresIn: TOKEN_EXPIRATION },
-      );
+      const token = await authController.createAndStoreToken(user.id);
 
-      // Добавление записи в `ActiveSessions`
-      await connection.query(
-        'INSERT INTO ActiveSessions (user_id, token, expires_at, is_guest) VALUES (?, ?, NOW() + INTERVAL ? DAY, TRUE)',
-        [userId, token, GUEST_EXPIRATION_DAYS],
-      );
-
-      res.status(200).json({ token });
-      return;
+      // Возвращаем токен и данные пользователя
+      res.status(200).json({
+        token,
+        userId: user.id,
+        username: user.username,
+        userAvatar: user.avatar || null,
+        permission: user.permission,
+      });
     } catch (error) {
       next(error);
     }
