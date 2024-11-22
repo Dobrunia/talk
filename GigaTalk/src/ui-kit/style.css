@@ -144,7 +144,12 @@
 }
 
 .user_in_channel_avatar {
-  @apply w-[22px] h-[22px] rounded-full mr-[8px] bg-cover bg-center
+  @apply w-[26px] h-[26px] rounded-full mr-[8px] bg-cover bg-center border-[2px] border-server_components_dg
+}
+
+.speaking .user_in_channel_avatar {
+  box-sizing: border-box;
+  @apply border-[2px] border-[#23A55A]
 }
 
 .user_in_channel_name {

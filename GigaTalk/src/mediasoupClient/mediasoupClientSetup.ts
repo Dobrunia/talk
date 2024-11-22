@@ -5,6 +5,7 @@ import { emitMediasoupEvent } from '../socket/socket';
 import { Producer, Consumer } from 'mediasoup-client/lib/types';
 import { toggleCamera, toggleFullscreen } from '../ui-kit/index.ts';
 import SVG from '../ui-kit/svgs.ts';
+import { createVolumeAnalyser } from '../utils/volumeController.ts';
 
 let audioProducer: Producer | null = null;
 let videoProducer: Producer | null = null;
@@ -83,12 +84,22 @@ export async function joinMediasoupRoom(
 
               // Логика воспроизведения видео при нажатии кнопки
               playButton.addEventListener('click', () => {
-                toggleCamera(mediaElement as HTMLVideoElement, playButton, pauseButton, fullscreenBtn);
+                toggleCamera(
+                  mediaElement as HTMLVideoElement,
+                  playButton,
+                  pauseButton,
+                  fullscreenBtn,
+                );
               });
 
               // Логика для паузы просмотра видео при нажатии кнопки
               pauseButton.addEventListener('click', () => {
-                toggleCamera(mediaElement as HTMLVideoElement, playButton, pauseButton, fullscreenBtn);
+                toggleCamera(
+                  mediaElement as HTMLVideoElement,
+                  playButton,
+                  pauseButton,
+                  fullscreenBtn,
+                );
               });
 
               fullscreenBtn.addEventListener('click', () => {
@@ -117,6 +128,9 @@ export async function joinMediasoupRoom(
               );
               mediaElement.autoplay = true;
               mediaElement.srcObject = new MediaStream([consumer.track]);
+
+              // Подключаем анализатор громкости
+              createVolumeAnalyser(consumer.track, consumerData.producerUserId);
 
               // Добавляем аудио в список
               const mediaTracksList =
@@ -257,6 +271,8 @@ async function startSendingMedia(socket: Socket) {
     for (const track of stream.getTracks()) {
       if (track.kind === 'audio') {
         audioProducer = await sendTransport!.produce({ track });
+        // Подключаем анализатор громкости
+        createVolumeAnalyser(track, localStorage.getItem('userId') as string);
         console.log('Audio producer created:', audioProducer.id);
       } else if (track.kind === 'video') {
         videoProducer = await sendTransport!.produce({ track });
