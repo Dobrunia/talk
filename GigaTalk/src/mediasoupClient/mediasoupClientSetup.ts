@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import { RtpCapabilities, Transport } from 'mediasoup-client/lib/types';
 import { emitMediasoupEvent } from '../socket/socket';
 import { Producer, Consumer } from 'mediasoup-client/lib/types';
+import { toggleCamera } from '../ui-kit/index.ts';
 
 let audioProducer: Producer | null = null;
 let videoProducer: Producer | null = null;
@@ -49,28 +50,70 @@ export async function joinMediasoupRoom(
             consumers.push(consumer); // Сохраняем consumer
             console.log('New consumer added:', consumer.id);
 
-            const mediaElement = document.createElement(
-              consumer.kind === 'audio' ? 'audio' : 'video',
-            );
+            let mediaElement: HTMLVideoElement | HTMLAudioElement;
+            if (consumer.kind === 'video') {
+              // Создаем контейнер для видео и кнопки
+              const videoContainer = document.createElement('div');
+              videoContainer.classList.add(
+                'videoContainer',
+                'mediaEl',
+                `mediaEl_${consumerData.producerUserId}`,
+              );
 
-            // mediaElement.id = `mediaEl_${consumerData.producerUserId}`;
-            mediaElement.classList.add(
-              `mediaEl_${consumerData.producerUserId}`,
-            );
-            mediaElement.classList.add('mediaEl');
-            mediaElement.classList.add(
-              consumer.kind === 'audio' ? 'remoteAudio' : 'remoteVideo',
-            );
+              // Создаем видео элемент
+              mediaElement = document.createElement('video');
+              mediaElement.classList.add('remoteVideo');
+              mediaElement.autoplay = false; // Видео не воспроизводится автоматически
+              mediaElement.srcObject = new MediaStream([consumer.track]);
 
-            // Присваиваем поток и устанавливаем свойства
-            mediaElement.srcObject = new MediaStream([consumer.track]);
-            mediaElement.autoplay = true;
+              // Создаем кнопку для воспроизведения видео
+              const playButton = document.createElement('button');
+              playButton.classList.add('playVideoBtn');
+              playButton.textContent = 'Смотреть камеру';
 
-            // Добавляем элемент в список
-            const media_tracks_list =
-              document.getElementById('media_tracks_list');
-            if (media_tracks_list) {
-              media_tracks_list.appendChild(mediaElement);
+              // Создаем кнопку для паузы просмотра видео
+              const pauseButton = document.createElement('button');
+              pauseButton.classList.add('pauseVideoBtn', 'hidden');
+              pauseButton.textContent = 'прекратить просмотр';
+
+              // Логика воспроизведения видео при нажатии кнопки
+              playButton.addEventListener('click', () => {
+                toggleCamera(mediaElement as HTMLVideoElement, playButton, pauseButton);
+              });
+
+              // Логика для паузы просмотра видео при нажатии кнопки
+              pauseButton.addEventListener('click', () => {
+                toggleCamera(mediaElement as HTMLVideoElement, playButton, pauseButton);
+              });
+
+              // Добавляем видео и кнопку в контейнер
+              videoContainer.appendChild(mediaElement);
+              videoContainer.appendChild(playButton);
+              videoContainer.appendChild(pauseButton);
+
+              // Добавляем контейнер в список
+              const mediaTracksList =
+                document.getElementById('media_tracks_list');
+              if (mediaTracksList) {
+                mediaTracksList.appendChild(videoContainer);
+              }
+            } else if (consumer.kind === 'audio') {
+              // Логика для аудио остается неизменной
+              mediaElement = document.createElement('audio');
+              mediaElement.classList.add(
+                'remoteAudio',
+                'mediaEl',
+                `mediaEl_${consumerData.producerUserId}`,
+              );
+              mediaElement.autoplay = true;
+              mediaElement.srcObject = new MediaStream([consumer.track]);
+
+              // Добавляем аудио в список
+              const mediaTracksList =
+                document.getElementById('media_tracks_list');
+              if (mediaTracksList) {
+                mediaTracksList.appendChild(mediaElement);
+              }
             }
 
             await consumer.resume();

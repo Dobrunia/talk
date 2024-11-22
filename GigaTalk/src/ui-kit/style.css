@@ -155,8 +155,32 @@
   @apply w-full h-full flex items-center justify-center
 }
 
+.videoContainer {
+  /* 16/9 */
+  @apply w-[320px] min-h-[180px] h-max relative rounded-lg mr-[8px] mb-[8px] bg-servers_list_dg overflow-hidden
+}
+
 .remoteVideo {
-  @apply w-[80%] h-auto rounded-lg
+  @apply w-full h-auto
+}
+
+.playVideoBtn {
+  transform: translate(-50%, -50%);
+  @apply absolute top-[50%] left-[50%] z-[1] rounded-full bg-blue-500 px-2 py-1 font-semibold
+}
+
+.playVideoBtn:hover {
+  @apply bg-blue-600;
+}
+
+.pauseVideoBtn {
+  transform: translate(-50%, 0);
+  white-space: nowrap;
+  @apply absolute bottom-[2%] left-[50%] rounded-full bg-[#B3404A] z-[-1] px-2 py-1
+}
+
+.videoContainer:hover .pauseVideoBtn{
+  @apply z-[1];
 }
 
 .remoteAudio {

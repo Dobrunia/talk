@@ -140,3 +140,25 @@ export function renderSettings() {
   if (!settings) return;
   settings.innerHTML = settingsSvg();
 }
+
+export function toggleCamera(mediaElement: HTMLVideoElement, playButton: HTMLButtonElement, pauseButton: HTMLButtonElement) {
+  if (mediaElement.paused) {
+    // Если видео на паузе, запускаем его и скрываем кнопку
+    mediaElement.play();
+    showCamera(playButton, pauseButton);
+  } else {
+    // Если видео воспроизводится, ставим его на паузу и показываем кнопку
+    mediaElement.pause();
+    hideCamera(playButton, pauseButton);
+  }
+}
+
+function showCamera(playButton: HTMLButtonElement, pauseButton: HTMLButtonElement) {
+  playButton.classList.add('hidden');
+  pauseButton.classList.remove('hidden');
+}
+
+function hideCamera(playButton: HTMLButtonElement, pauseButton: HTMLButtonElement) {
+  playButton.classList.remove('hidden');
+  pauseButton.classList.add('hidden');
+}
