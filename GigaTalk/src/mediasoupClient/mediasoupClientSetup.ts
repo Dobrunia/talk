@@ -3,7 +3,8 @@ import { Socket } from 'socket.io-client';
 import { RtpCapabilities, Transport } from 'mediasoup-client/lib/types';
 import { emitMediasoupEvent } from '../socket/socket';
 import { Producer, Consumer } from 'mediasoup-client/lib/types';
-import { toggleCamera } from '../ui-kit/index.ts';
+import { toggleCamera, toggleFullscreen } from '../ui-kit/index.ts';
+import SVG from '../ui-kit/svgs.ts';
 
 let audioProducer: Producer | null = null;
 let videoProducer: Producer | null = null;
@@ -76,20 +77,29 @@ export async function joinMediasoupRoom(
               pauseButton.classList.add('pauseVideoBtn', 'hidden');
               pauseButton.textContent = 'прекратить просмотр';
 
+              const fullscreenBtn = document.createElement('button');
+              fullscreenBtn.classList.add('fullscreenBtn', 'hidden');
+              fullscreenBtn.innerHTML = SVG.fullscreen;
+
               // Логика воспроизведения видео при нажатии кнопки
               playButton.addEventListener('click', () => {
-                toggleCamera(mediaElement as HTMLVideoElement, playButton, pauseButton);
+                toggleCamera(mediaElement as HTMLVideoElement, playButton, pauseButton, fullscreenBtn);
               });
 
               // Логика для паузы просмотра видео при нажатии кнопки
               pauseButton.addEventListener('click', () => {
-                toggleCamera(mediaElement as HTMLVideoElement, playButton, pauseButton);
+                toggleCamera(mediaElement as HTMLVideoElement, playButton, pauseButton, fullscreenBtn);
+              });
+
+              fullscreenBtn.addEventListener('click', () => {
+                toggleFullscreen(mediaElement as HTMLVideoElement);
               });
 
               // Добавляем видео и кнопку в контейнер
               videoContainer.appendChild(mediaElement);
               videoContainer.appendChild(playButton);
               videoContainer.appendChild(pauseButton);
+              videoContainer.appendChild(fullscreenBtn);
 
               // Добавляем контейнер в список
               const mediaTracksList =

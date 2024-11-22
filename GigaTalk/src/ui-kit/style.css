@@ -183,6 +183,14 @@
   @apply z-[1];
 }
 
+.fullscreenBtn {
+  @apply absolute bottom-[2%] left-[90%] z-[-1] w-[24px] h-[24px]
+}
+
+.videoContainer:hover .fullscreenBtn{
+  @apply z-[1];
+}
+
 .remoteAudio {
   @apply hidden
 }
