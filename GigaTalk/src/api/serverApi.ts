@@ -8,6 +8,6 @@ export const serverApi = {
 
   async getMyServerInfoById(serverId: string) {
     const response = await apiClient.get(`/getMyServerInfoById/${serverId}`);
-    return response.data;
+    return JSON.stringify(response.data);
   },
 };

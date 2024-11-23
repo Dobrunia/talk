@@ -1,6 +1,5 @@
 import { closeAuthModal, showLogin } from './authUIController.ts';
 import { authApi } from '../api/authApi.ts';
-import { saveUserData } from './cache.ts';
 import { logInRender } from './render.ts';
 import { connectSocket } from '../socket/socket.ts';
 
@@ -118,4 +117,14 @@ export async function getInCheck() {
     }
     return false;
   }
+}
+
+function saveUserData(
+  userId: string,
+  username: string,
+  userAvatar: string,
+) {
+  localStorage.setItem('userId', userId.toString());
+  localStorage.setItem('username', username);
+  localStorage.setItem('userAvatar', userAvatar);
 }

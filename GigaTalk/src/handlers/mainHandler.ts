@@ -1,3 +1,4 @@
+import { serverApi } from '../api/serverApi.ts';
 import { userApi } from '../api/userApi.ts';
 import { toggleMicrophoneMute, toggleSoundMute } from '../mediasoupClient/muteControls.ts';
 import {
@@ -12,11 +13,9 @@ import {
   handleRegister,
 } from '../utils/authController.ts';
 import { showLogin, showRegister } from '../utils/authUIController.ts';
-import { updateCache } from '../utils/cache.ts';
 
 async function serverClickHandler(serverId: string) {
-  await updateCache.serverInfo(serverId);
-  const updatedServerData = localStorage.getItem(`server_${serverId}`);
+  const updatedServerData = await serverApi.getMyServerInfoById(serverId);
   if (updatedServerData) {
     const serverData = JSON.parse(updatedServerData) as serverDATA;
     renderServerInfo(serverData);
