@@ -3,6 +3,30 @@ import { RowDataPacket } from 'mysql2';
 import connection from '../db/connection.ts';
 
 class UserController {
+  async getMyProfileInfo(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = (req as any).userId;
+  
+      const [user] = await connection.query<RowDataPacket[]>(
+        'SELECT * FROM users WHERE id = ?',
+        [userId],
+      );
+  
+      if (!user?.length) {
+        res.status(404).json({ error: 'Пользователь не найден' });
+        return;
+      }
+  
+      res.status(200).json({ user: user[0] });
+    } catch (error) {
+      console.error('Ошибка при получении данных пользователя:', error);
+      next(error);
+    }
+  }  
   async changeUsername(
     req: Request,
     res: Response,

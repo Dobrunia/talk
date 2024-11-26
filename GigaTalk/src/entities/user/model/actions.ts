@@ -1,7 +1,20 @@
+import { userApi } from '../api.ts';
+import { User } from '../types.ts';
 import { userStore } from './store.ts';
 
+export async function updateMyInfo() {
+  const user: User = await userApi.getMyProfileInfo();
+  const { id, avatar } = user;
+  const name = user.username;
+  setUser(id.toString(), name, avatar);
+}
+
 // Установить пользователя
-export function setUser(id: string, name: string, avatar: string) {
+export function setUser(
+  id: string,
+  name: string,
+  avatar: string | null | undefined,
+) {
   userStore.setState({ id, name, avatar });
 }
 

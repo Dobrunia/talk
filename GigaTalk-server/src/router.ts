@@ -10,6 +10,13 @@ const router = Router();
 router.get('/getAllMyServers', authMiddleware, serverController.getAllMyServers);
 router.get('/getMyServerInfoById/:serverId', authMiddleware, serverController.getMyServerInfoById);
 
+// Маршруты пользователя
+router.post('/getMyProfileInfo', userController.getMyProfileInfo);
+
+// Маршруты смены информации о пользователе
+//router.post('/changeUsername', authMiddleware, userController.changeUsername);
+router.post('/changeAvatar', authMiddleware, userController.changeAvatar);
+
 // Маршруты для аутентификации
 router.post('/register', authController.register);
 router.post('/login', authController.login);
@@ -18,9 +25,5 @@ router.post('/guest-login', authController.guestLogin);
 
 // Маршрут проверки токена
 router.get('/verify-token', authMiddleware, authController.verifyToken);
-
-// Маршруты смены информации о пользователе
-//router.post('/changeUsername', authMiddleware, userController.changeUsername);
-router.post('/changeAvatar', authMiddleware, userController.changeAvatar);
 
 export { router };
