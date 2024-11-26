@@ -1,12 +1,9 @@
-import { userStore } from "../../../entities/user/model/store.ts";
+import { logOut } from "../../auth/model/actions";
 
-export function logOut() {
+export function logOutConfirme() {
   const confirmation = window.confirm('Вы уверены, что хотите выйти?');
   if (confirmation) {
-    // Логика выхода из аккаунта
-    localStorage.removeItem('token');
-    userStore.resetState();
-    window.location.reload(); // Обновление страницы для удаления всех сессий и кэшированных данных
+    logOut();
   } else {
     console.log('Выход из аккаунта отменен');
   }

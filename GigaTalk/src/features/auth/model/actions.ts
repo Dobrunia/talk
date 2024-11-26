@@ -1,7 +1,7 @@
 import { updateMyInfo } from '../../../entities/user/model/actions.ts';
 import { userStore } from '../../../entities/user/model/store.ts';
 import { authApi } from '../api.ts';
-import { closeAuthModal, showLogin } from '../ui/AuthModal.ts';
+import { closeAuthModal, openAuthModal, showLogin } from '../ui/AuthModal.ts';
 
 /**
  * Регистрация пользователя.
@@ -87,27 +87,33 @@ export async function guestLogin() {
 }
 
 export async function getInCheck() {
-  const authModal = document.getElementById('authModal');
   const token = localStorage.getItem('token');
 
   // Если токена нет, показываем модальное окно и завершаем проверку
   if (!token) {
-    if (authModal) {
-      authModal.classList.remove('hidden');
-    }
+    logOut();
     return false;
   }
 
-  const isValid = await authApi.verifyToken(token);
-  if (isValid) {
-    await updateMyInfo();
-    return true;
-  } else {
-    // Если токен недействителен, удаляем его и показываем модальное окно
-    localStorage.removeItem('token');
-    if (authModal) {
-      authModal.classList.remove('hidden');
+  try {
+    const isValid = await authApi.verifyToken(token);
+    if (isValid) {
+      await updateMyInfo();
+      return true;
+    } else {
+      logOut();
+      return false;
     }
+  } catch (error) {
+    console.error('Ошибка проверки токена:', error);
+    logOut();
     return false;
   }
+}
+
+export function logOut() {
+  localStorage.removeItem('token');
+  userStore.resetState();
+  openAuthModal();
+  //window.location.reload(); // Обновление страницы для удаления всех сессий и кэшированных данных
 }

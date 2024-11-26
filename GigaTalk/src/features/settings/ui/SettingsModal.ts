@@ -1,4 +1,4 @@
-import { logOut } from '../model/actions.ts';
+import { logOutConfirme } from '../model/actions.ts';
 
 export async function renderSettingsModal() {
   const settingsModal = document.createElement('div');
@@ -55,7 +55,7 @@ export async function renderSettingsModal() {
   const logoutButton = document.createElement('button');
   logoutButton.textContent = 'Выйти из аккаунта';
   logoutButton.className = 'button button-primary';
-  logoutButton.onclick = () => logOut();
+  logoutButton.onclick = () => logOutConfirme();
   modalContent.appendChild(logoutButton);
 
   // Кнопка закрытия

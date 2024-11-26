@@ -200,7 +200,7 @@ svg.muted path {
 
 /* Базовые стили для модального окна */
 .modal {
-  @apply fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden;
+  @apply fixed inset-0 flex items-center justify-center bg-black bg-opacity-50;
 }
 
 .modal-content {
@@ -217,17 +217,17 @@ svg.muted path {
 }
 
 /* ====== Базовые стили для формы ====== */
-.form {
+.modal-form {
   @apply space-y-4;
 }
 
 /* Поля ввода */
-.input {
+.modal-input {
   @apply w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none;
 }
 
 /* Поля выбора файлов */
-.input-file {
+.modal-input-file {
   @apply file:bg-gray-600 file:text-white file:border-none file:rounded-md file:px-4 file:py-2 hover:file:bg-gray-700;
 }
 
@@ -243,7 +243,7 @@ svg.muted path {
 
 /* ====== Стили для кнопок ====== */
 .button {
-  @apply w-full p-2 rounded-md focus:outline-none;
+  @apply w-full p-2 rounded-md focus:outline-none mt-4;
 }
 
 /* Основные кнопки */
@@ -278,10 +278,6 @@ svg.muted path {
 }
 
 /* ====== Контейнеры ====== */
-.container {
-  @apply mb-4;
-}
-
 /* Контейнер для настроек */
 .modal-container {
   @apply mb-4;

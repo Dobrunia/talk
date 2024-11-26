@@ -22,6 +22,7 @@ export const authApi = {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log(response)
     return response.data.valid;
   },
 };

@@ -155,10 +155,10 @@ export function showLogin() {
   toggleElementClass('registerForm', 'hidden', 'add');
 
   // Переключаем активные и неактивные классы для вкладок
-  toggleElementClass('loginTab', 'auth-tab-active', 'add');
-  toggleElementClass('loginTab', 'auth-tab-inactive', 'remove');
-  toggleElementClass('registerTab', 'auth-tab-active', 'remove');
-  toggleElementClass('registerTab', 'auth-tab-inactive', 'add');
+  toggleElementClass('loginTab', 'button-tab-active', 'add');
+  toggleElementClass('loginTab', 'button-tab-inactive', 'remove');
+  toggleElementClass('registerTab', 'button-tab-active', 'remove');
+  toggleElementClass('registerTab', 'button-tab-inactive', 'add');
 }
 
 function showRegister() {
@@ -166,10 +166,14 @@ function showRegister() {
   toggleElementClass('loginForm', 'hidden', 'add');
 
   // Переключаем активные и неактивные классы для вкладок
-  toggleElementClass('registerTab', 'auth-tab-active', 'add');
-  toggleElementClass('registerTab', 'auth-tab-inactive', 'remove');
-  toggleElementClass('loginTab', 'auth-tab-active', 'remove');
-  toggleElementClass('loginTab', 'auth-tab-inactive', 'add');
+  toggleElementClass('registerTab', 'button-tab-active', 'add');
+  toggleElementClass('registerTab', 'button-tab-inactive', 'remove');
+  toggleElementClass('loginTab', 'button-tab-active', 'remove');
+  toggleElementClass('loginTab', 'button-tab-inactive', 'add');
+}
+
+export function openAuthModal() {
+  toggleElementClass('authModal', 'hidden', 'remove');
 }
 
 export function closeAuthModal() {
