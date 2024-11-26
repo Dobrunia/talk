@@ -3,7 +3,7 @@ import apiClient from '../../app/api/axiosInstance.ts';
 export const userApi = {
   async getMyProfileInfo() {
     const response = await apiClient.get('/getMyProfileInfo');
-    return response.data;
+    return response.data.user;
   },
   async changeUsername(newUsername: string) {
     const response = await apiClient.post('/changeUsername', { newUsername });
