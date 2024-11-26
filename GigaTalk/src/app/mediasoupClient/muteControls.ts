@@ -1,5 +1,13 @@
-import { muteMicrophone, toggleMicrophone, toggleSound, unmuteMicrophone } from '../../entities/user/model/actions';
-import { isMicrophoneMuted, isSoundMuted } from '../../entities/user/model/selectors';
+import {
+  muteMicrophone,
+  toggleMicrophone,
+  toggleSound,
+  unmuteMicrophone,
+} from '../../entities/user/model/actions';
+import {
+  isMicrophoneMuted,
+  isSoundMuted,
+} from '../../entities/user/model/selectors';
 import { getAudioProducer, consumers } from './mediasoupClientSetup';
 
 let audioProducer = getAudioProducer();
@@ -20,10 +28,10 @@ export function toggleMicrophoneMute(): void {
       audioProducer.pause();
       console.log('Microphone muted');
     }
-    toggleMicrophone();
   } else {
     console.error('Audio producer not available');
   }
+  toggleMicrophone();
 }
 
 export function toggleSoundMute(): void {

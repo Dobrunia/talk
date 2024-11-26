@@ -73,21 +73,27 @@ export function renderProfile() {
 }
 
 function toggleMicVisual() {
-  const micButton = document.getElementById('micro');
-  if (!micButton) return;
-  if (isMicrophoneMuted()) {
-    micButton.classList.add('muted');
-  } else {
-    micButton.classList.remove('muted');
-  }
+  const micButtons = document.getElementsByClassName('micro');
+  if (!micButtons.length) return;
+
+  Array.from(micButtons).forEach((micButton) => {
+    if (isMicrophoneMuted()) {
+      micButton.classList.add('muted');
+    } else {
+      micButton.classList.remove('muted');
+    }
+  });
 }
 
 function toggleSoundVisual() {
-  const soundButton = document.getElementById('headphones');
-  if (!soundButton) return;
-  if (isSoundMuted()) {
-    soundButton.classList.add('muted');
-  } else {
-    soundButton.classList.remove('muted');
-  }
+  const soundButtons = document.getElementsByClassName('headphones');
+  if (!soundButtons.length) return;
+
+  Array.from(soundButtons).forEach((soundButton) => {
+    if (isSoundMuted()) {
+      soundButton.classList.add('muted');
+    } else {
+      soundButton.classList.remove('muted');
+    }
+  });
 }

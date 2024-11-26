@@ -116,7 +116,7 @@ export async function getInCheck() {
   }
 }
 
-export function logInRender() {
+function logInRender() {
   closeAuthModal();
   renderProfile();
   renderProfileModal();
