@@ -1,0 +1,293 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ====== Общие стили ====== */
+
+:root {
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app {
+  @apply w-screen h-screen flex;
+}
+
+.servers_block {
+  @apply w-[80px] h-full bg-servers_list_dg flex flex-col items-center justify-start;
+}
+
+.servers_list {
+  min-height: calc(100% - 60px);
+  @apply w-[80px] h-max flex flex-col items-center justify-start;
+}
+
+.server_list_element {
+  @apply w-[60px] h-[60px] rounded-md bg-[#EB4C42] my-default cursor-pointer relative bg-cover bg-center;
+}
+
+.add_server {
+  background-image: url('/add.svg');
+  background-color: #6839c7;
+}
+
+.element_info {
+  @apply w-max h-[48px] invisible bg-[#333] absolute top-[6px] left-[117%] z-[1] text-[16px] p-[8px] rounded-md flex items-center justify-center;
+}
+
+/* Треугольник внизу всплывающей подсказки */
+.element_info::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  transform: translateY(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #333 transparent transparent;
+}
+
+.server_list_element:hover .element_info {
+  @apply visible;
+}
+
+.server_components_block {
+  height: calc(100% - 120px);
+  @apply w-[230px] bg-server_components_dg p-default;
+}
+
+.server_name {
+  white-space: nowrap;
+  @apply w-full h-[48px] flex items-center justify-start text-[18px] text-ellipsis overflow-hidden border-b-[1px] mb-[20px];
+}
+
+.server_category {
+  @apply cursor-pointer;
+}
+
+.category_header {
+  @apply flex justify-between items-center italic rounded-md p-[4px] hover:bg-[#2f3136];
+}
+
+.toggle_icon {
+  font-size: 12px;
+  transition: transform 0.3s;
+}
+
+.channel_list {
+  list-style-type: none;
+  @apply m-0 block p-[4px];
+}
+
+.channel_item {
+  @apply h-max cursor-pointer flex flex-col items-center justify-start rounded-md;
+}
+
+.channel_name {
+  @apply h-[24px] pb-[2px] flex items-center justify-start hover:bg-[#2D2E32];
+}
+
+.profile {
+  @apply w-full h-[60px] bg-[#1A1B1E];
+}
+
+.profile_wrapper {
+  @apply w-full h-full flex items-center justify-center;
+}
+
+.profile_avatar {
+  @apply w-[42px] h-[42px] rounded-full bg-cover bg-center cursor-pointer hover:brightness-75 transition duration-200;
+}
+
+.profile_name {
+  @apply w-[100px] text-[16px] truncate max-w-[90px] ml-[5px];
+}
+
+.profile_buttons {
+  @apply w-[72px] h-[48px] flex items-center justify-between;
+}
+
+.profile_buttons svg:hover {
+  cursor: pointer;
+}
+
+.profile_buttons svg:hover path {
+  fill: #b3404a !important;
+}
+
+svg.muted path {
+  fill: #b3404a !important;
+}
+
+.user_list {
+  @apply w-full h-max pl-[38px];
+}
+
+.user_in_channel {
+  @apply w-full h-[30px] flex items-center justify-start text-[16px] mt-[12px] mb-[12px] hover:bg-[#2D2E32];
+}
+
+.user_in_channel_avatar {
+  @apply w-[26px] h-[26px] rounded-full mr-[8px] bg-cover bg-center border-[2px] border-server_components_dg;
+}
+
+.speaking .user_in_channel_avatar {
+  box-sizing: border-box;
+  @apply border-[2px] border-[#23A55A];
+}
+
+.user_in_channel_name {
+  @apply truncate max-w-[100px];
+}
+
+.media_tracks {
+  @apply w-full h-full flex items-center justify-center;
+}
+
+.videoContainer {
+  /* 16/9 */
+  @apply w-[320px] min-h-[180px] h-max relative rounded-lg mr-[8px] mb-[8px] bg-servers_list_dg overflow-hidden;
+}
+
+.remoteVideo {
+  @apply w-full h-auto;
+}
+
+.playVideoBtn {
+  transform: translate(-50%, -50%);
+  @apply absolute top-[50%] left-[50%] z-[1] rounded-full bg-blue-500 px-2 py-1 font-semibold;
+}
+
+.playVideoBtn:hover {
+  @apply bg-blue-600;
+}
+
+.pauseVideoBtn {
+  transform: translate(-50%, 0);
+  white-space: nowrap;
+  @apply absolute bottom-[2%] left-[50%] rounded-full bg-[#B3404A] z-[-1] px-2 py-1;
+}
+
+.videoContainer:hover .pauseVideoBtn {
+  @apply z-[1];
+}
+
+.fullscreenBtn {
+  @apply absolute bottom-[2%] left-[90%] z-[-1] w-[24px] h-[24px];
+}
+
+.videoContainer:hover .fullscreenBtn {
+  @apply z-[1];
+}
+
+.remoteAudio {
+  @apply hidden;
+}
+
+.settings {
+  @apply w-[60px] h-[60px] flex items-center justify-center cursor-pointer;
+}
+
+.settings:hover svg path {
+  fill: #374151 !important;
+}
+
+/* Базовые стили для модального окна */
+.modal {
+  @apply fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden;
+}
+
+.modal-content {
+  @apply bg-gray-800 text-white p-6 rounded-lg w-96;
+}
+
+/* ====== Стили для заголовков ====== */
+.header {
+  @apply text-xl font-semibold mb-4;
+}
+
+.modal-header {
+  @apply flex justify-between mb-4;
+}
+
+/* ====== Базовые стили для формы ====== */
+.form {
+  @apply space-y-4;
+}
+
+/* Поля ввода */
+.input {
+  @apply w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none;
+}
+
+/* Поля выбора файлов */
+.input-file {
+  @apply file:bg-gray-600 file:text-white file:border-none file:rounded-md file:px-4 file:py-2 hover:file:bg-gray-700;
+}
+
+/* Поля диапазона (range) */
+.modal-range {
+  @apply w-full;
+}
+
+/* Выпадающий список (select) */
+.modal-select {
+  @apply w-full p-2 bg-gray-700 rounded-md;
+}
+
+/* ====== Стили для кнопок ====== */
+.button {
+  @apply w-full p-2 rounded-md focus:outline-none;
+}
+
+/* Основные кнопки */
+.button-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.button-secondary {
+  @apply bg-gray-600 hover:bg-gray-700 text-white text-sm mt-4;
+}
+
+/* Таб-кнопки для переключения форм */
+.button-tab {
+  @apply px-4 py-2 text-xl font-semibold rounded-lg cursor-pointer border focus:outline-none;
+}
+
+.button-tab-active {
+  @apply text-white bg-blue-500 border-blue-500;
+}
+
+.button-tab-inactive {
+  @apply text-blue-400 bg-gray-200 border-gray-300;
+}
+
+.button-tab-inactive:hover {
+  @apply bg-blue-100 text-blue-600;
+}
+
+/* ====== Стили для изображений ====== */
+.preview-image {
+  @apply w-32 h-32 rounded-full object-cover hidden;
+}
+
+/* ====== Контейнеры ====== */
+.container {
+  @apply mb-4;
+}
+
+/* Контейнер для настроек */
+.modal-container {
+  @apply mb-4;
+}
+
+/* Контейнеры для форм */
+.form-container {
+  @apply mt-4;
+}

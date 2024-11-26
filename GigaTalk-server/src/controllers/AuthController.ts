@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import connection from '../db/connection.ts';
 import {
-  GUEST_EXPIRATION_DAYS,
   JWT_SECRET,
   TOKEN_EXPIRATION,
 } from '../data.ts';

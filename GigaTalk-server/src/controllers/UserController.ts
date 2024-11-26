@@ -1,42 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { RowDataPacket } from 'mysql2';
 import connection from '../db/connection.ts';
-import { authController } from './AuthController.ts';
 
 class UserController {
-  async getUserById(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    try {
-      const userId = req.params.id;
-
-      // Проверка наличия ID пользователя
-      if (!userId) {
-        res.status(400).json({ message: 'ID пользователя обязателен' });
-        return;
-      }
-
-      // Запрос в базу данных для получения данных пользователя по ID
-      const [rows] = await connection.query<RowDataPacket[]>(
-        'SELECT * FROM users WHERE id = ?',
-        [userId],
-      );
-
-      // Проверка наличия пользователя
-      if (rows.length === 0) {
-        res.status(404).json({ message: 'Пользователь не найден' });
-        return;
-      }
-
-      // Возвращение данные пользователя
-      res.status(200).json(rows[0]);
-    } catch (error) {
-      console.error('Ошибка при получении данных пользователя:', error);
-      next(error);
-    }
-  }
   async changeUsername(
     req: Request,
     res: Response,
