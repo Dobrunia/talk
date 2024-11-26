@@ -1,5 +1,10 @@
+import { setMyServersList } from '../../../entities/server/model/actions.ts';
 import { updateMyInfo } from '../../../entities/user/model/actions.ts';
 import { userStore } from '../../../entities/user/model/store.ts';
+import { renderProfile } from '../../profile/ui/myProfile.ts';
+import { renderProfileModal } from '../../profile/ui/ProfileModal.ts';
+import { renderServersList } from '../../serverComponent/model/actions.ts';
+import { renderSettingsModal } from '../../settings/ui/SettingsModal.ts';
 import { authApi } from '../api.ts';
 import { closeAuthModal, openAuthModal, showLogin } from '../ui/AuthModal.ts';
 
@@ -55,8 +60,7 @@ export async function handleLogin(event: Event) {
       name: data.username,
       avatar: data.userAvatar,
     });
-
-    closeAuthModal();
+    logInRender();
   } catch (error) {
     console.error('Ошибка входа:', error);
     throw error;
@@ -79,7 +83,7 @@ export async function guestLogin() {
       avatar: data.userAvatar,
     });
 
-    closeAuthModal();
+    logInRender();
   } catch (error) {
     console.error('Ошибка входа как гостя:', error);
     throw error;
@@ -99,6 +103,7 @@ export async function getInCheck() {
     const isValid = await authApi.verifyToken(token);
     if (isValid) {
       await updateMyInfo();
+      logInRender();
       return true;
     } else {
       logOut();
@@ -109,6 +114,15 @@ export async function getInCheck() {
     logOut();
     return false;
   }
+}
+
+export function logInRender() {
+  closeAuthModal();
+  renderProfile();
+  renderProfileModal();
+  setMyServersList();
+  renderServersList();
+  renderSettingsModal();
 }
 
 export function logOut() {
