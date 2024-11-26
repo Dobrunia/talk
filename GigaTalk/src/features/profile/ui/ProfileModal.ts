@@ -3,7 +3,7 @@ import { closeProfileModal, handleAvatarChange } from '../model/actions.ts';
 export function renderProfileModal() {
   const profileModal = document.createElement('div');
   profileModal.id = 'profileModal';
-  profileModal.className = 'modal';
+  profileModal.className = 'modal hidden';
 
   const modalContent = document.createElement('div');
   modalContent.className = 'modal-content';

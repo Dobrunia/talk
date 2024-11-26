@@ -3,7 +3,7 @@ import { guestLogin, handleLogin, handleRegister } from '../model/actions.ts';
 export function renderAuthModal() {
   const authModal = document.createElement('div');
   authModal.id = 'authModal';
-  authModal.className = 'modal';
+  authModal.className = 'modal hidden';
 
   const modalContent = document.createElement('div');
   modalContent.className = 'modal-content';

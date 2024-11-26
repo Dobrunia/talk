@@ -3,7 +3,7 @@ import { logOutConfirme } from '../model/actions.ts';
 export async function renderSettingsModal() {
   const settingsModal = document.createElement('div');
   settingsModal.id = 'settingsModal';
-  settingsModal.className = 'modal';
+  settingsModal.className = 'modal hidden';
 
   const modalContent = document.createElement('div');
   modalContent.className = 'modal-content';
