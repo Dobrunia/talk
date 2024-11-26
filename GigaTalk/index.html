@@ -43,31 +43,9 @@
       <div class="media_tracks" id="media_tracks_list"></div>
     </div>
     <script type="module" src="/src/app/main.ts"></script>
-    <script type="module" src="/src/handlers/mainHandler.ts"></script>
     <script>
       function openSettingsModal() {
         document.getElementById('settingsModal').classList.remove('hidden');
-      }
-
-      document
-        .getElementById('change_avatar')
-        .addEventListener('change', previewImage);
-
-      function previewImage(event) {
-        const file = event.target.files[0];
-        const previewImage = document.getElementById('previewImage');
-
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            previewImage.src = e.target.result;
-            previewImage.classList.remove('hidden');
-          };
-          reader.readAsDataURL(file);
-        } else {
-          previewImage.src = '';
-          previewImage.classList.add('hidden');
-        }
       }
     </script>
   </body>

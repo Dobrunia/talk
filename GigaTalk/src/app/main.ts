@@ -1,12 +1,18 @@
+import { setMyServersList } from '../entities/server/model/actions.ts';
 import { getInCheck } from '../features/auth/model/actions.ts';
+import { renderProfile } from '../features/profile/ui/myProfile.ts';
+import { renderProfileModal } from '../features/profile/ui/ProfileModal.ts';
+import { renderServersList } from '../features/serverComponent/model/actions.ts';
+import { renderSettingsModal } from '../features/settings/ui/SettingsModal.ts';
 import { connectSocket } from './api/socket/socket.ts';
-import './ui-kit/style.css';
+import './style.css';
 
 function logInRender() {
   renderProfile();
-  renderServers();
-  renderSettings();
-  populateMicrophoneSelect();
+  renderProfileModal();
+  setMyServersList();
+  renderServersList();
+  renderSettingsModal();
 }
 
 async function start() {

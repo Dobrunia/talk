@@ -1,4 +1,4 @@
-import { userStore } from "../../../entities/user/model/store";
+import { userStore } from "../../../entities/user/model/store.ts";
 
 export function logOut() {
   const confirmation = window.confirm('Вы уверены, что хотите выйти?');

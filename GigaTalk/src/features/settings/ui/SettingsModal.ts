@@ -1,6 +1,6 @@
 import { logOut } from '../model/actions.ts';
 
-async function renderSettingsModal() {
+export async function renderSettingsModal() {
   const settingsModal = document.createElement('div');
   settingsModal.id = 'settingsModal';
   settingsModal.className = 'modal';

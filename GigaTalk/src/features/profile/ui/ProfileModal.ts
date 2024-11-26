@@ -1,4 +1,4 @@
-import { closeProfileModal, handleAvatarChange } from "../model/actions.ts";
+import { closeProfileModal, handleAvatarChange } from '../model/actions.ts';
 
 export function renderProfileModal() {
   const profileModal = document.createElement('div');
@@ -29,25 +29,25 @@ export function renderProfileModal() {
 
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
-  fileInput.id = 'change_avatar';
   fileInput.name = 'change_avatar';
   fileInput.accept = 'image/*';
   fileInput.className = 'input input-file';
-  fileInputContainer.appendChild(fileInput);
-  avatarForm.appendChild(fileInputContainer);
 
   // Предварительный просмотр изображения
   const previewContainer = document.createElement('div');
   const previewLabel = document.createElement('label');
   previewLabel.textContent = 'Предварительный просмотр:';
   previewLabel.className = 'modal-label';
-  previewContainer.appendChild(previewLabel);
 
   const previewImageWrapper = document.createElement('div');
   const previewImage = document.createElement('img');
-  previewImage.id = 'previewImage';
   previewImage.className = 'preview-image';
   previewImage.alt = 'Предварительный просмотр';
+
+  fileInput.addEventListener('change', (event) => previewImageHandler(event, previewImage));
+  fileInputContainer.appendChild(fileInput);
+  avatarForm.appendChild(fileInputContainer);
+  previewContainer.appendChild(previewLabel);
   previewImageWrapper.appendChild(previewImage);
   previewContainer.appendChild(previewImageWrapper);
   avatarForm.appendChild(previewContainer);
@@ -71,4 +71,32 @@ export function renderProfileModal() {
   profileModal.appendChild(modalContent);
 
   document.body.appendChild(profileModal);
+}
+
+function previewImageHandler(event: Event, previewImage: HTMLImageElement) {
+  const target = event.target as HTMLInputElement | null;
+
+  if (!target || !target.files || target.files.length === 0) {
+    // Если файл не выбран
+    previewImage.src = '';
+    previewImage.classList.add('hidden');
+    return;
+  }
+
+  const file = target.files[0]; // Получаем выбранный файл
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+    const result = e.target?.result; // Проверяем, что результат существует
+    if (typeof result === 'string') {
+      previewImage.src = result;
+      previewImage.classList.remove('hidden');
+    }
+  };
+
+  reader.onerror = function () {
+    console.error('Ошибка чтения файла:', reader.error);
+  };
+
+  reader.readAsDataURL(file); // Читаем файл как Data URL
 }

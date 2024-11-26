@@ -7,7 +7,7 @@ function setAllServers(servers: serverDATA[]) {
   serverStore.setState({ servers });
 }
 
-async function setServersList() {
+export async function setMyServersList() {
   let serversList: serverDATA[] = await serverApi.getAllMyServers();
   setAllServers(serversList);
 }

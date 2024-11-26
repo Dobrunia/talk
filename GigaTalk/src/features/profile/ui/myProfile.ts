@@ -59,7 +59,7 @@ function createMyProfile(username: string, userAvatar: string): HTMLElement {
   return profileContainer;
 }
 
-function renderProfile() {
+export function renderProfile() {
   const profile = document.getElementById('my_profile');
   if (!profile) {
     console.error('My profile container not found!');

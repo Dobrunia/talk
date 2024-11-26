@@ -3,10 +3,11 @@ import SVG from '../../../app/ui/svgs.ts';
 import { voiceChannelClick } from '../../../entities/channel/model/actions.ts';
 import { Channel } from '../../../entities/channel/types.ts';
 import { serverApi } from '../../../entities/server/api.ts';
+import { getAllServers } from '../../../entities/server/model/selectors.ts';
 import { Category, serverDATA } from '../../../entities/server/types.ts';
 import { addServerElement, createServerListElement } from '../ui/components.ts';
 
-export function renderServerInfo(serverData: serverDATA) {
+function renderServerInfo(serverData: serverDATA) {
   const serverSlot = document.getElementById('server_components_block');
   if (!serverSlot) {
     console.error('Server info container not found!');
@@ -106,7 +107,7 @@ function createChannelItem(channel: Channel): HTMLElement {
 }
 
 // Отрисовка списка серверов
-export function renderServersList(serversList: serverDATA[]): void {
+export function renderServersList(): void {
   const serverListContainer = document.getElementById('servers_list');
   if (!serverListContainer) {
     console.error('Server list container not found!');
@@ -119,6 +120,7 @@ export function renderServersList(serversList: serverDATA[]): void {
   // Добавление кнопки "Добавить сервер"
   serverListContainer.appendChild(addServerElement());
 
+  let serversList = getAllServers();
   // Добавление серверов
   serversList.forEach((server) => {
     const serverElement = createServerListElement(server);
