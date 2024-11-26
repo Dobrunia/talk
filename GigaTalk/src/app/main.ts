@@ -1,7 +1,13 @@
+import { getInCheck } from '../features/auth/model/actions.ts';
+import { connectSocket } from './api/socket/socket.ts';
 import './ui-kit/style.css';
-import { getInCheck } from './utils/authController.ts';
-import { logInRender } from './utils/render.ts';
-import { connectSocket } from './socket/socket.ts';
+
+function logInRender() {
+  renderProfile();
+  renderServers();
+  renderSettings();
+  populateMicrophoneSelect();
+}
 
 async function start() {
   if (await getInCheck()) {
@@ -13,9 +19,3 @@ async function start() {
 window.onload = () => {
   start();
 };
-export function logInRender() {
-  renderProfile();
-  renderServers();
-  renderSettings();
-  populateMicrophoneSelect();
-}
