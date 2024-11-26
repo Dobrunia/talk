@@ -11,7 +11,7 @@ router.get('/getAllMyServers', authMiddleware, serverController.getAllMyServers)
 router.get('/getMyServerInfoById/:serverId', authMiddleware, serverController.getMyServerInfoById);
 
 // Маршруты пользователя
-router.post('/getMyProfileInfo', userController.getMyProfileInfo);
+router.get('/getMyProfileInfo', authMiddleware, userController.getMyProfileInfo);
 
 // Маршруты смены информации о пользователе
 //router.post('/changeUsername', authMiddleware, userController.changeUsername);

@@ -1,3 +1,4 @@
+import { updateMyInfo } from '../../../entities/user/model/actions.ts';
 import { userStore } from '../../../entities/user/model/store.ts';
 import { authApi } from '../api.ts';
 import { closeAuthModal, showLogin } from '../ui/AuthModal.ts';
@@ -99,6 +100,7 @@ export async function getInCheck() {
 
   const isValid = await authApi.verifyToken(token);
   if (isValid) {
+    await updateMyInfo();
     return true;
   } else {
     // Если токен недействителен, удаляем его и показываем модальное окно

@@ -24,7 +24,6 @@ class UserController {
       res.status(200).json({ user: user[0] });
     } catch (error) {
       console.error('Ошибка при получении данных пользователя:', error);
-      next(error);
     }
   }  
   async changeUsername(

@@ -1,5 +1,4 @@
 import { setMyServersList } from '../entities/server/model/actions.ts';
-import { updateMyInfo } from '../entities/user/model/actions.ts';
 import { getInCheck } from '../features/auth/model/actions.ts';
 import { renderProfile } from '../features/profile/ui/myProfile.ts';
 import { renderProfileModal } from '../features/profile/ui/ProfileModal.ts';
@@ -8,8 +7,7 @@ import { renderSettingsModal } from '../features/settings/ui/SettingsModal.ts';
 import { connectSocket } from './api/socket/socket.ts';
 import './style.css';
 
-async function logInRender() {
-  await updateMyInfo();
+function logInRender() {
   renderProfile();
   renderProfileModal();
   setMyServersList();
@@ -19,7 +17,7 @@ async function logInRender() {
 
 async function start() {
   if (await getInCheck()) {
-    await logInRender();
+    logInRender();
     connectSocket(); // Запускаем соединение WebSocket
   }
 }
