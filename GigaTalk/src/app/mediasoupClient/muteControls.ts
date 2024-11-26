@@ -51,7 +51,7 @@ export function toggleSoundMute(): void {
       console.log('Microphone unmuted');
     }
 
-    unmuteMicrophone(); // Сбрасываем состояние микрофона
+    //unmuteMicrophone(); // Сбрасываем состояние микрофона
     console.log('All sounds unmuted');
   } else {
     // Выключаем всех (видео остается активным)

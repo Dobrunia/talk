@@ -14,6 +14,7 @@ import { openProfileModal } from '../model/actions.ts';
 function createMyProfile(username: string, userAvatar: string): HTMLElement {
   // Создаем основной контейнер профиля
   const profileContainer = document.createElement('div');
+  profileContainer.className = 'profile_container';
 
   // Аватар профиля
   const profileAvatar = document.createElement('div');
@@ -51,6 +52,7 @@ function createMyProfile(username: string, userAvatar: string): HTMLElement {
   headphonesButton.onclick = () => {
     toggleSoundMute();
     toggleSoundVisual();
+    // toggleMicVisual();
   };
   profileButtons.appendChild(headphonesButton);
 
