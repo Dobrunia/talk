@@ -216,10 +216,6 @@ svg.muted path {
 }
 
 /* ====== Стили для заголовков ====== */
-.header {
-  @apply text-xl font-semibold mb-4;
-}
-
 .modal-header {
   @apply flex justify-between mb-4;
 }
@@ -282,7 +278,7 @@ svg.muted path {
 
 /* ====== Стили для изображений ====== */
 .preview-image {
-  @apply w-32 h-32 rounded-full object-cover hidden;
+  @apply w-32 h-32 rounded-full object-cover;
 }
 
 /* ====== Контейнеры ====== */
@@ -294,4 +290,8 @@ svg.muted path {
 /* Контейнеры для форм */
 .form-container {
   @apply mt-4;
+}
+
+.preview-container {
+  @apply flex justify-center items-center mt-4;
 }
