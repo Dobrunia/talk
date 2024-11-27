@@ -116,11 +116,11 @@ export async function getInCheck() {
   }
 }
 
-function logInRender() {
+async function logInRender() {
   closeAuthModal();
   renderProfile();
   renderProfileModal();
-  setMyServersList();
+  await setMyServersList();
   renderServersList();
   renderSettingsModal();
 }
