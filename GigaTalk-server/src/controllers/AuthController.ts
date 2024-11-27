@@ -184,7 +184,7 @@ class AuthController {
     // Добавление записи в `active_sessions`
     try {
       await connection.query(
-        'INSERT INTO active_sessions (user_id, token, expires_at, is_guest) VALUES (?, ?, NOW() + INTERVAL 1 DAY, FALSE)',
+        'INSERT INTO active_sessions (user_id, token, expires_at) VALUES (?, ?, NOW() + INTERVAL 1 DAY)',
         [userId, newToken],
       );
       console.log(`Токен успешно создан и сохранен для userId ${userId}`);
