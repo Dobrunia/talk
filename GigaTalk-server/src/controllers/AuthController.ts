@@ -139,8 +139,8 @@ class AuthController {
         return;
       }
 
-      // Удаление сессии из `ActiveSessions`
-      await connection.query('DELETE FROM ActiveSessions WHERE token = ?', [
+      // Удаление сессии из `active_sessions`
+      await connection.query('DELETE FROM active_sessions WHERE token = ?', [
         token,
       ]);
       res.status(200).json({ message: 'Выход выполнен успешно' });
