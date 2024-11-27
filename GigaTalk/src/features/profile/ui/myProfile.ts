@@ -20,7 +20,7 @@ function createMyProfile(username: string, userAvatar: string): HTMLElement {
   const profileAvatar = document.createElement('div');
   profileAvatar.className = 'profile_avatar';
   profileAvatar.style.backgroundImage = `url('${
-    userAvatar.startsWith('data:image/') ? userAvatar : '/default_profile.jpg'
+    userAvatar ?? '/default_profile.jpg'
   }')`;
   profileAvatar.onclick = openProfileModal; // Добавляем обработчик события
   profileContainer.appendChild(profileAvatar);
