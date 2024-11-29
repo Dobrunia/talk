@@ -120,6 +120,7 @@ export async function getInCheck() {
 
 export async function logInRender() {
   closeAuthModal();
+  userStore.subscribe(renderProfile);
   renderProfile();
   renderProfileModal();
   await setMyServersList();
