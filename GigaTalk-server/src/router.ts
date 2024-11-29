@@ -9,6 +9,7 @@ const router = Router();
 // Маршруты для серверов
 router.get('/getAllMyServers', authMiddleware, serverController.getAllMyServers);
 router.get('/getMyServerInfoById/:serverId', authMiddleware, serverController.getMyServerInfoById);
+router.get('/getAllAvailableServers', authMiddleware, serverController.getAllAvailableServers);
 
 // Маршруты пользователя
 router.get('/getMyProfileInfo', authMiddleware, userController.getMyProfileInfo);

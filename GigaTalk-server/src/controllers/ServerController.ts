@@ -6,10 +6,10 @@ class ServerController {
   async getAllMyServers(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = (req as any).userId;
-      console.log('getAllMyServers userId ' + userId)
+      console.log('getAllMyServers userId ' + userId);
       const [servers] = await connection.query<RowDataPacket[]>(
         'SELECT servers.* FROM servers JOIN server_members ON servers.id = server_members.server_id WHERE server_members.member_id = ?',
-        [userId]
+        [userId],
       );
       res.status(200).json(servers);
     } catch (error) {
@@ -22,7 +22,7 @@ class ServerController {
       const userId = (req as any).userId;
       const [serverData] = await connection.query<RowDataPacket[]>(
         'SELECT servers.* FROM servers LEFT JOIN server_members ON servers.id = server_members.server_id AND server_members.member_id = ? WHERE servers.id = ? AND (servers.type = "open" OR (servers.type = "private" AND server_members.member_id IS NOT NULL))',
-        [userId, serverId]
+        [userId, serverId],
       );
 
       const server = serverData[0];
@@ -47,6 +47,23 @@ class ServerController {
         categories: categoriesWithChannels,
       };
       res.status(200).json(serverWithCategoriesAndChannels);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getAllAvailableServers(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const userId = (req as any).userId;
+
+      const [servers] = await connection.query<RowDataPacket[]>(
+        'SELECT s.* FROM servers s WHERE s.id NOT IN (SELECT sm.server_id FROM server_members sm WHERE sm.member_id = ?)',
+        [userId],
+      );
+      res.status(200).json(servers);
     } catch (error) {
       next(error);
     }

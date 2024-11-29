@@ -106,7 +106,7 @@
 }
 
 .profile_container {
-  @apply w-full h-full flex items-center justify-center
+  @apply w-full h-full flex items-center justify-center;
 }
 
 .profile_avatar {
@@ -217,7 +217,7 @@ svg.muted path {
 
 /* ====== Стили для заголовков ====== */
 .modal-header {
-  @apply flex justify-between mb-4;
+  @apply flex justify-center mb-4;
 }
 
 /* ====== Базовые стили для формы ====== */
@@ -294,4 +294,19 @@ svg.muted path {
 
 .preview-container {
   @apply flex justify-center items-center mt-4;
+}
+
+/* Элемент сервера: выравнивание название-кнопка */
+.server-item {
+  @apply flex justify-between items-center p-2 bg-gray-700 rounded-md mt-2;
+}
+
+/* Название сервера с выравниванием слева */
+.server-name {
+  @apply truncate text-sm mr-4; /* Убираем длинный текст */
+}
+
+/* Кнопка присоединения */
+.button-small {
+  @apply px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-md;
 }

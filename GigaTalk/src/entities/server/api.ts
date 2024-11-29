@@ -10,4 +10,9 @@ export const serverApi = {
     const response = await apiClient.get(`/getMyServerInfoById/${serverId}`);
     return JSON.stringify(response.data);
   },
+
+  async getAllAvailableServers() {
+    const response = await apiClient.get(`/getAllAvailableServers`);
+    return response.data;
+  },
 };
