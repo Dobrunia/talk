@@ -1,3 +1,4 @@
+import { connectSocket } from '../../../app/api/socket/socket.ts';
 import { setMyServersList } from '../../../entities/server/model/actions.ts';
 import { updateMyInfo } from '../../../entities/user/model/actions.ts';
 import { userStore } from '../../../entities/user/model/store.ts';
@@ -95,7 +96,7 @@ export async function getInCheck() {
 
   // Если токена нет, показываем модальное окно и завершаем проверку
   if (!token) {
-    logOut();
+    // logOut();
     return false;
   }
 
@@ -103,26 +104,27 @@ export async function getInCheck() {
     const isValid = await authApi.verifyToken(token);
     if (isValid) {
       await updateMyInfo();
-      logInRender();
+      // logInRender();
       return true;
     } else {
-      logOut();
+      // logOut();
       return false;
     }
   } catch (error) {
     console.error('Ошибка проверки токена:', error);
-    logOut();
+    // logOut();
     return false;
   }
 }
 
-async function logInRender() {
+export async function logInRender() {
   closeAuthModal();
   renderProfile();
   renderProfileModal();
   await setMyServersList();
   renderServersList();
   renderSettingsModal();
+  connectSocket();
 }
 
 export function logOut() {
