@@ -60,7 +60,7 @@ class ServerController {
       const userId = (req as any).userId;
 
       const [servers] = await connection.query<RowDataPacket[]>(
-        'SELECT s.* FROM servers s WHERE s.id NOT IN (SELECT sm.server_id FROM server_members sm WHERE sm.member_id = ?)',
+        'SELECT s.* FROM servers s WHERE s.id NOT IN (SELECT sm.server_id FROM server_members sm WHERE sm.member_id = ?) AND s.type != "private"',
         [userId],
       );
       res.status(200).json(servers);
