@@ -3,25 +3,24 @@ import { setUserAvatar } from '../../../entities/user/model/actions.ts';
 
 export async function handleAvatarChange(event: Event): Promise<void> {
   event.preventDefault();
-  const avatarInput = document.getElementById(
-    'change_avatar',
-  ) as HTMLInputElement | null;
+  const target = event.target as HTMLFormElement; // Приводим event.target к форме
+  const avatarInput = target.querySelector(
+    'input[name="change_avatar"]',
+  ) as HTMLInputElement;
 
   if (avatarInput && avatarInput.files && avatarInput.files.length > 0) {
     const file = avatarInput.files[0];
     const reader = new FileReader();
 
-    reader.onload = async function () {
-      if (reader.result) {
-        const base64String = reader.result.toString();
-
+    reader.onload = async function (e) {
+      const result = e.target?.result as string | null;
+      if (result) {
         try {
-          const response = await userApi.changeAvatar(base64String);
+          const response = await userApi.changeAvatar(result);
 
           if (response.userAvatar) {
             console.log('Аватар успешно обновлен:', response);
             setUserAvatar(response.userAvatar);
-            //renderProfile();
             closeProfileModal();
             alert(response.message || 'Аватар успешно обновлен');
           } else {

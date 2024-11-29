@@ -18,7 +18,7 @@ export function renderProfileModal() {
   const avatarForm = document.createElement('form');
   avatarForm.id = 'avatarForm';
   avatarForm.className = 'modal-form';
-  avatarForm.onsubmit = (event) => handleAvatarChange(event);
+  avatarForm.onsubmit = handleAvatarChange;
 
   // Поле для загрузки аватара
   const fileInputContainer = document.createElement('div');
@@ -74,9 +74,7 @@ export function renderProfileModal() {
   cancelButton.className = 'button button-secondary';
   cancelButton.onclick = () => closeProfileModal();
   modalContent.appendChild(cancelButton);
-
   profileModal.appendChild(modalContent);
-
   document.body.appendChild(profileModal);
 }
 
