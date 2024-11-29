@@ -1,5 +1,5 @@
-import { serverDATA } from '../../../entities/server/types';
-import { joinServer } from '../model/model';
+import { serverDATA } from '../../../entities/server/types.ts';
+import { joinServerWithState } from '../model/model.ts';
 
 export function addServerModal(servers: serverDATA[]) {
   const modal = document.createElement('div');
@@ -49,7 +49,7 @@ export function addServerModal(servers: serverDATA[]) {
     const joinButton = document.createElement('button');
     joinButton.textContent = 'Присоединиться';
     joinButton.className = 'button-small';
-    joinButton.addEventListener('click', () => joinServer(server.id));
+    joinButton.addEventListener('click', () => joinServerWithState(server.id, joinButton));
 
     serverElement.appendChild(serverName);
     serverElement.appendChild(joinButton);

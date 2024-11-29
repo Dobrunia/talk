@@ -310,3 +310,18 @@ svg.muted path {
 .button-small {
   @apply px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-md;
 }
+
+/* Состояние ожидания для кнопки */
+.button-wait {
+  @apply px-3 py-1 text-xs rounded-md bg-gray-500 cursor-not-allowed text-white;
+}
+
+/* Успешное состояние кнопки */
+.button-success {
+  @apply px-3 py-1 text-xs rounded-md cursor-not-allowed bg-green-600 text-white;
+}
+
+/* Ошибочное состояние кнопки */
+.button-error {
+  @apply px-3 py-1 text-xs rounded-md cursor-not-allowed bg-red-600 text-white;
+}
