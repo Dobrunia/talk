@@ -67,7 +67,7 @@ export function renderProfile() {
     console.error('My profile container not found!');
     return;
   }
-  profile.innerHTML = ''; // TODO: сделать точечную перерисовку username и userAvatar
+  profile.innerHTML = ''; // TODO: сделать точечную перерисовку username и userAvatar и микрофоны переработать логику
   const username = getUsername();
   const userAvatar = getAvatar();
   profile.appendChild(
