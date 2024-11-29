@@ -18,10 +18,10 @@ export async function setMyServersList() {
 // }
 
 // // Добавить новый сервер
-// export function addServer(server: serverDATA) {
-//   const currentServers = serverStore.getState().servers;
-//   serverStore.setState({ servers: [...currentServers, server] });
-// }
+export function addServer(server: serverDATA) {
+  const currentServers = serverStore.getState().servers;
+  serverStore.setState({ servers: [...currentServers, server] });
+}
 
 // // Обновить сервер по ID
 // export function updateServerById(

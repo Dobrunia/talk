@@ -1,5 +1,6 @@
 import { connectSocket } from '../../../app/api/socket/socket.ts';
 import { setMyServersList } from '../../../entities/server/model/actions.ts';
+import serverStore from '../../../entities/server/model/store.ts';
 import { updateMyInfo } from '../../../entities/user/model/actions.ts';
 import { userStore } from '../../../entities/user/model/store.ts';
 import { renderProfile } from '../../profile/ui/myProfile.ts';
@@ -122,6 +123,7 @@ export async function logInRender() {
   renderProfile();
   renderProfileModal();
   await setMyServersList();
+  serverStore.subscribe(renderServersList);
   renderServersList();
   renderSettingsModal();
   connectSocket();

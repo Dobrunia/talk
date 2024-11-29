@@ -10,6 +10,7 @@ const router = Router();
 router.get('/getAllMyServers', authMiddleware, serverController.getAllMyServers);
 router.get('/getMyServerInfoById/:serverId', authMiddleware, serverController.getMyServerInfoById);
 router.get('/getAllAvailableServers', authMiddleware, serverController.getAllAvailableServers);
+router.post('/joinServer', authMiddleware, serverController.joinServer);
 
 // Маршруты пользователя
 router.get('/getMyProfileInfo', authMiddleware, userController.getMyProfileInfo);

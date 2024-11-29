@@ -15,4 +15,9 @@ export const serverApi = {
     const response = await apiClient.get(`/getAllAvailableServers`);
     return response.data;
   },
+
+  async joinServer(serverId: string) {
+    const response = await apiClient.post('/joinServer', { serverId });
+    return response.data;
+  },
 };
