@@ -30,10 +30,22 @@
         <div class="server_components_block" id="server_components_block"></div>
         <div
           id="in_conversation_things"
-          class="w-full h-[60px] flex items-center justify-center hidden bg-[#1A1B1E]"
+          class="w-full h-[60px] flex items-center justify-between px-3 hidden bg-[#1A1B1E]"
         >
-          <button id="leave_button" onclick="voiceChannelLeave()">
-            Покинуть канал
+          <div id="networkIndicator" class="flex items-center space-x-1">
+            <!-- Полоска 1 -->
+            <div id="bar1" class="w-2 h-2 bg-green-500 rounded-full"></div>
+            <!-- Полоска 2 -->
+            <div id="bar2" class="w-2 h-4 bg-green-500 rounded-full"></div>
+            <!-- Полоска 3 -->
+            <div id="bar3" class="w-2 h-6 bg-green-500 rounded-full"></div>
+          </div>
+          <button
+            id="leave_button"
+            class="bg-gray-500 px-3 py-1 text-xs rounded-md hover:bg-gray-600"
+            onclick="voiceChannelLeave()"
+          >
+            Отключиться
           </button>
         </div>
         <div class="profile">

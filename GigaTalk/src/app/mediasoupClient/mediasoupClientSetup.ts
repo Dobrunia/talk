@@ -1,11 +1,23 @@
 import { Device } from 'mediasoup-client';
 import { Socket } from 'socket.io-client';
-import { RtpCapabilities, Transport, Producer, Consumer } from 'mediasoup-client/lib/types';
+import {
+  RtpCapabilities,
+  Transport,
+  Producer,
+  Consumer,
+} from 'mediasoup-client/lib/types';
 import SVG from '../ui/svgs.ts';
 import { createVolumeAnalyser } from './volumeController.ts';
 import { emitMediasoupEvent } from '../api/socket/socket.ts';
-import { toggleCamera, toggleFullscreen } from '../../entities/camera/model/actions.ts';
+import {
+  toggleCamera,
+  toggleFullscreen,
+} from '../../entities/camera/model/actions.ts';
 import { getUserId } from '../../entities/user/model/selectors.ts';
+import {
+  checkTransportStatus,
+  updateNetworkIndicator,
+} from '../../features/networkIndicator/model/actions.ts';
 
 let audioProducer: Producer | null = null;
 let videoProducer: Producer | null = null;
@@ -185,15 +197,31 @@ async function createTransport(socket: Socket): Promise<void> {
       return;
     }
 
+    // setInterval(() => {
+    //   const networkQuality = Math.random();
+    //   if (networkQuality < 0.3) {
+    //     updateNetworkIndicator('poor'); // Красный индикатор
+    //   } else if (networkQuality < 0.7) {
+    //     updateNetworkIndicator('average'); // Желтый индикатор
+    //   } else {
+    //     updateNetworkIndicator('good'); // Зеленый индикатор
+    //   }
+    // }, 5000);
+
     // Save the transport and set up event handlers
     if (!sendTransport) {
       sendTransport = device.createSendTransport(responseSend);
       await setupTransportEventHandlers(socket, sendTransport, 'sendTransport');
+      sendTransport.on('connectionstatechange', () =>
+        checkTransportStatus(sendTransport),
+      );
     }
     if (!recvTransport) {
       recvTransport = device.createRecvTransport(responseRecv);
-
       await setupTransportEventHandlers(socket, recvTransport, 'recvTransport');
+      recvTransport.on('connectionstatechange', () =>
+        checkTransportStatus(recvTransport),
+      );
     }
   } catch (error) {
     console.error('Failed to create transport:', error);
@@ -205,6 +233,10 @@ async function setupTransportEventHandlers(
   transport: Transport,
   type: string,
 ) {
+  transport.on('connectionstatechange', (state) => {
+    checkTransportStatus(transport);
+  });
+
   transport.on('connect', async ({ dtlsParameters }, callback, errback) => {
     socket.emit(
       'mediasoup',

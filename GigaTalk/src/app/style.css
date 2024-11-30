@@ -329,3 +329,20 @@ svg.muted path {
 .button-error {
   @apply px-3 py-1 text-xs rounded-md cursor-not-allowed bg-red-600 text-white;
 }
+
+/* NetworkIndicator */
+/* .networkIndicator {
+  @apply flex items-center space-x-1
+}
+
+.bar1 {
+  @apply w-2 h-2 bg-green-500 rounded-full
+}
+
+.bar2 {
+  @apply w-2 h-4 bg-green-500 rounded-full
+}
+
+.bar3 {
+  @apply w-2 h-6 bg-green-500 rounded-full
+} */
