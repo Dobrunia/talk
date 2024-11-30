@@ -9,7 +9,7 @@ export function renderAuthModal() {
   modalContent.className = 'modal-content';
 
   const header = document.createElement('div');
-  header.className = 'modal-header';
+  header.className = 'modal-header-auth';
 
   const loginTab = document.createElement('button');
   loginTab.id = 'loginTab';

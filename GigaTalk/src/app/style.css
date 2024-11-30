@@ -220,6 +220,10 @@ svg.muted path {
   @apply flex justify-center mb-4;
 }
 
+.modal-header-auth {
+  @apply flex justify-between mb-4;
+}
+
 /* ====== Базовые стили для формы ====== */
 .modal-form {
   @apply space-y-4;
