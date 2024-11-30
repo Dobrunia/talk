@@ -14,10 +14,7 @@ import {
   toggleFullscreen,
 } from '../../entities/camera/model/actions.ts';
 import { getUserId } from '../../entities/user/model/selectors.ts';
-import {
-  checkTransportStatus,
-  updateNetworkIndicator,
-} from '../../features/networkIndicator/model/actions.ts';
+import { updateNetworkIndicator } from '../../features/networkIndicator/model/actions.ts';
 
 let audioProducer: Producer | null = null;
 let videoProducer: Producer | null = null;
@@ -202,26 +199,20 @@ async function createTransport(socket: Socket): Promise<void> {
     //   if (networkQuality < 0.3) {
     //     updateNetworkIndicator('poor'); // Красный индикатор
     //   } else if (networkQuality < 0.7) {
-    //     updateNetworkIndicator('average'); // Желтый индикатор
+    //     updateNetworkIndicator('fair'); // Желтый индикатор
     //   } else {
-    //     updateNetworkIndicator('good'); // Зеленый индикатор
+    //     updateNetworkIndicator('bad'); // Зеленый индикатор
     //   }
     // }, 5000);
 
     // Save the transport and set up event handlers
     if (!sendTransport) {
       sendTransport = device.createSendTransport(responseSend);
-      await setupTransportEventHandlers(socket, sendTransport, 'sendTransport');
-      sendTransport.on('connectionstatechange', () =>
-        checkTransportStatus(sendTransport),
-      );
+      await setupTransportEventHandlers(socket, sendTransport, 'sendTransport'); 
     }
     if (!recvTransport) {
       recvTransport = device.createRecvTransport(responseRecv);
       await setupTransportEventHandlers(socket, recvTransport, 'recvTransport');
-      recvTransport.on('connectionstatechange', () =>
-        checkTransportStatus(recvTransport),
-      );
     }
   } catch (error) {
     console.error('Failed to create transport:', error);
@@ -233,9 +224,6 @@ async function setupTransportEventHandlers(
   transport: Transport,
   type: string,
 ) {
-  transport.on('connectionstatechange', (state) => {
-    checkTransportStatus(transport);
-  });
 
   transport.on('connect', async ({ dtlsParameters }, callback, errback) => {
     socket.emit(
@@ -322,6 +310,12 @@ async function startSendingMedia(socket: Socket) {
 }
 
 function cleanUpTransports() {
+  // Очищаем интервал сбора сетевых метрик
+  // if (networkStatsIntervalId) {
+  //   clearInterval(networkStatsIntervalId);
+  //   networkStatsIntervalId = null;
+  //   console.log('Network stats interval cleared');
+  // }
   // Close the send transport if it's active
   if (sendTransport) {
     sendTransport.removeAllListeners();
