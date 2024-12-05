@@ -285,7 +285,10 @@ async function startSendingMedia(socket: Socket) {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: true,
-      audio: true,
+      audio: {
+        echoCancellation: true, // Подавление эха
+        noiseSuppression: true, // Подавление шума
+      },
     });
 
     for (const track of stream.getTracks()) {
