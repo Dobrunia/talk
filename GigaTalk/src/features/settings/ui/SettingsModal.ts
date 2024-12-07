@@ -62,7 +62,7 @@ export async function renderSettingsModal() {
   const closeButton = document.createElement('button');
   closeButton.textContent = 'Закрыть';
   closeButton.className = 'button button-secondary';
-  closeButton.onclick = () => settingsModal.classList.add('hidden');
+  closeButton.onclick = () => closeSettingsModal();
   modalContent.appendChild(closeButton);
 
   settingsModal.appendChild(modalContent);
@@ -89,5 +89,12 @@ export async function renderSettingsModal() {
     });
   } catch (error) {
     console.error('Ошибка при получении устройств:', error);
+  }
+}
+
+export function closeSettingsModal() {
+  const settingsModal = document.getElementById('settingsModal');
+  if (settingsModal) {
+    settingsModal.classList.add('hidden');
   }
 }

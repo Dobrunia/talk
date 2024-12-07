@@ -6,7 +6,7 @@ import { userStore } from '../../../entities/user/model/store.ts';
 import { renderProfile } from '../../profile/ui/myProfile.ts';
 import { renderProfileModal } from '../../profile/ui/ProfileModal.ts';
 import { renderServersList } from '../../serverComponent/model/actions.ts';
-import { renderSettingsModal } from '../../settings/ui/SettingsModal.ts';
+import { closeSettingsModal, renderSettingsModal } from '../../settings/ui/SettingsModal.ts';
 import { authApi } from '../api.ts';
 import { closeAuthModal, openAuthModal, showLogin } from '../ui/AuthModal.ts';
 
@@ -133,6 +133,8 @@ export async function logInRender() {
 export function logOut() {
   localStorage.removeItem('token');
   userStore.resetState();
+  serverStore.resetState();
+  closeSettingsModal();
   openAuthModal();
   //window.location.reload(); // Обновление страницы для удаления всех сессий и кэшированных данных
 }

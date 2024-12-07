@@ -6,10 +6,12 @@ type ServerState = {
 };
 
 const serverStore = (() => {
-  let state: ServerState = {
+  const initialState: ServerState = {
     servers: [],
     currentServer: null,
   };
+
+  let state: ServerState = { ...initialState };
 
   const listeners: Array<(state: ServerState) => void> = [];
 
@@ -19,6 +21,10 @@ const serverStore = (() => {
     },
     setState(newState: Partial<ServerState>) {
       state = { ...state, ...newState };
+      listeners.forEach((listener) => listener(state));
+    },
+    resetState() {
+      state = { ...initialState };
       listeners.forEach((listener) => listener(state));
     },
     subscribe(listener: (state: ServerState) => void) {
