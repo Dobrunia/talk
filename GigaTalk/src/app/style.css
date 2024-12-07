@@ -169,7 +169,7 @@ svg.muted path {
 
 .playVideoBtn {
   transform: translate(-50%, -50%);
-  @apply absolute top-[50%] left-[50%] z-[1] rounded-full bg-blue-500 px-2 py-1 font-semibold;
+  @apply absolute top-[50%] left-[50%] rounded-full bg-blue-500 px-2 py-1 font-semibold;
 }
 
 .playVideoBtn:hover {

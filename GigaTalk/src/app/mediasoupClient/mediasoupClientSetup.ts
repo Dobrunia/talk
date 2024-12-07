@@ -14,7 +14,6 @@ import {
   toggleFullscreen,
 } from '../../entities/camera/model/actions.ts';
 import { getUserId } from '../../entities/user/model/selectors.ts';
-import { updateNetworkIndicator } from '../../features/networkIndicator/model/actions.ts';
 
 let audioProducer: Producer | null = null;
 let videoProducer: Producer | null = null;
@@ -41,7 +40,7 @@ export async function joinMediasoupRoom(
       await initializeDevice(response.rtpCapabilities);
       await createTransport(socket);
 
-      await startSendingMedia(socket);
+      await startSendingMedia();
       socket.emit('mediasoup', {
         type: 'createConsumersForClient',
         payload: { rtpCapabilities: response.rtpCapabilities },
@@ -281,7 +280,7 @@ async function setupTransportEventHandlers(
   }
 }
 
-async function startSendingMedia(socket: Socket) {
+async function startSendingMedia() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: true,
