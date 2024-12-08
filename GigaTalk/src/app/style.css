@@ -330,9 +330,10 @@ svg.muted path {
   @apply px-3 py-1 text-xs rounded-md cursor-not-allowed bg-red-600 text-white;
 }
 
+/* MediaControls */
 /* NetworkIndicator */
-/* .networkIndicator {
-  @apply flex items-center space-x-1
+.networkIndicator {
+  @apply flex items-center space-x-1 px-2 py-1 rounded-md
 }
 
 .bar1 {
@@ -345,7 +346,7 @@ svg.muted path {
 
 .bar3 {
   @apply w-2 h-6 bg-green-500 rounded-full
-} */
+}
 
 #leave_button:hover {
   animation: shake 0.3s ease-in-out; /* Длительность и плавность */

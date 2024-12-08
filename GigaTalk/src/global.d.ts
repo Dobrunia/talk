@@ -2,6 +2,6 @@ export {};
 
 declare global {
   interface Window {
-    voiceChannelLeave: typeof voiceChannelLeave;
+    // voiceChannelLeave: typeof voiceChannelLeave;
   }
 }

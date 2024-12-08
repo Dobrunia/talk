@@ -7,25 +7,30 @@ import {
   Consumer,
 } from 'mediasoup-client/lib/types';
 import SVG from '../ui/svgs.ts';
-import { createVolumeAnalyser } from './volumeController.ts';
 import { emitMediasoupEvent } from '../api/socket/socket.ts';
 import {
   toggleCamera,
   toggleFullscreen,
 } from '../../entities/camera/model/actions.ts';
 import { getUserId } from '../../entities/user/model/selectors.ts';
+import {
+  createAudioConsumer,
+  createAudioTrack,
+} from './services/audioTrackService.ts';
+import {
+  createVideoConsumer,
+  createVideoTrack,
+} from './services/videoTrackService.ts';
 
-let audioProducer: Producer | null = null;
-let videoProducer: Producer | null = null;
 export const consumers: Consumer[] = []; // Для хранения всех консьюмеров
-
-export function getAudioProducer(): Producer | null {
-  return audioProducer;
-}
 
 let device: Device;
 let sendTransport: Transport | null;
 let recvTransport: Transport | null;
+
+export function getSendTransport(): Transport | null {
+  return sendTransport;
+}
 
 export async function joinMediasoupRoom(
   socket: Socket,
@@ -39,8 +44,8 @@ export async function joinMediasoupRoom(
     if (response.rtpCapabilities) {
       await initializeDevice(response.rtpCapabilities);
       await createTransport(socket);
+      await createAudioTrack(sendTransport);
 
-      await startSendingMedia();
       socket.emit('mediasoup', {
         type: 'createConsumersForClient',
         payload: { rtpCapabilities: response.rtpCapabilities },
@@ -60,92 +65,10 @@ export async function joinMediasoupRoom(
             consumers.push(consumer); // Сохраняем consumer
             console.log('New consumer added:', consumer.id);
 
-            let mediaElement: HTMLVideoElement | HTMLAudioElement;
             if (consumer.kind === 'video') {
-              // Создаем контейнер для видео и кнопки
-              const videoContainer = document.createElement('div');
-              videoContainer.classList.add(
-                'videoContainer',
-                'mediaEl',
-                `mediaEl_${consumerData.producerUserId}`,
-              );
-
-              // Создаем видео элемент
-              mediaElement = document.createElement('video');
-              mediaElement.classList.add('remoteVideo');
-              mediaElement.autoplay = false; // Видео не воспроизводится автоматически
-              mediaElement.srcObject = new MediaStream([consumer.track]);
-
-              // Создаем кнопку для воспроизведения видео
-              const playButton = document.createElement('button');
-              playButton.classList.add('playVideoBtn');
-              playButton.textContent = 'Смотреть камеру';
-
-              // Создаем кнопку для паузы просмотра видео
-              const pauseButton = document.createElement('button');
-              pauseButton.classList.add('pauseVideoBtn', 'hidden');
-              pauseButton.textContent = 'прекратить просмотр';
-
-              const fullscreenBtn = document.createElement('button');
-              fullscreenBtn.classList.add('fullscreenBtn', 'hidden');
-              fullscreenBtn.innerHTML = SVG.fullscreen;
-
-              // Логика воспроизведения видео при нажатии кнопки
-              playButton.addEventListener('click', () => {
-                toggleCamera(
-                  mediaElement as HTMLVideoElement,
-                  playButton,
-                  pauseButton,
-                  fullscreenBtn,
-                );
-              });
-
-              // Логика для паузы просмотра видео при нажатии кнопки
-              pauseButton.addEventListener('click', () => {
-                toggleCamera(
-                  mediaElement as HTMLVideoElement,
-                  playButton,
-                  pauseButton,
-                  fullscreenBtn,
-                );
-              });
-
-              fullscreenBtn.addEventListener('click', () => {
-                toggleFullscreen(mediaElement as HTMLVideoElement);
-              });
-
-              // Добавляем видео и кнопку в контейнер
-              videoContainer.appendChild(mediaElement);
-              videoContainer.appendChild(playButton);
-              videoContainer.appendChild(pauseButton);
-              videoContainer.appendChild(fullscreenBtn);
-
-              // Добавляем контейнер в список
-              const mediaTracksList =
-                document.getElementById('media_tracks_list');
-              if (mediaTracksList) {
-                mediaTracksList.appendChild(videoContainer);
-              }
+              createVideoConsumer(consumer, consumerData.producerUserId);
             } else if (consumer.kind === 'audio') {
-              // Логика для аудио остается неизменной
-              mediaElement = document.createElement('audio');
-              mediaElement.classList.add(
-                'remoteAudio',
-                'mediaEl',
-                `mediaEl_${consumerData.producerUserId}`,
-              );
-              mediaElement.autoplay = true;
-              mediaElement.srcObject = new MediaStream([consumer.track]);
-
-              // Подключаем анализатор громкости
-              createVolumeAnalyser(consumer.track, consumerData.producerUserId);
-
-              // Добавляем аудио в список
-              const mediaTracksList =
-                document.getElementById('media_tracks_list');
-              if (mediaTracksList) {
-                mediaTracksList.appendChild(mediaElement);
-              }
+              createAudioConsumer(consumer, consumerData.producerUserId);
             }
 
             await consumer.resume();
@@ -207,7 +130,7 @@ async function createTransport(socket: Socket): Promise<void> {
     // Save the transport and set up event handlers
     if (!sendTransport) {
       sendTransport = device.createSendTransport(responseSend);
-      await setupTransportEventHandlers(socket, sendTransport, 'sendTransport'); 
+      await setupTransportEventHandlers(socket, sendTransport, 'sendTransport');
     }
     if (!recvTransport) {
       recvTransport = device.createRecvTransport(responseRecv);
@@ -223,7 +146,6 @@ async function setupTransportEventHandlers(
   transport: Transport,
   type: string,
 ) {
-
   transport.on('connect', async ({ dtlsParameters }, callback, errback) => {
     socket.emit(
       'mediasoup',
@@ -277,37 +199,6 @@ async function setupTransportEventHandlers(
         },
       );
     });
-  }
-}
-
-async function startSendingMedia() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: {
-        echoCancellation: true, // Подавление эха
-        noiseSuppression: true, // Подавление шума
-      },
-    });
-
-    for (const track of stream.getTracks()) {
-      if (track.kind === 'audio') {
-        audioProducer = await sendTransport!.produce({ track });
-        // Подключаем анализатор громкости
-        createVolumeAnalyser(track, getUserId() as string);
-        console.log('Audio producer created:', audioProducer.id);
-      } else if (track.kind === 'video') {
-        videoProducer = await sendTransport!.produce({ track });
-        console.log('Video producer created:', videoProducer.id);
-      }
-    }
-
-    console.log('Media stream sent');
-  } catch (error) {
-    console.error('Error sending media:', error);
-    alert(
-      'Access to camera and microphone denied. Check your browser settings.',
-    );
   }
 }
 

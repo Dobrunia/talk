@@ -3,12 +3,13 @@ import {
   toggleMicrophone,
   toggleSound,
   unmuteMicrophone,
-} from '../../entities/user/model/actions';
+} from '../../entities/user/model/actions.ts';
 import {
   isMicrophoneMuted,
   isSoundMuted,
-} from '../../entities/user/model/selectors';
-import { getAudioProducer, consumers } from './mediasoupClientSetup';
+} from '../../entities/user/model/selectors.ts';
+import { consumers } from './mediasoupClientSetup.ts';
+import { getAudioProducer } from './services/audioTrackService.ts';
 
 let audioProducer = getAudioProducer();
 

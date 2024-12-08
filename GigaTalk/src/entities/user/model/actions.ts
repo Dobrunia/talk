@@ -67,6 +67,11 @@ export function setCurrentChannel(channelId: string) {
   userStore.setState({ currentChannelId: channelId });
 }
 
+// Вышел из канала
+export function resetCurrentChannel() {
+  userStore.setState({ currentChannelId: null });
+}
+
 // Сбросить пользователя
 export function resetUser() {
   userStore.resetState();

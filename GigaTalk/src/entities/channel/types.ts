@@ -5,7 +5,3 @@ export type Channel = {
   name: string;
   type: channelType;
 };
-
-export type ChannelStoreState = {
-  currentChannel: Channel | null;
-};
