@@ -38,6 +38,7 @@ function createMyProfile(username: string, userAvatar: string): HTMLElement {
   // Кнопка микрофона
   const microButton = document.createElement('button');
   microButton.className = 'micro_button';
+  microButton.title = 'Отключить микрофон';
   microButton.innerHTML = SVG.micro;
   microButton.onclick = () => {
     toggleMicrophoneMute();
@@ -48,6 +49,7 @@ function createMyProfile(username: string, userAvatar: string): HTMLElement {
   // Кнопка наушников
   const headphonesButton = document.createElement('button');
   headphonesButton.className = 'headphones_button';
+  headphonesButton.title = 'Отключить звук';
   headphonesButton.innerHTML = SVG.headphones;
   headphonesButton.onclick = () => {
     toggleSoundMute();
