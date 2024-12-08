@@ -348,7 +348,15 @@ svg.muted path {
   @apply w-2 h-6 bg-green-500 rounded-full
 }
 
-#leave_button:hover {
+.send_track {
+  @apply px-2 py-1 rounded-md hover:bg-gray-600
+}
+
+.leave_button {
+  @apply px-2 py-1 rounded-md
+}
+
+.leave_button:hover {
   animation: shake 0.3s ease-in-out; /* Длительность и плавность */
 }
 

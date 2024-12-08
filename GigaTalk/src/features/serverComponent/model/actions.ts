@@ -1,10 +1,12 @@
-import { sendSocketMessage } from '../../../app/api/socket/socket.ts';
+import { handleJoinMediasoupRoom, sendSocketMessage } from '../../../app/api/socket/socket.ts';
 import SVG from '../../../app/ui/svgs.ts';
-import { voiceChannelClick } from '../../../entities/channel/model/actions.ts';
 import { Channel } from '../../../entities/channel/types.ts';
 import { serverApi } from '../../../entities/server/api.ts';
 import { getAllServers } from '../../../entities/server/model/selectors.ts';
 import { Category, serverDATA } from '../../../entities/server/types.ts';
+import { setCurrentChannel } from '../../../entities/user/model/actions.ts';
+import { getCurrentChannel } from '../../../entities/user/model/selectors.ts';
+import { createMediaControls } from '../../mediaControls/ui/mediaControls.ts';
 import { addServerElement, createServerListElement } from '../ui/components.ts';
 
 function renderServerInfo(serverData: serverDATA) {
@@ -77,6 +79,22 @@ function toggleCategory(
     channelList.style.display = 'none';
     toggleIcon.textContent = '+';
   }
+}
+
+async function voiceChannelClick(channelId: string) {
+  let currentChannelId = getCurrentChannel();
+  if (channelId === currentChannelId) {
+    console.log('Вы уже в этом канале');
+    return;
+  }
+  setCurrentChannel(channelId);
+  sendSocketMessage({
+    type: 'join_channel',
+    channelId,
+  });
+  handleJoinMediasoupRoom(channelId);
+  createMediaControls();
+  document.getElementById('in_conversation_things')?.classList.remove('hidden');
 }
 
 function createChannelItem(channel: Channel): HTMLElement {

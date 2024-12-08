@@ -1,4 +1,4 @@
-import { Channel } from "../channel/types.ts";
+import { Channel } from '../channel/types.ts';
 
 export type serverDATA = {
   id: string;

@@ -6,21 +6,12 @@ import {
   Producer,
   Consumer,
 } from 'mediasoup-client/lib/types';
-import SVG from '../ui/svgs.ts';
 import { emitMediasoupEvent } from '../api/socket/socket.ts';
-import {
-  toggleCamera,
-  toggleFullscreen,
-} from '../../entities/camera/model/actions.ts';
-import { getUserId } from '../../entities/user/model/selectors.ts';
 import {
   createAudioConsumer,
   createAudioTrack,
 } from './services/audioTrackService.ts';
-import {
-  createVideoConsumer,
-  createVideoTrack,
-} from './services/videoTrackService.ts';
+import { createVideoConsumer } from './services/videoTrackService.ts';
 
 export const consumers: Consumer[] = []; // Для хранения всех консьюмеров
 
