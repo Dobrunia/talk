@@ -7,6 +7,7 @@ import {
 import SVG from '../../ui/svgs.ts';
 
 let videoProducer: Producer | null = null;
+let videoStream: MediaStream;
 
 function toggleCamera(
   mediaElement: HTMLVideoElement,
@@ -62,10 +63,10 @@ export async function createVideoTrack(
 ) {
   if (!sendTransport) return;
   try {
-    const mediaStream = await navigator.mediaDevices.getUserMedia({
+    videoStream = await navigator.mediaDevices.getUserMedia({
       video: true,
     });
-    const track = mediaStream.getVideoTracks()[0];
+    const track = videoStream.getVideoTracks()[0];
     videoProducer = await sendTransport.produce({ track });
     console.log('Video producer created:', videoProducer.id);
   } catch (error) {
@@ -108,26 +109,16 @@ export function createVideoConsumer(
 
   // Логика воспроизведения видео при нажатии кнопки
   playButton.addEventListener('click', () => {
-    toggleCamera(
-      mediaElement as HTMLVideoElement,
-      playButton,
-      pauseButton,
-      fullscreenBtn,
-    );
+    toggleCamera(mediaElement, playButton, pauseButton, fullscreenBtn);
   });
 
   // Логика для паузы просмотра видео при нажатии кнопки
   pauseButton.addEventListener('click', () => {
-    toggleCamera(
-      mediaElement as HTMLVideoElement,
-      playButton,
-      pauseButton,
-      fullscreenBtn,
-    );
+    toggleCamera(mediaElement, playButton, pauseButton, fullscreenBtn);
   });
 
   fullscreenBtn.addEventListener('click', () => {
-    toggleFullscreen(mediaElement as HTMLVideoElement);
+    toggleFullscreen(mediaElement);
   });
 
   // Добавляем видео и кнопку в контейнер
@@ -140,5 +131,18 @@ export function createVideoConsumer(
   const mediaTracksList = document.getElementById('media_tracks_list');
   if (mediaTracksList) {
     mediaTracksList.appendChild(videoContainer);
+  }
+}
+
+export function closeVideoProducer() {
+  if (videoProducer) {
+    videoProducer.close();
+    console.log('Video producer closed');
+  }
+
+  // Останавливаем треки, связанные с MediaStream
+  if (videoStream) {
+    videoStream.getTracks().forEach((track) => track.stop());
+    console.log('All media tracks stopped');
   }
 }

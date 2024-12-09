@@ -352,6 +352,10 @@ svg.muted path {
   @apply px-2 py-1 rounded-md hover:bg-gray-600
 }
 
+.stream_on {
+  @apply bg-gray-600
+}
+
 .leave_button {
   @apply px-2 py-1 rounded-md
 }

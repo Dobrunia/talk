@@ -1,6 +1,6 @@
 import SVG from '../../../app/ui/svgs.ts';
 import { createNetworkIndicator } from '../../networkIndicator/ui/NetworkIndicator.ts';
-import { sendVideo, voiceChannelLeave } from '../model/actions.ts';
+import { toggleCameraStream, voiceChannelLeave } from '../model/actions.ts';
 
 export function createMediaControls() {
   const wrapper = document.getElementById('in_conversation_things');
@@ -17,6 +17,9 @@ function createScreenShareBtn(): HTMLButtonElement {
   screenShareButton.className = 'send_track';
   screenShareButton.title = 'Продемонстрируйте свой экран';
   screenShareButton.innerHTML = SVG.screen_share;
+  screenShareButton.onclick = () => {
+    screenShareButton.classList.toggle('stream_on');
+  };
 
   return screenShareButton;
 }
@@ -26,7 +29,10 @@ function createCameraShareBtn(): HTMLButtonElement {
   cameraShareButton.className = 'send_track';
   cameraShareButton.title = 'Включить камеру';
   cameraShareButton.innerHTML = SVG.camera_share;
-  cameraShareButton.onclick = sendVideo;
+  cameraShareButton.onclick = () => {
+    toggleCameraStream();
+    cameraShareButton.classList.toggle('stream_on');
+  };
 
   return cameraShareButton;
 }
