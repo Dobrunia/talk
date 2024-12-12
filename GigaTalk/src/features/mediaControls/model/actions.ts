@@ -2,14 +2,14 @@ import { sendSocketMessage } from '../../../app/api/socket/socket.ts';
 import { getSendTransport } from '../../../app/mediasoupClient/mediasoupClientSetup.ts';
 import {
   closeVideoProducer,
-  createVideoTrack,
+  createVideoProducer,
 } from '../../../app/mediasoupClient/services/videoTrackService.ts';
 import { resetCurrentChannel } from '../../../entities/user/model/actions.ts';
 import { mediaStore } from './store.ts';
 
 async function startVideoStream() {
   const sendTransport = getSendTransport();
-  await createVideoTrack(sendTransport);
+  await createVideoProducer(sendTransport);
   console.log('sendVideo');
 }
 

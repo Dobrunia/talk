@@ -3,7 +3,6 @@ import { Socket } from 'socket.io-client';
 import {
   RtpCapabilities,
   Transport,
-  Producer,
   Consumer,
 } from 'mediasoup-client/lib/types';
 import { emitMediasoupEvent } from '../api/socket/socket.ts';
@@ -11,7 +10,7 @@ import {
   createAudioConsumer,
   createAudioTrack,
 } from './services/audioTrackService.ts';
-import { createVideoConsumer } from './services/videoTrackService.ts';
+import { createVideoConsumer } from '../../features/mediaPreviewElements/ui/video.ts';
 
 export const consumers: Consumer[] = []; // Для хранения всех консьюмеров
 
@@ -53,16 +52,28 @@ export async function joinMediasoupRoom(
               rtpParameters: consumerData.rtpParameters,
             });
 
+            // Подписываемся на события consumer
+            consumer.on('close', () => {
+              console.log(`Consumer ${consumer.id} closed by server`);
+              // Выполняем действия, например, удаляем из DOM
+            });
+
+            consumer.on('pause', () => {
+              console.log(`Consumer ${consumer.id} paused by server`);
+              // Реакция на остановку передачи
+            });
+
             consumers.push(consumer); // Сохраняем consumer
             console.log('New consumer added:', consumer.id);
 
             if (consumer.kind === 'video') {
               createVideoConsumer(consumer, consumerData.producerUserId);
+              consumer.pause();
             } else if (consumer.kind === 'audio') {
               createAudioConsumer(consumer, consumerData.producerUserId);
+              consumer.resume();
             }
 
-            await consumer.resume();
             console.log(`Consumer ${consumer.id} created and streaming`);
           } catch (error) {
             console.error('Error creating consumer:', error);

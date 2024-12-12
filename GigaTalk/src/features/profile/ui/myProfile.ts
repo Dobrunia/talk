@@ -1,13 +1,13 @@
 import {
+  getIsMicrophoneMuted,
+  getIsSoundMuted,
   toggleMicrophoneMute,
   toggleSoundMute,
-} from '../../../app/mediasoupClient/muteControls.ts';
+} from '../../../app/mediasoupClient/services/audioTrackService.ts';
 import SVG from '../../../app/ui/svgs.ts';
 import {
   getAvatar,
   getUsername,
-  isMicrophoneMuted,
-  isSoundMuted,
 } from '../../../entities/user/model/selectors.ts';
 import { openProfileModal } from '../model/actions.ts';
 
@@ -42,7 +42,7 @@ function createMyProfile(username: string, userAvatar: string): HTMLElement {
   microButton.innerHTML = SVG.micro;
   microButton.onclick = () => {
     toggleMicrophoneMute();
-    toggleMicVisual();
+    micVisual();
   };
   profileButtons.appendChild(microButton);
 
@@ -53,8 +53,8 @@ function createMyProfile(username: string, userAvatar: string): HTMLElement {
   headphonesButton.innerHTML = SVG.headphones;
   headphonesButton.onclick = () => {
     toggleSoundMute();
-    toggleSoundVisual();
-    // toggleMicVisual();
+    soundVisual();
+    micVisual();
   };
   profileButtons.appendChild(headphonesButton);
 
@@ -77,12 +77,12 @@ export function renderProfile() {
   );
 }
 
-function toggleMicVisual() {
+function micVisual() {
   const micButtons = document.getElementsByClassName('micro');
   if (!micButtons.length) return;
 
   Array.from(micButtons).forEach((micButton) => {
-    if (isMicrophoneMuted()) {
+    if (getIsMicrophoneMuted()) {
       micButton.classList.add('muted');
     } else {
       micButton.classList.remove('muted');
@@ -90,12 +90,12 @@ function toggleMicVisual() {
   });
 }
 
-function toggleSoundVisual() {
+function soundVisual() {
   const soundButtons = document.getElementsByClassName('headphones');
   if (!soundButtons.length) return;
 
   Array.from(soundButtons).forEach((soundButton) => {
-    if (isSoundMuted()) {
+    if (getIsSoundMuted()) {
       soundButton.classList.add('muted');
     } else {
       soundButton.classList.remove('muted');

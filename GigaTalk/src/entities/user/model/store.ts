@@ -6,8 +6,6 @@ const initialState: UserStore = {
   name: null,
   avatar: null,
   currentChannelId: null,
-  isMicrophoneMuted: false,
-  isSoundMuted: false,
 };
 
 // Глобальное состояние пользователя
