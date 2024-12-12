@@ -155,12 +155,21 @@ svg.muted path {
 }
 
 .media_tracks {
-  @apply w-full h-full flex items-center justify-center;
+  @apply w-full h-full flex flex-col items-center justify-center;
+}
+
+.consumers_media {
+  height: calc(100% - 280px);
+  @apply w-full flex flex-col items-center justify-center
+}
+
+.myMedia {
+  @apply w-full h-[280px] flex items-center justify-around border-server_components_dg border-t-4
 }
 
 .videoContainer {
   /* 16/9 */
-  @apply w-[320px] min-h-[180px] h-max relative rounded-lg mr-[8px] mb-[8px] bg-servers_list_dg overflow-hidden;
+  @apply w-[320px] min-h-[180px] h-[240px] relative rounded-lg mr-[8px] mb-[8px] bg-servers_list_dg overflow-hidden;
 }
 
 .remoteVideo {

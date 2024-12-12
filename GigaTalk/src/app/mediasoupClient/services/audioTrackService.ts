@@ -62,7 +62,7 @@ export function createAudioConsumer(
   createVolumeAnalyser(consumer.track, producerUserId);
 
   // Добавляем аудио в список
-  const mediaTracksList = document.getElementById('media_tracks_list');
+  const mediaTracksList = document.getElementById('consumers_media');
   if (mediaTracksList) {
     mediaTracksList.appendChild(mediaElement);
   }

@@ -3,19 +3,23 @@ import { getSendTransport } from '../../../app/mediasoupClient/mediasoupClientSe
 import {
   closeVideoProducer,
   createVideoProducer,
+  startMyVideoPreview,
 } from '../../../app/mediasoupClient/services/videoTrackService.ts';
 import { resetCurrentChannel } from '../../../entities/user/model/actions.ts';
+import { stopMyVideoPreview } from '../../mediaPreviewElements/ui/video.ts';
 import { mediaStore } from './store.ts';
 
 async function startVideoStream() {
   const sendTransport = getSendTransport();
   await createVideoProducer(sendTransport);
-  console.log('sendVideo');
+  startMyVideoPreview();
+  console.log('startVideoStream');
 }
 
 function stopVideoStream() {
   closeVideoProducer();
-  console.log('Stream off');
+  stopMyVideoPreview(); //TODO: уведомление другим о удалении элемента
+  console.log('stopVideoStream');
 }
 
 export function voiceChannelLeave() {

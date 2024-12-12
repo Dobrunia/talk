@@ -1,6 +1,9 @@
 import { AppData, Consumer } from 'mediasoup-client/lib/types';
 import SVG from '../../../app/ui/svgs.ts';
-import { pauseVideoConsumer, resumeVideoConsumer } from '../model/videoActions.ts';
+import {
+  pauseVideoConsumer,
+  resumeVideoConsumer,
+} from '../model/videoActions.ts';
 
 function toggleCamera(
   mediaElement: HTMLVideoElement,
@@ -97,8 +100,56 @@ export function createVideoConsumer(
   videoContainer.appendChild(pauseButton);
   videoContainer.appendChild(fullscreenBtn);
 
-  const mediaTracksList = document.getElementById('media_tracks_list');
+  const mediaTracksList = document.getElementById('consumers_media');
   if (mediaTracksList) {
     mediaTracksList.appendChild(videoContainer);
   }
+}
+
+export function createMyVideoElement(track: MediaStreamTrack) {
+  let myMediaElement: HTMLVideoElement;
+  // Создаем контейнер для видео и кнопки
+  const videoContainer = document.createElement('div');
+  videoContainer.id = 'myVideoEl';
+  videoContainer.classList.add('videoContainer', 'mediaEl');
+
+  myMediaElement = document.createElement('video');
+  myMediaElement.classList.add('remoteVideo');
+  myMediaElement.autoplay = false;
+  myMediaElement.srcObject = new MediaStream([track]);
+
+  const playButton = document.createElement('button');
+  playButton.classList.add('playVideoBtn');
+  playButton.textContent = 'Смотреть мою камеру';
+  playButton.onclick = () => {
+    toggleCamera(myMediaElement, playButton, pauseButton, fullscreenBtn);
+  };
+
+  const pauseButton = document.createElement('button');
+  pauseButton.classList.add('pauseVideoBtn', 'hidden');
+  pauseButton.textContent = 'прекратить просмотр';
+  pauseButton.onclick = () => {
+    toggleCamera(myMediaElement, playButton, pauseButton, fullscreenBtn);
+  };
+
+  const fullscreenBtn = document.createElement('button');
+  fullscreenBtn.classList.add('fullscreenBtn', 'hidden');
+  fullscreenBtn.innerHTML = SVG.fullscreen;
+  fullscreenBtn.onclick = () => {
+    toggleFullscreen(myMediaElement);
+  };
+
+  videoContainer.appendChild(myMediaElement);
+  videoContainer.appendChild(playButton);
+  videoContainer.appendChild(pauseButton);
+  videoContainer.appendChild(fullscreenBtn);
+
+  const mediaTracksList = document.getElementById('myMedia');
+  if (mediaTracksList) {
+    mediaTracksList.appendChild(videoContainer);
+  }
+}
+
+export function stopMyVideoPreview() {
+  document.getElementById(`myVideoEl`)?.remove();
 }

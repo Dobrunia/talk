@@ -1,11 +1,9 @@
-import {
-  AppData,
-  Producer,
-  Transport,
-} from 'mediasoup-client/lib/types';
+import { AppData, Producer, Transport } from 'mediasoup-client/lib/types';
+import { createMyVideoElement } from '../../../features/mediaPreviewElements/ui/video.ts';
 
 let videoProducer: Producer | null = null;
 let videoStream: MediaStream;
+let track: MediaStreamTrack;
 
 export async function createVideoProducer(
   sendTransport: Transport<AppData> | null,
@@ -15,7 +13,7 @@ export async function createVideoProducer(
     videoStream = await navigator.mediaDevices.getUserMedia({
       video: true,
     });
-    const track = videoStream.getVideoTracks()[0];
+    track = videoStream.getVideoTracks()[0];
     videoProducer = await sendTransport.produce({ track });
     console.log('Video producer created:', videoProducer.id);
   } catch (error) {
@@ -33,5 +31,11 @@ export function closeVideoProducer() {
   if (videoStream) {
     videoStream.getTracks().forEach((track) => track.stop());
     console.log('All media tracks stopped');
+  }
+}
+
+export function startMyVideoPreview() {
+  if (track) {
+    createMyVideoElement(track);
   }
 }
