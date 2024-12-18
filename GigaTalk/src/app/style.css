@@ -86,6 +86,7 @@
 }
 
 .category_header {
+  user-select: none; /* Отключает выделение текста */
   @apply flex justify-between items-center italic rounded-md p-[4px] hover:bg-[#2f3136];
 }
 
