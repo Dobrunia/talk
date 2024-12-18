@@ -40,7 +40,7 @@ export function createMyServerElement(): HTMLElement {
 export function createServerListElement(server: serverDATA): HTMLElement {
   const serverDiv = document.createElement('div');
   serverDiv.className = 'server_list_element';
-  serverDiv.style.backgroundImage = `url(${server.imageUrl})`;
+  serverDiv.style.backgroundImage = server.imageUrl ? `url(${server.imageUrl})` : `url(./question-mark.svg`;
   serverDiv.onclick = () => serverClickHandler(server.id);
 
   const elementInfo = document.createElement('div');
