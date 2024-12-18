@@ -2,16 +2,16 @@ import { serverDATA } from "../../../entities/server/types.ts";
 import { renderAddServerModal } from "../../joinServerModal/model/model.ts";
 import { serverClickHandler } from "../model/actions.ts";
 
-export function addServerElement(): HTMLElement {
-  const addServerDiv = document.createElement('div');
-  addServerDiv.className = 'server_list_element add_server';
+export function joinServerElement(): HTMLElement {
+  const joinServerDiv = document.createElement('div');
+  joinServerDiv.className = 'server_list_element join_server';
 
   const elementInfo = document.createElement('div');
   elementInfo.className = 'element_info';
   elementInfo.textContent = 'Присоединиться к серверу';
 
-  addServerDiv.appendChild(elementInfo);
-  addServerDiv.onclick = () => {
+  joinServerDiv.appendChild(elementInfo);
+  joinServerDiv.onclick = () => {
     const addServerModal = document.getElementById('addServerModal');
     if (addServerModal) {
       addServerModal.classList.remove('hidden');
@@ -19,7 +19,7 @@ export function addServerElement(): HTMLElement {
       renderAddServerModal();
     }
   };
-  return addServerDiv;
+  return joinServerDiv;
 }
 
 // Создание элемента сервера

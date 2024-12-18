@@ -7,7 +7,7 @@ import { Category, serverDATA } from '../../../entities/server/types.ts';
 import { setCurrentChannel } from '../../../entities/user/model/actions.ts';
 import { getCurrentChannel } from '../../../entities/user/model/selectors.ts';
 import { createMediaControls } from '../../mediaControls/ui/mediaControls.ts';
-import { addServerElement, createServerListElement } from '../ui/components.ts';
+import { joinServerElement, createServerListElement } from '../ui/components.ts';
 
 function renderServerInfo(serverData: serverDATA) {
   const serverSlot = document.getElementById('server_components_block');
@@ -135,8 +135,8 @@ export function renderServersList(): void {
   // Очистка предыдущего содержимого
   serverListContainer.innerHTML = '';
 
-  // Добавление кнопки "Добавить сервер"
-  serverListContainer.appendChild(addServerElement());
+  // Добавление кнопки "Присоединиться к доступным серверам"
+  serverListContainer.appendChild(joinServerElement());
 
   let serversList = getAllServers();
   // Добавление серверов

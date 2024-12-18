@@ -36,7 +36,7 @@
   @apply w-[60px] h-[60px] rounded-md bg-[#EB4C42] my-default cursor-pointer relative bg-cover bg-center;
 }
 
-.add_server {
+.join_server {
   background-image: url('/add.svg');
   background-color: #6839c7;
 }
