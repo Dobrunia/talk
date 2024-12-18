@@ -1,12 +1,11 @@
 import { serverApi } from '../../../entities/server/api.ts';
 import { addServer } from '../../../entities/server/model/actions.ts';
-import { getAllServers } from '../../../entities/server/model/selectors.ts';
-import { addServerModal } from '../ui/AddServerModal.ts';
+import { joinServerModal } from '../ui/JoinServerModal.ts';
 
-export async function renderAddServerModal() {
+export async function renderJoinServerModal() {
   let servers = await serverApi.getAllAvailableServers();
   console.log(servers);
-  addServerModal(servers);
+  joinServerModal(servers);
 }
 
 export async function joinServerWithState(

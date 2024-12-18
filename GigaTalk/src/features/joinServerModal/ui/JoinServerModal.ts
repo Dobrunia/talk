@@ -1,9 +1,9 @@
 import { serverDATA } from '../../../entities/server/types.ts';
 import { joinServerWithState } from '../model/model.ts';
 
-export function addServerModal(servers: serverDATA[]) {
+export function joinServerModal(servers: serverDATA[]) {
   const modal = document.createElement('div');
-  modal.id = 'addServerModal';
+  modal.id = 'joinServerModal';
   modal.className = 'modal';
 
   const modalContent = document.createElement('div');

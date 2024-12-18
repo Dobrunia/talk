@@ -1,5 +1,5 @@
 import { serverDATA } from "../../../entities/server/types.ts";
-import { renderAddServerModal } from "../../joinServerModal/model/model.ts";
+import { renderJoinServerModal } from "../../joinServerModal/model/model.ts";
 import { serverClickHandler } from "../model/actions.ts";
 
 export function joinServerElement(): HTMLElement {
@@ -12,11 +12,11 @@ export function joinServerElement(): HTMLElement {
 
   joinServerDiv.appendChild(elementInfo);
   joinServerDiv.onclick = () => {
-    const addServerModal = document.getElementById('addServerModal');
-    if (addServerModal) {
-      addServerModal.classList.remove('hidden');
+    const joinServerModal = document.getElementById('joinServerModal');
+    if (joinServerModal) {
+      joinServerModal.classList.remove('hidden');
     } else {
-      renderAddServerModal();
+      renderJoinServerModal();
     }
   };
   return joinServerDiv;
