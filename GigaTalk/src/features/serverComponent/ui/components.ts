@@ -1,4 +1,5 @@
 import { serverDATA } from "../../../entities/server/types.ts";
+import { renderCreateServerModal } from "../../createServerModal/model/model.ts";
 import { renderJoinServerModal } from "../../joinServerModal/model/model.ts";
 import { serverClickHandler } from "../model/actions.ts";
 
@@ -20,6 +21,19 @@ export function joinServerElement(): HTMLElement {
     }
   };
   return joinServerDiv;
+}
+
+export function createMyServerElement(): HTMLElement {
+  const createServerDiv = document.createElement('div');
+  createServerDiv.className = 'server_list_element create_server';
+
+  const elementInfo = document.createElement('div');
+  elementInfo.className = 'element_info';
+  elementInfo.textContent = 'Создать свой сервер';
+
+  createServerDiv.appendChild(elementInfo);
+  createServerDiv.onclick = renderCreateServerModal;
+  return createServerDiv;
 }
 
 // Создание элемента сервера

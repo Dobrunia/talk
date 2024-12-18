@@ -33,12 +33,17 @@
 }
 
 .server_list_element {
-  @apply w-[60px] h-[60px] rounded-md bg-[#EB4C42] my-default cursor-pointer relative bg-cover bg-center;
+  @apply w-[60px] h-[60px] rounded-md bg-gray-600 my-default cursor-pointer relative bg-cover bg-center;
 }
 
 .join_server {
+  background-image: url('/search.svg');
+  @apply bg-blue-600
+}
+
+.create_server {
   background-image: url('/add.svg');
-  background-color: #6839c7;
+  @apply bg-blue-600
 }
 
 .element_info {

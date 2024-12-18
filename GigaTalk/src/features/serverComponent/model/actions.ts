@@ -1,4 +1,7 @@
-import { handleJoinMediasoupRoom, sendSocketMessage } from '../../../app/api/socket/socket.ts';
+import {
+  handleJoinMediasoupRoom,
+  sendSocketMessage,
+} from '../../../app/api/socket/socket.ts';
 import SVG from '../../../app/ui/svgs.ts';
 import { Channel } from '../../../entities/channel/types.ts';
 import { serverApi } from '../../../entities/server/api.ts';
@@ -7,7 +10,11 @@ import { Category, serverDATA } from '../../../entities/server/types.ts';
 import { setCurrentChannel } from '../../../entities/user/model/actions.ts';
 import { getCurrentChannel } from '../../../entities/user/model/selectors.ts';
 import { createMediaControls } from '../../mediaControls/ui/mediaControls.ts';
-import { joinServerElement, createServerListElement } from '../ui/components.ts';
+import {
+  joinServerElement,
+  createServerListElement,
+  createMyServerElement,
+} from '../ui/components.ts';
 
 function renderServerInfo(serverData: serverDATA) {
   const serverSlot = document.getElementById('server_components_block');
@@ -137,6 +144,9 @@ export function renderServersList(): void {
 
   // Добавление кнопки "Присоединиться к доступным серверам"
   serverListContainer.appendChild(joinServerElement());
+
+  // Добавление кнопки "Создать свой сервер"
+  serverListContainer.appendChild(createMyServerElement());
 
   let serversList = getAllServers();
   // Добавление серверов
