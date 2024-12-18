@@ -41,7 +41,14 @@ export function createServerListElement(server: serverDATA): HTMLElement {
   const serverDiv = document.createElement('div');
   serverDiv.className = 'server_list_element';
   serverDiv.style.backgroundImage = server.imageUrl ? `url(${server.imageUrl})` : `url(./question-mark.svg`;
-  serverDiv.onclick = () => serverClickHandler(server.id);
+  serverDiv.onclick = () => {
+    serverClickHandler(server.id);
+    const elements = document.querySelectorAll('.current_server_element');
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].classList.remove('current_server_element');
+    }
+    serverDiv.classList.add('current_server_element');
+  };
 
   const elementInfo = document.createElement('div');
   elementInfo.className = 'element_info';

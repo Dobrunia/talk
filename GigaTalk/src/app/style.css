@@ -36,6 +36,11 @@
   @apply w-[60px] h-[60px] rounded-md bg-gray-600 hover:bg-gray-700 my-default cursor-pointer relative bg-cover bg-center;
 }
 
+.current_server_element::before {
+  content: '';
+  @apply absolute w-[5px] h-[100%] top-0 left-[-10px] bg-blue-600 rounded-r-md;
+}
+
 .join_server {
   background-image: url('/search.svg');
   @apply bg-blue-600 hover:bg-blue-700
