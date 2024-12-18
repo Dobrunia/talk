@@ -179,7 +179,7 @@ svg.muted path {
 
 .videoContainer {
   /* 16/9 */
-  @apply w-[320px] min-h-[180px] h-[240px] relative rounded-lg mr-[8px] mb-[8px] bg-servers_list_dg overflow-hidden;
+  @apply w-[320px] min-h-[180px] h-[240px] relative rounded-md mr-[8px] mb-[8px] bg-servers_list_dg overflow-hidden;
 }
 
 .remoteVideo {
@@ -231,7 +231,7 @@ svg.muted path {
 }
 
 .modal-content {
-  @apply bg-gray-800 text-white p-6 rounded-lg w-96;
+  @apply bg-gray-800 text-white p-6 rounded-md w-96;
 }
 
 /* ====== Стили для заголовков ====== */
@@ -284,7 +284,7 @@ svg.muted path {
 
 /* Таб-кнопки для переключения форм */
 .button-tab {
-  @apply px-4 py-2 text-xl font-semibold rounded-lg cursor-pointer border focus:outline-none;
+  @apply px-4 py-2 text-xl font-semibold rounded-md cursor-pointer border focus:outline-none;
 }
 
 .button-tab-active {
