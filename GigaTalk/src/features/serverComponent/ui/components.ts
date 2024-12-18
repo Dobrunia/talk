@@ -42,12 +42,17 @@ export function createServerListElement(server: serverDATA): HTMLElement {
   serverDiv.className = 'server_list_element';
   serverDiv.style.backgroundImage = server.imageUrl ? `url(${server.imageUrl})` : `url(./question-mark.svg`;
   serverDiv.onclick = () => {
-    serverClickHandler(server.id);
-    const elements = document.querySelectorAll('.current_server_element');
-    for (let i = 0; i < elements.length; i++) {
-      elements[i].classList.remove('current_server_element');
+    if (!serverDiv.classList.contains('current_server_element')) {//TODO: переделать в store
+      serverClickHandler(server.id);
+      const elements = document.querySelectorAll('.current_server_element');
+      for (let i = 0; i < elements.length; i++) {
+        elements[i].classList.remove('current_server_element');
+      }
+      serverDiv.classList.add('current_server_element');
+    } else {
+      console.log('Вы уже открыли этот сервер');
     }
-    serverDiv.classList.add('current_server_element');
+
   };
 
   const elementInfo = document.createElement('div');
