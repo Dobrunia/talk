@@ -7,8 +7,8 @@
 :root {
   color-scheme: light dark;
   color: var(--color-main-text);
-  background-color: #242424;
-
+  background-color: var(--color-main-background);
+  font-size: var(--font-size-medium);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -24,7 +24,7 @@
 }
 
 .servers_block {
-  @apply w-[80px] h-full bg-servers_list_dg flex flex-col items-center justify-start;
+  @apply w-[80px] h-full flex flex-col items-center justify-start bg-[var(--color-background-servers-list)];
 }
 
 .servers_list {
@@ -33,26 +33,26 @@
 }
 
 .server_list_element {
-  @apply w-[60px] h-[60px] rounded-md bg-gray-600 hover:bg-gray-700 my-default cursor-pointer relative bg-cover bg-center;
+  @apply w-[60px] h-[60px] rounded-[var(--border-radius-base)] bg-[var(--color-background-primary-gray)] hover:bg-[var(--color-background-primary-gray-hover)] my-[var(--spacing-ml)] cursor-pointer relative bg-cover bg-center;
 }
 
 .current_server_element::before {
   content: '';
-  @apply absolute w-[5px] h-[100%] top-0 left-[-10px] bg-blue-600 rounded-r-md;
+  @apply absolute w-[5px] h-[100%] top-0 left-[-10px] bg-[var(--color-background-primary-blue)] rounded-r-[var(--border-radius-base)];
 }
 
 .join_server {
   background-image: url('/search.svg');
-  @apply bg-blue-600 hover:bg-blue-700
+  @apply bg-[var(--color-background-primary-blue)] hover:bg-[var(--color-background-primary-blue-hover)];
 }
 
 .create_server {
   background-image: url('/add.svg');
-  @apply bg-blue-600 hover:bg-blue-700
+  @apply bg-[var(--color-background-primary-blue)] hover:bg-[var(--color-background-primary-blue-hover)];
 }
 
 .element_info {
-  @apply w-max h-[48px] invisible bg-[#333] absolute top-[6px] left-[117%] z-[1] text-[16px] p-[8px] rounded-md flex items-center justify-center;
+  @apply w-max h-[48px] rounded-[var(--border-radius-base)] invisible bg-[var(--color-background-primary-gray-hover)] absolute top-[6px] left-[117%] z-[1] text-[16px] p-[var(--spacing-small)] flex items-center justify-center;
 }
 
 /* Треугольник внизу всплывающей подсказки */
@@ -60,11 +60,11 @@
   content: '';
   position: absolute;
   top: 50%;
-  left: -10px;
+  left: -9px;
   transform: translateY(-50%);
   border-width: 5px;
   border-style: solid;
-  border-color: transparent #333 transparent transparent;
+  border-color: transparent var(--color-background-primary-gray-hover) transparent transparent;
 }
 
 .server_list_element:hover .element_info {
@@ -73,12 +73,12 @@
 
 .server_components_block {
   height: calc(100% - 120px);
-  @apply w-[230px] bg-server_components_dg p-default;
+  @apply w-[230px] bg-[var(--color-background-server-content)] p-[var(--spacing-ml)];
 }
 
 .server_name {
   white-space: nowrap;
-  @apply w-full h-[48px] flex items-center justify-start text-[18px] text-ellipsis overflow-hidden border-b-[1px] mb-[20px];
+  @apply w-full h-[48px] flex items-center justify-start text-[var(--font-size-large)] text-ellipsis overflow-hidden border-b-[1px] mb-[var(--spacing-ml)];
 }
 
 .server_category {
@@ -87,29 +87,29 @@
 
 .category_header {
   user-select: none; /* Отключает выделение текста */
-  @apply flex justify-between items-center italic rounded-md p-[4px] hover:bg-[#2f3136];
+  @apply flex rounded-[var(--border-radius-base)] justify-between items-center italic p-[var(--spacing-micro)] hover:bg-[--color-background-server-content-hover];
 }
 
 .toggle_icon {
-  font-size: 12px;
-  transition: transform 0.3s;
+  font-size: var(--font-size-primary);
+  transition: transform var(--animation-duration-medium);
 }
 
 .channel_list {
   list-style-type: none;
-  @apply m-0 block p-[4px];
+  @apply m-0 block p-[var(--spacing-micro)];
 }
 
 .channel_item {
-  @apply h-max cursor-pointer flex flex-col items-center justify-start rounded-md;
+  @apply h-max rounded-[var(--border-radius-base)] cursor-pointer flex flex-col items-center justify-start;
 }
 
 .channel_name {
-  @apply h-[24px] pb-[2px] flex items-center justify-start hover:bg-[#2D2E32];
+  @apply h-[24px] flex items-center justify-start hover:bg-[--color-background-server-content-hover];
 }
 
 .profile {
-  @apply w-full h-[60px] bg-[#1A1B1E];
+  @apply w-full h-[60px] bg-[--color-background-profile];
 }
 
 .profile_wrapper {
@@ -121,11 +121,11 @@
 }
 
 .profile_avatar {
-  @apply w-[42px] h-[42px] rounded-full bg-cover bg-center cursor-pointer hover:brightness-75 transition duration-200;
+  @apply w-[42px] h-[42px] rounded-full bg-cover bg-center cursor-pointer hover:brightness-75 transition duration-[--animation-duration-fast];
 }
 
 .profile_name {
-  @apply w-[100px] text-[16px] truncate max-w-[90px] ml-[5px];
+  @apply w-[100px] text-[16px] truncate max-w-[90px] ml-[var(--spacing-micro)];
 }
 
 .profile_buttons {
@@ -137,28 +137,28 @@
 }
 
 .profile_buttons svg:hover path {
-  fill: #b3404a !important;
+  fill: var(--color-svg-fill-red) !important;
 }
 
 svg.muted path {
-  fill: #b3404a !important;
+  fill: var(--color-svg-fill-red) !important;
 }
 
 .user_list {
-  @apply w-full h-max pl-[38px];
+  @apply w-full h-max pl-[var(--spacing-xxl)];
 }
 
 .user_in_channel {
-  @apply w-full h-[30px] flex items-center justify-start text-[16px] mt-[12px] mb-[12px] hover:bg-[#2D2E32];
+  @apply w-full h-[30px] flex items-center justify-start mt-[var(--spacing-m)] mb-[var(--spacing-m)] hover:bg-[--color-background-server-content-hover];
 }
 
 .user_in_channel_avatar {
-  @apply w-[26px] h-[26px] rounded-full mr-[8px] bg-cover bg-center border-[2px] border-server_components_dg;
+  @apply w-[26px] h-[26px] rounded-full mr-[var(--spacing-small)] bg-cover bg-center border-[2px] border-[var(--color-background-server-content)];
 }
 
 .speaking .user_in_channel_avatar {
   box-sizing: border-box;
-  @apply border-[2px] border-[#23A55A];
+  @apply border-[2px] border-[var(--color-border-speaker)];
 }
 
 .user_in_channel_name {
@@ -171,16 +171,16 @@ svg.muted path {
 
 .consumers_media {
   height: calc(100% - 280px);
-  @apply w-full flex flex-col items-center justify-center
+  @apply w-full flex flex-col items-center justify-center;
 }
 
 .myMedia {
-  @apply w-full h-[280px] flex items-center justify-around border-server_components_dg border-t-4
+  @apply w-full h-[280px] flex items-center justify-around border-[var(--color-background-primary-gray)] border-t-4;
 }
 
 .videoContainer {
   /* 16/9 */
-  @apply w-[320px] min-h-[180px] h-[240px] relative rounded-md mr-[8px] mb-[8px] bg-servers_list_dg overflow-hidden;
+  @apply w-[320px] min-h-[180px] h-[240px] rounded-[var(--border-radius-base)] bg-[var(--color-background-modal)] relative mr-[var(--spacing-small)] mb-[var(--spacing-small)] overflow-hidden;
 }
 
 .remoteVideo {
@@ -189,17 +189,17 @@ svg.muted path {
 
 .playVideoBtn {
   transform: translate(-50%, -50%);
-  @apply absolute top-[50%] left-[50%] rounded-full bg-blue-500 px-2 py-1 font-semibold;
+  @apply absolute top-[50%] left-[50%] rounded-full bg-[var(--color-background-secondary-blue)] px-[var(--spacing-small)] py-[var(--spacing-micro)] font-semibold;
 }
 
 .playVideoBtn:hover {
-  @apply bg-blue-600;
+  @apply bg-[var(--color-background-primary-blue)];
 }
 
 .pauseVideoBtn {
   transform: translate(-50%, 0);
   white-space: nowrap;
-  @apply absolute bottom-[2%] left-[50%] rounded-full bg-[#B3404A] z-[-1] px-2 py-1;
+  @apply absolute bottom-[2%] left-[50%] rounded-full bg-[var(--color-svg-fill-red)] z-[-1] px-[var(--spacing-small)] py-[var(--spacing-micro)];
 }
 
 .videoContainer:hover .pauseVideoBtn {
@@ -223,7 +223,7 @@ svg.muted path {
 }
 
 .settings:hover svg path {
-  fill: #374151 !important;
+  fill: var(--color-svg-fill-primary-hover) !important;
 }
 
 /* Базовые стили для модального окна */
@@ -232,16 +232,18 @@ svg.muted path {
 }
 
 .modal-content {
-  @apply bg-gray-800 text-white p-6 rounded-md w-96;
+  background-color: var(--color-background-modal);
+  border-radius: var(--border-radius-base);
+  @apply p-[var(--spacing-modal-content)] w-96;
 }
 
 /* ====== Стили для заголовков ====== */
 .modal-header {
-  @apply flex justify-center mb-4;
+  @apply flex justify-center mb-[var(--spacing-ml)];
 }
 
 .modal-header-auth {
-  @apply flex justify-between mb-4;
+  @apply flex justify-between mb-[var(--spacing-ml)];
 }
 
 /* ====== Базовые стили для формы ====== */
@@ -251,53 +253,53 @@ svg.muted path {
 
 /* Поля ввода */
 .modal-input {
-  @apply w-full p-2 mt-1 bg-gray-700 rounded-md focus:outline-none;
+  @apply w-full rounded-[var(--border-radius-base)] p-[var(--spacing-small)] mt-[var(--spacing-micro)] bg-[var(--color-background-primary-gray-hover)] focus:outline-none;
 }
 
 /* Поля выбора файлов */
 .modal-input-file {
-  @apply file:bg-gray-600 file:text-white file:border-none file:rounded-md file:px-4 file:py-2 hover:file:bg-gray-700;
+  @apply file:bg-[var(--color-background-primary-gray)] file:text-white file:border-none file:rounded-md file:px-[var(--spacing-ml)] file:py-[var(--spacing-small)] hover:file:bg-[var(--color-background-primary-gray-hover)];
 }
 
 /* Поля диапазона (range) */
 .modal-range {
-  @apply w-full;
+  @apply w-full cursor-pointer;
 }
 
 /* Выпадающий список (select) */
 .modal-select {
-  @apply w-full p-2 bg-gray-700 rounded-md;
+  @apply w-full rounded-[var(--border-radius-base)] p-[var(--spacing-small)] bg-[var(--color-background-primary-gray-hover)];
 }
 
 /* ====== Стили для кнопок ====== */
 .button {
-  @apply w-full p-2 rounded-md focus:outline-none mt-4;
+  @apply w-full p-[var(--spacing-small)] rounded-[var(--border-radius-base)] focus:outline-none mt-[var(--spacing-ml)];
 }
 
 /* Основные кнопки */
 .button-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white;
+  @apply bg-[var(--color-background-primary-blue)] hover:bg-[var(--color-background-primary-blue-hover)];
 }
 
 .button-secondary {
-  @apply bg-gray-600 hover:bg-gray-700 text-white text-sm mt-4;
+  @apply bg-[var(--color-background-primary-gray)] hover:bg-[var(--color-background-primary-gray-hover)] text-sm mt-[var(--spacing-ml)];
 }
 
 /* Таб-кнопки для переключения форм */
 .button-tab {
-  @apply px-4 py-2 text-xl font-semibold rounded-md cursor-pointer border focus:outline-none;
+  @apply px-[var(--spacing-ml)] py-[var(--spacing-small)] text-xl font-semibold cursor-pointer border rounded-[var(--border-radius-base)] focus:outline-none;
 }
 
 .button-tab-active {
-  @apply text-white bg-blue-500 border-blue-500;
+  @apply bg-[var(--color-background-secondary-blue)] border-[var(--color-border-secondary-blue)];
 }
-
+/* TODO: pcss */
 .button-tab-inactive {
-  @apply text-blue-400 bg-gray-200 border-gray-300;
+  @apply text-blue-400 bg-gray-200 border-gray-300; 
 }
 
 .button-tab-inactive:hover {
-  @apply bg-blue-100 text-blue-600;
+  @apply bg-blue-100 text-[var(--color-background-primary-blue)];
 }
 
 /* ====== Стили для изображений ====== */
@@ -308,80 +310,80 @@ svg.muted path {
 /* ====== Контейнеры ====== */
 /* Контейнер для настроек */
 .modal-container {
-  @apply mb-4;
+  @apply mb-[var(--spacing-ml)];
 }
 
 /* Контейнеры для форм */
 .form-container {
-  @apply mt-4;
+  @apply mt-[var(--spacing-ml)];
 }
 
 .preview-container {
-  @apply flex justify-center items-center mt-4;
+  @apply flex justify-center items-center mt-[var(--spacing-ml)];
 }
 
 /* Элемент сервера: выравнивание название-кнопка */
 .server-item {
-  @apply flex justify-between items-center p-2 bg-gray-700 rounded-md mt-2;
+  @apply flex justify-between rounded-[var(--border-radius-base)] items-center p-[var(--spacing-small)] bg-[var(--color-background-primary-gray-hover)] mt-[var(--spacing-small)];
 }
 
 /* Название сервера с выравниванием слева */
 .server-name {
-  @apply truncate text-sm mr-4; /* Убираем длинный текст */
+  @apply truncate text-sm mr-[var(--spacing-ml)]; /* Убираем длинный текст */
 }
 
 /* Кнопка присоединения */
 .button-small {
-  @apply px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-md;
+  @apply px-[var(--spacing-m)] py-[var(--spacing-micro)] text-xs rounded-[var(--border-radius-base)] bg-[var(--color-background-primary-blue)] hover:bg-[var(--color-background-primary-blue-hover)];
 }
 
 /* Состояние ожидания для кнопки */
 .button-wait {
-  @apply px-3 py-1 text-xs rounded-md bg-gray-500 cursor-not-allowed text-white;
+  @apply px-[var(--spacing-m)] py-[var(--spacing-micro)] text-xs bg-[var(--color-background-secondary-gray)] cursor-not-allowed rounded-[var(--border-radius-base)];
 }
 
 /* Успешное состояние кнопки */
 .button-success {
-  @apply px-3 py-1 text-xs rounded-md cursor-not-allowed bg-green-600 text-white;
+  @apply px-[var(--spacing-m)] py-[var(--spacing-micro)] text-xs cursor-not-allowed bg-[var(--color-background-primary-green)] rounded-[var(--border-radius-base)];
 }
 
 /* Ошибочное состояние кнопки */
 .button-error {
-  @apply px-3 py-1 text-xs rounded-md cursor-not-allowed bg-red-600 text-white;
+  @apply px-[var(--spacing-m)] py-[var(--spacing-micro)] text-xs cursor-not-allowed bg-[var(--color-background-primary-red)] rounded-[var(--border-radius-base)];
 }
 
 /* MediaControls */
 /* NetworkIndicator */
 .networkIndicator {
-  @apply flex items-center space-x-1 px-2 py-1 rounded-md
+  @apply flex items-center space-x-1 px-2 py-1 rounded-[var(--border-radius-base)];
 }
 
 .bar1 {
-  @apply w-2 h-2 bg-green-500 rounded-full
+  @apply w-[var(--spacing-small)] h-2 bg-[var(--color-background-primary-green)] rounded-full;
 }
 
 .bar2 {
-  @apply w-2 h-4 bg-green-500 rounded-full
+  @apply w-[var(--spacing-small)] h-4 bg-[var(--color-background-primary-green)] rounded-full;
 }
 
 .bar3 {
-  @apply w-2 h-6 bg-green-500 rounded-full
+  @apply w-[var(--spacing-small)] h-6 bg-[var(--color-background-primary-green)] rounded-full;
 }
 
 .send_track {
-  @apply px-2 py-1 rounded-md hover:bg-gray-600
+  @apply px-[var(--spacing-small)] py-[var(--spacing-micro)] hover:bg-[var(--color-background-primary-gray)] rounded-[var(--border-radius-base)];
 }
 
 .stream_on {
-  @apply bg-gray-600
+  @apply bg-[var(--color-background-primary-gray)];
 }
 
 .leave_button {
-  @apply px-2 py-1 rounded-md
+  @apply px-[var(--spacing-small)] py-[var(--spacing-micro)] rounded-[var(--border-radius-base)];
 }
 
 .leave_button:hover {
-  animation: shake 0.3s ease-in-out; /* Длительность и плавность */
+  animation: shake var(--animation-duration-medium) ease-in-out; /* Длительность и плавность */
 }
 
 @keyframes shake {

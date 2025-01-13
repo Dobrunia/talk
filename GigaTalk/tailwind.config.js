@@ -7,8 +7,6 @@ export default {
         Prosto: ['Prosto One'],
       },
       colors: {
-        servers_list_dg: '#151618',
-        server_components_dg: '#202124',
         UIapricot: '#FBCEB1',
         UImagenta: '#FF00FF',
         /* политра
