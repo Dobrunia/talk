@@ -4,7 +4,8 @@ import {
   logOut,
 } from '../features/auth/model/actions.ts';
 import { renderAuthModal } from '../features/auth/ui/AuthModal.ts';
-import './style.css';
+import './ui/styles/style.css';
+import './ui/styles/dimensions.pcss';
 
 async function start() {
   renderAuthModal();

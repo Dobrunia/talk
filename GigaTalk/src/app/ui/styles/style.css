@@ -6,7 +6,7 @@
 
 :root {
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--color-main-text);
   background-color: #242424;
 
   font-synthesis: none;
