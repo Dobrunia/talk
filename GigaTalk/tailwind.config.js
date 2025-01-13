@@ -9,22 +9,11 @@ export default {
       colors: {
         UIapricot: '#FBCEB1',
         UImagenta: '#FF00FF',
-        /* политра
-        bg-black
-        bg-gray-800
-        bg-gray-700
-        bg-blue-600
-        bg-blue-700
-        */
       },
       backgroundImage: {},
       borderRadius: {},
-      margin: {
-        default: '16px',
-      },
-      padding: {
-        default: '16px',
-      },
+      margin: {},
+      padding: {},
       boxShadow: {},
       screens: {},
     },
