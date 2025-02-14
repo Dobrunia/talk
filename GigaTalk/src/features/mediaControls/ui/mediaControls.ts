@@ -1,6 +1,6 @@
 import SVG from '../../../app/ui/svgs.ts';
 import { createNetworkIndicator } from '../../networkIndicator/ui/NetworkIndicator.ts';
-import { toggleCameraStream, voiceChannelLeave } from '../model/actions.ts';
+import { toggleCameraStream, toggleScreenShare, voiceChannelLeave } from '../model/actions.ts';
 
 export function createMediaControls() {
   const wrapper = document.getElementById('in_conversation_things');
@@ -18,6 +18,7 @@ function createScreenShareBtn(): HTMLButtonElement {
   screenShareButton.title = 'Продемонстрируйте свой экран';
   screenShareButton.innerHTML = SVG.screen_share;
   screenShareButton.onclick = () => {
+    toggleScreenShare();
     screenShareButton.classList.toggle('stream_on');
   };
 

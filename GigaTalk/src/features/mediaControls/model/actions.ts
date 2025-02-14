@@ -37,3 +37,12 @@ export async function toggleCameraStream() {
   }
   mediaStore.toggleCamera();
 }
+
+export async function toggleScreenShare() {
+  if (mediaStore.getScreenShareStatus()) {
+    console.log('показ экрана остановлен')
+  } else {
+    console.log('показ экрана')
+  }
+  mediaStore.toggleScreenShare();
+}
